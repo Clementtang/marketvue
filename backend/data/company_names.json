@@ -1,0 +1,182 @@
+{
+  "2330.TW": {
+    "zh-TW": "台積電",
+    "en-US": "TSMC"
+  },
+  "2912.TW": {
+    "zh-TW": "統一超商",
+    "en-US": "President Chain Store"
+  },
+  "2454.TW": {
+    "zh-TW": "聯發科",
+    "en-US": "MediaTek"
+  },
+  "2317.TW": {
+    "zh-TW": "鴻海",
+    "en-US": "Hon Hai"
+  },
+  "2303.TW": {
+    "zh-TW": "聯電",
+    "en-US": "UMC"
+  },
+  "2882.TW": {
+    "zh-TW": "國泰金",
+    "en-US": "Cathay Financial"
+  },
+  "2881.TW": {
+    "zh-TW": "富邦金",
+    "en-US": "Fubon Financial"
+  },
+  "2886.TW": {
+    "zh-TW": "兆豐金",
+    "en-US": "Mega Financial"
+  },
+  "2891.TW": {
+    "zh-TW": "中信金",
+    "en-US": "CTBC Financial"
+  },
+  "2892.TW": {
+    "zh-TW": "第一金",
+    "en-US": "First Financial"
+  },
+  "2357.TW": {
+    "zh-TW": "華碩",
+    "en-US": "ASUS"
+  },
+  "2382.TW": {
+    "zh-TW": "廣達",
+    "en-US": "Quanta"
+  },
+  "2408.TW": {
+    "zh-TW": "南亞科",
+    "en-US": "Nanya Tech"
+  },
+  "3008.TW": {
+    "zh-TW": "大立光",
+    "en-US": "Largan"
+  },
+  "2412.TW": {
+    "zh-TW": "中華電",
+    "en-US": "Chunghwa Telecom"
+  },
+  "5904.TWO": {
+    "zh-TW": "寶雅",
+    "en-US": "Poya"
+  },
+  "6415.TWO": {
+    "zh-TW": "矽力-KY",
+    "en-US": "Silergy"
+  },
+  "6446.TWO": {
+    "zh-TW": "藥華藥",
+    "en-US": "PharmaEssentia"
+  },
+  "6592.TWO": {
+    "zh-TW": "和潤企業",
+    "en-US": "Hotai Leasing"
+  },
+  "AAPL": {
+    "zh-TW": "蘋果",
+    "en-US": "Apple"
+  },
+  "GOOGL": {
+    "zh-TW": "Google",
+    "en-US": "Google"
+  },
+  "MSFT": {
+    "zh-TW": "微軟",
+    "en-US": "Microsoft"
+  },
+  "TSLA": {
+    "zh-TW": "特斯拉",
+    "en-US": "Tesla"
+  },
+  "AMZN": {
+    "zh-TW": "亞馬遜",
+    "en-US": "Amazon"
+  },
+  "META": {
+    "zh-TW": "Meta",
+    "en-US": "Meta"
+  },
+  "NVDA": {
+    "zh-TW": "輝達",
+    "en-US": "NVIDIA"
+  },
+  "0700.HK": {
+    "zh-TW": "騰訊",
+    "en-US": "Tencent"
+  },
+  "9988.HK": {
+    "zh-TW": "阿里巴巴",
+    "en-US": "Alibaba"
+  },
+  "0941.HK": {
+    "zh-TW": "中國移動",
+    "en-US": "China Mobile"
+  },
+  "1299.HK": {
+    "zh-TW": "友邦保險",
+    "en-US": "AIA"
+  },
+  "5903.TWO": {
+    "zh-TW": "全家便利商店",
+    "en-US": "Taiwan FamilyMart"
+  },
+  "6703.TWO": {
+    "zh-TW": "軒郁",
+    "en-US": "Shiny Brands Group"
+  },
+  "3045.TW": {
+    "zh-TW": "台灣大哥大",
+    "en-US": "Taiwan Mobile"
+  },
+  "6214.TW": {
+    "zh-TW": "精誠資訊",
+    "en-US": "Systex"
+  },
+  "6763.TWO": {
+    "zh-TW": "綠界科技",
+    "en-US": "Green World FinTech"
+  },
+  "4904.TW": {
+    "zh-TW": "遠傳電信",
+    "en-US": "Far EasTone Telecom"
+  },
+  "9983.JP": {
+    "zh-TW": "FAST RETAILING｜UNIQLO",
+    "en-US": "Fast Retailing"
+  },
+  "2685.JP": {
+    "zh-TW": "AND ST HD｜ADASTRIA",
+    "en-US": "and ST HD"
+  },
+  "9715.JP": {
+    "zh-TW": "TRANSCOSMOS｜大宇宙",
+    "en-US": "transcosmos"
+  },
+  "7453.JP": {
+    "zh-TW": "RYOHIN KEIKAKU｜MUJI",
+    "en-US": "Ryohin Keikaku"
+  },
+  "8016.JP": {
+    "zh-TW": "ONWARD HOLDINGS｜ONWARD",
+    "en-US": "Onward Holdings"
+  },
+  "4180.JP": {
+    "zh-TW": "APPIER GROUP｜Appier",
+    "en-US": "Appier Group"
+  },
+  "8227.JP": {
+    "zh-TW": "SHIMAMURA｜思夢樂",
+    "en-US": "Shimamura"
+  },
+  "4168.JP": {
+    "zh-TW": "YAPPLI｜Yappli",
+    "en-US": "Yappli"
+  },
+  "4689.JP": {
+    "zh-TW": "LY CORPORATION｜LINE Yahoo",
+    "en-US": "LY Corporation"
+  }
+}

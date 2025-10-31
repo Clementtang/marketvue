@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Range LocalStorage Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+        }
+        .test-section.error {
+            border-left-color: #f44336;
+        }
+        .test-section.warning {
+            border-left-color: #ff9800;
+        }
+        h2 {
+            color: #555;
+            margin-top: 0;
+        }
+        button {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #1976D2;
+        }
+        button.danger {
+            background: #f44336;
+        }
+        button.danger:hover {
+            background: #d32f2f;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            background: #fff;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            border: 1px solid #ddd;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.pass {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.fail {
+            background: #f44336;
+            color: white;
+        }
+        .instruction {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Date Range LocalStorage Test Suite</h1>
+
+        <div class="instruction">
+            <strong>測試說明：</strong>
+            <ol>
+                <li>這個測試頁面會驗證時間區間 localStorage 持久化功能</li>
+                <li>請按照順序執行每個測試</li>
+                <li>所有測試都應該顯示 PASS 狀態</li>
+            </ol>
+        </div>
+
+        <!-- Test 1: Save Date Range -->
+        <div class="test-section" id="test1">
+            <h2>測試 1: 儲存時間區間到 LocalStorage</h2>
+            <p>模擬用戶選擇 "3M" 時間區間</p>
+            <button onclick="test1_saveDateRange()">執行測試 1</button>
+            <div id="test1-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 2: Load Date Range -->
+        <div class="test-section" id="test2">
+            <h2>測試 2: 從 LocalStorage 讀取時間區間</h2>
+            <p>驗證儲存的數據可以正確讀取</p>
+            <button onclick="test2_loadDateRange()">執行測試 2</button>
+            <div id="test2-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 3: Update Date Range -->
+        <div class="test-section" id="test3">
+            <h2>測試 3: 更新時間區間</h2>
+            <p>模擬用戶切換到 "1M" 時間區間</p>
+            <button onclick="test3_updateDateRange()">執行測試 3</button>
+            <div id="test3-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 4: Custom Date Range -->
+        <div class="test-section" id="test4">
+            <h2>測試 4: 自定義時間區間</h2>
+            <p>模擬用戶選擇自定義日期範圍</p>
+            <button onclick="test4_customDateRange()">執行測試 4</button>
+            <div id="test4-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 5: Persistence After Reload -->
+        <div class="test-section warning" id="test5">
+            <h2>測試 5: 頁面重新載入後的持久性</h2>
+            <p>⚠️ 此測試需要手動重新整理頁面</p>
+            <button onclick="test5_prepareReload()">準備測試 5</button>
+            <button onclick="test5_verifyAfterReload()" style="background:#ff9800;">重新整理後點擊驗證</button>
+            <div id="test5-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Test 6: Clear Storage -->
+        <div class="test-section" id="test6">
+            <h2>測試 6: 清除 LocalStorage</h2>
+            <p>清除所有測試數據</p>
+            <button class="danger" onclick="test6_clearStorage()">清除數據</button>
+            <div id="test6-result" class="result" style="display:none;"></div>
+        </div>
+
+        <!-- Summary -->
+        <div class="test-section" style="border-left-color: #9C27B0;">
+            <h2>測試摘要</h2>
+            <div id="summary">等待測試執行...</div>
+        </div>
+    </div>
+
+    <script>
+        let testResults = {
+            test1: null,
+            test2: null,
+            test3: null,
+            test4: null,
+            test5: null,
+            test6: null
+        };
+
+        function updateSummary() {
+            const total = Object.keys(testResults).length;
+            const passed = Object.values(testResults).filter(r => r === true).length;
+            const failed = Object.values(testResults).filter(r => r === false).length;
+            const pending = total - passed - failed;
+
+            document.getElementById('summary').innerHTML = `
+                <strong>總測試數：</strong> ${total}<br>
+                <strong style="color: #4CAF50;">通過：</strong> ${passed}<br>
+                <strong style="color: #f44336;">失敗：</strong> ${failed}<br>
+                <strong style="color: #ff9800;">待執行：</strong> ${pending}
+            `;
+        }
+
+        function showResult(testId, passed, message) {
+            const resultDiv = document.getElementById(`${testId}-result`);
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <span class="status ${passed ? 'pass' : 'fail'}">${passed ? 'PASS ✓' : 'FAIL ✗'}</span>
+                <div style="margin-top: 10px;">${message}</div>
+            `;
+            testResults[testId] = passed;
+            updateSummary();
+        }
+
+        // Test 1: Save Date Range
+        function test1_saveDateRange() {
+            try {
+                const dateRange = {
+                    startDate: '2024-07-22',
+                    endDate: '2024-10-22',
+                    preset: '3m'
+                };
+
+                localStorage.setItem('date-range', JSON.stringify(dateRange));
+
+                const saved = localStorage.getItem('date-range');
+                const parsed = JSON.parse(saved);
+
+                const passed =
+                    parsed.startDate === dateRange.startDate &&
+                    parsed.endDate === dateRange.endDate &&
+                    parsed.preset === dateRange.preset;
+
+                showResult('test1', passed,
+                    `儲存的數據：\n${JSON.stringify(parsed, null, 2)}\n\n` +
+                    `驗證：startDate, endDate, preset 都正確儲存`
+                );
+            } catch (error) {
+                showResult('test1', false, `錯誤：${error.message}`);
+            }
+        }
+
+        // Test 2: Load Date Range
+        function test2_loadDateRange() {
+            try {
+                const saved = localStorage.getItem('date-range');
+
+                if (!saved) {
+                    showResult('test2', false, '找不到儲存的數據。請先執行測試 1。');
+                    return;
+                }
+
+                const parsed = JSON.parse(saved);
+                const passed =
+                    parsed.hasOwnProperty('startDate') &&
+                    parsed.hasOwnProperty('endDate') &&
+                    parsed.hasOwnProperty('preset');
+
+                showResult('test2', passed,
+                    `讀取的數據：\n${JSON.stringify(parsed, null, 2)}\n\n` +
+                    `驗證：所有必要欄位都存在`
+                );
+            } catch (error) {
+                showResult('test2', false, `錯誤：${error.message}`);
+            }
+        }
+
+        // Test 3: Update Date Range
+        function test3_updateDateRange() {
+            try {
+                const newDateRange = {
+                    startDate: '2024-09-22',
+                    endDate: '2024-10-22',
+                    preset: '1m'
+                };
+
+                localStorage.setItem('date-range', JSON.stringify(newDateRange));
+
+                const saved = localStorage.getItem('date-range');
+                const parsed = JSON.parse(saved);
+
+                const passed =
+                    parsed.preset === '1m' &&
+                    parsed.startDate === '2024-09-22';
+
+                showResult('test3', passed,
+                    `更新後的數據：\n${JSON.stringify(parsed, null, 2)}\n\n` +
+                    `驗證：preset 從 '3m' 更新為 '1m'，日期也正確更新`
+                );
+            } catch (error) {
+                showResult('test3', false, `錯誤：${error.message}`);
+            }
+        }
+
+        // Test 4: Custom Date Range
+        function test4_customDateRange() {
+            try {
+                const customRange = {
+                    startDate: '2024-01-01',
+                    endDate: '2024-12-31',
+                    preset: 'custom'
+                };
+
+                localStorage.setItem('date-range', JSON.stringify(customRange));
+
+                const saved = localStorage.getItem('date-range');
+                const parsed = JSON.parse(saved);
+
+                const passed =
+                    parsed.preset === 'custom' &&
+                    parsed.startDate === '2024-01-01' &&
+                    parsed.endDate === '2024-12-31';
+
+                showResult('test4', passed,
+                    `自定義範圍：\n${JSON.stringify(parsed, null, 2)}\n\n` +
+                    `驗證：可以正確儲存自定義日期範圍`
+                );
+            } catch (error) {
+                showResult('test4', false, `錯誤：${error.message}`);
+            }
+        }
+
+        // Test 5: Prepare for reload test
+        function test5_prepareReload() {
+            const testData = {
+                startDate: '2024-06-01',
+                endDate: '2024-12-01',
+                preset: '6m',
+                testMarker: 'RELOAD_TEST_' + Date.now()
+            };
+
+            localStorage.setItem('date-range', JSON.stringify(testData));
+            localStorage.setItem('reload-test-marker', testData.testMarker);
+
+            alert('測試數據已準備好。\n\n請按 F5 或點擊重新整理按鈕來重新載入頁面。\n\n重新載入後，點擊橘色的「重新整理後點擊驗證」按鈕。');
+        }
+
+        function test5_verifyAfterReload() {
+            try {
+                const marker = localStorage.getItem('reload-test-marker');
+                const saved = localStorage.getItem('date-range');
+
+                if (!marker || !saved) {
+                    showResult('test5', false, '請先點擊「準備測試 5」，然後重新整理頁面。');
+                    return;
+                }
+
+                const parsed = JSON.parse(saved);
+                const passed =
+                    parsed.testMarker === marker &&
+                    parsed.preset === '6m' &&
+                    parsed.startDate === '2024-06-01';
+
+                showResult('test5', passed,
+                    `重新載入後的數據：\n${JSON.stringify(parsed, null, 2)}\n\n` +
+                    `驗證：數據在頁面重新載入後仍然保持完整`
+                );
+
+                // Clean up test marker
+                localStorage.removeItem('reload-test-marker');
+            } catch (error) {
+                showResult('test5', false, `錯誤：${error.message}`);
+            }
+        }
+
+        // Test 6: Clear Storage
+        function test6_clearStorage() {
+            try {
+                localStorage.removeItem('date-range');
+
+                const saved = localStorage.getItem('date-range');
+                const passed = saved === null;
+
+                showResult('test6', passed,
+                    `驗證：date-range 已從 localStorage 中移除\n` +
+                    `localStorage.getItem('date-range') = ${saved}`
+                );
+            } catch (error) {
+                showResult('test6', false, `錯誤：${error.message}`);
+            }
+        }
+
+        // Initialize summary
+        updateSummary();
+    </script>
+</body>
+</html>

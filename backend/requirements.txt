@@ -1,0 +1,9 @@
+Flask==3.0.0
+Flask-CORS==4.0.0
+Flask-Limiter==3.5.0
+Flask-Caching==2.1.0
+marshmallow==3.20.1
+yfinance>=0.2.66
+python-dotenv==1.0.0
+requests==2.31.0
+Werkzeug==3.0.1
