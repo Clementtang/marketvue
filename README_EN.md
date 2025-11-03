@@ -4,6 +4,8 @@
 
 English | [繁體中文](./README.md)
 
+> **🚀 Ready to Deploy?** Check out the complete [Deployment Guide](./docs/DEPLOYMENT.md)
+
 ---
 
 ## 📖 About

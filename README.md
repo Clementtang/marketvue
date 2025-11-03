@@ -4,6 +4,8 @@
 
 [English](./README_EN.md) | 繁體中文
 
+> **🚀 準備部署？** 查看完整的[部署指南](./docs/DEPLOYMENT.md)
+
 ---
 
 ## 📖 專案簡介
