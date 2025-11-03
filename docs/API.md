@@ -310,4 +310,4 @@ curl -X POST http://localhost:5001/api/batch-stocks \
 
 ---
 
-For questions or issues, please open an issue on [GitHub](https://github.com/your-username/marketvue/issues).
+For questions or issues, please open an issue on [GitHub](https://github.com/Clementtang/marketvue/issues).

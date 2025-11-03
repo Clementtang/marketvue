@@ -74,7 +74,7 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
 ### 1. Clone 專案
 
 ```bash
-git clone https://github.com/你的使用者名稱/marketvue.git
+git clone https://github.com/Clementtang/marketvue.git
 cd marketvue
 ```
 

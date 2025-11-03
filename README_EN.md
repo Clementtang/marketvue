@@ -74,7 +74,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/marketvue.git
+git clone https://github.com/Clementtang/marketvue.git
 cd marketvue
 ```
 

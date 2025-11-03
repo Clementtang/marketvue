@@ -27,7 +27,7 @@ Click the "Fork" button at the top right of the repository page.
 #### 2. Clone Your Fork
 
 ```bash
-git clone https://github.com/your-username/marketvue.git
+git clone https://github.com/Clementtang/marketvue.git
 cd marketvue
 ```
 
@@ -207,7 +207,7 @@ Please be respectful and considerate in all interactions. We aim to maintain a w
 #### 2. Clone 您的 Fork
 
 ```bash
-git clone https://github.com/your-username/marketvue.git
+git clone https://github.com/Clementtang/marketvue.git
 cd marketvue
 ```
 
