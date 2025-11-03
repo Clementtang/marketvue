@@ -39,6 +39,8 @@ class DevelopmentConfig(Config):
 class ProductionConfig(Config):
     """Production configuration"""
     DEBUG = False
+    # Production CORS should be set via CORS_ORIGINS environment variable
+    # Example: CORS_ORIGINS=https://marketvue.vercel.app,https://marketvue-staging.vercel.app
 
 
 # Configuration dictionary

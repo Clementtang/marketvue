@@ -7,3 +7,4 @@ yfinance>=0.2.66
 python-dotenv==1.0.0
 requests==2.31.0
 Werkzeug==3.0.1
+gunicorn==21.2.0
