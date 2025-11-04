@@ -189,16 +189,51 @@ class StockService:
                 }
 
             # Format news items
+            # Note: yfinance news API structure changed - data is now nested in 'content' field
             news_items = []
             for item in news[:limit]:
+                # Extract content dict (new structure)
+                content = item.get('content', {})
+
+                # Get title from content
+                title = content.get('title', 'No title')
+
+                # Get publisher from provider field
+                provider = content.get('provider', {})
+                publisher = provider.get('displayName', 'Unknown')
+
+                # Get link from canonicalUrl or clickThroughUrl
+                canonical_url = content.get('canonicalUrl', {})
+                click_through_url = content.get('clickThroughUrl', {})
+                link = canonical_url.get('url') or click_through_url.get('url') or ''
+
+                # Get published date from pubDate (ISO format string)
+                pub_date_str = content.get('pubDate', '')
+                if pub_date_str:
+                    try:
+                        # Parse ISO format: '2025-11-03T21:32:29Z'
+                        pub_date = datetime.fromisoformat(pub_date_str.replace('Z', '+00:00'))
+                        published_date = pub_date.strftime('%Y-%m-%d %H:%M:%S')
+                    except (ValueError, AttributeError):
+                        published_date = 'Unknown'
+                else:
+                    published_date = 'Unknown'
+
+                # Get thumbnail URL
+                thumbnail_data = content.get('thumbnail', {})
+                thumbnail_url = None
+                if thumbnail_data:
+                    resolutions = thumbnail_data.get('resolutions', [])
+                    if resolutions and len(resolutions) > 0:
+                        # Use the first resolution (usually original or largest)
+                        thumbnail_url = resolutions[0].get('url')
+
                 news_item = {
-                    'title': item.get('title', 'No title'),
-                    'publisher': item.get('publisher', 'Unknown'),
-                    'link': item.get('link', ''),
-                    'published_date': datetime.fromtimestamp(
-                        item.get('providerPublishTime', 0)
-                    ).strftime('%Y-%m-%d %H:%M:%S') if item.get('providerPublishTime') else 'Unknown',
-                    'thumbnail': item.get('thumbnail', {}).get('resolutions', [{}])[0].get('url') if item.get('thumbnail') else None
+                    'title': title,
+                    'publisher': publisher,
+                    'link': link,
+                    'published_date': published_date,
+                    'thumbnail': thumbnail_url
                 }
                 news_items.append(news_item)
 
