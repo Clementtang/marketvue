@@ -84,13 +84,18 @@ export interface Translations {
 
   // Footer
   poweredBy: string;
+  madeBy: string;
+  viewOnGitHub: string;
+
+  // Notification Banner
+  freeHostingNotice: string;
 }
 
 export const translations: Record<Language, Translations> = {
   'en-US': {
     // Header
-    appTitle: 'Stock Dashboard',
-    appSubtitle: 'Track up to 9 stocks with real-time data',
+    appTitle: 'MarketVue',
+    appSubtitle: 'Real-time Multi-Market Stock Dashboard',
 
     // Settings
     settings: 'Settings',
@@ -171,11 +176,16 @@ export const translations: Record<Language, Translations> = {
 
     // Footer
     poweredBy: 'Stock Dashboard - Real-time data powered by',
+    madeBy: 'Made by',
+    viewOnGitHub: 'View on GitHub',
+
+    // Notification Banner
+    freeHostingNotice: 'Using free hosting: Backend sleeps after 15min idle. First load may take 30-60s.',
   },
   'zh-TW': {
     // Header
-    appTitle: '股票儀表板',
-    appSubtitle: '追蹤最多 9 支股票的即時數據',
+    appTitle: 'MarketVue',
+    appSubtitle: '即時多市場股票追蹤儀表板',
 
     // Settings
     settings: '設定',
@@ -256,6 +266,11 @@ export const translations: Record<Language, Translations> = {
 
     // Footer
     poweredBy: '股票儀表板 - 即時資料由',
+    madeBy: '製作者',
+    viewOnGitHub: '在 GitHub 上查看',
+
+    // Notification Banner
+    freeHostingNotice: '採用免費託管服務：後端閒置 15 分鐘後休眠，首次載入可能需要 30-60 秒',
   },
 };
 

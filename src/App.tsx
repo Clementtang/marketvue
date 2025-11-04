@@ -8,6 +8,8 @@ import NewsPanel from './components/NewsPanel';
 import type { NewsItem } from './components/NewsPanel';
 import ThemeSettings from './components/ThemeSettings';
 import type { ThemeMode } from './components/ThemeSettings';
+import NotificationBanner from './components/NotificationBanner';
+import Footer from './components/Footer';
 import { COLOR_THEMES } from './components/ColorThemeSelector';
 import type { ColorTheme } from './components/ColorThemeSelector';
 import { useTranslation, type Language } from './i18n/translations';
@@ -168,6 +170,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+      {/* Notification Banner */}
+      <NotificationBanner t={t} />
+
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
@@ -241,21 +246,7 @@ function App() {
       />
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 mt-12 transition-colors">
-        <div className="container mx-auto px-4 py-6 text-center text-gray-600 dark:text-gray-400 text-sm">
-          <p>
-            {t.poweredBy}{' '}
-            <a
-              href="https://pypi.org/project/yfinance/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
-            >
-              yfinance
-            </a>
-          </p>
-        </div>
-      </footer>
+      <Footer t={t} />
     </div>
   );
 }

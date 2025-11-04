@@ -5,6 +5,34 @@ All notable changes to MarketVue will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-11-04
+
+### Added
+- **Notification Banner**: Added dismissible warning banner about free hosting limitations
+  - Displays information about backend sleep time and first-load delays
+  - Banner remembers dismissal state using localStorage
+  - Responsive design with yellow warning styling
+  - Bilingual support (English and Traditional Chinese)
+- **Enhanced Footer**: New footer component with improved functionality
+  - MarketVue branding with copyright year
+  - Author information with GitHub profile link
+  - Repository link with GitHub icon
+  - Responsive layout for desktop and mobile
+  - Replaced old footer that only showed yfinance attribution
+
+### Changed
+- **Application Branding**: Updated application name from "Stock Dashboard" to "MarketVue"
+  - Updated browser title in index.html
+  - Updated all UI text in translations (English and Traditional Chinese)
+  - Changed header subtitle to "Real-time Multi-Market Stock Dashboard" / "即時多市場股票追蹤儀表板"
+- **Package Version**: Bumped version to 1.2.0
+
+### Technical
+- Created NotificationBanner component with localStorage integration
+- Created Footer component with bilingual link support
+- Added new translation keys: freeHostingNotice, madeBy, viewOnGitHub
+- Integrated new components into main App.tsx layout
+
 ## [1.1.1] - 2025-11-04
 
 ### Fixed
