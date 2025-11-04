@@ -36,10 +36,6 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
   - English
   - 公司名稱多語言對照（36+ 家公司）
 
-- 📰 **新聞整合**
-  - 即時股票相關新聞
-  - 一鍵查看最新資訊
-
 - 💾 **本地儲存**
   - 追蹤列表自動保存
   - 使用者偏好設定記憶
@@ -136,7 +132,6 @@ PORT=5001 python app.py
 3. **查看股票資訊**
    - 查看即時價格和漲跌幅
    - 分析移動平均線趨勢（MA20、MA60）
-   - 點擊新聞圖示查看相關新聞
    - 查看成交量走勢
 
 4. **自訂設定**
@@ -196,7 +191,6 @@ marketvue/
 │   │   ├── StockManager.tsx     # 股票管理組件
 │   │   ├── TimeRangeSelector.tsx # 時間範圍選擇器
 │   │   ├── DashboardGrid.tsx    # 儀表板網格
-│   │   ├── NewsPanel.tsx        # 新聞面板
 │   │   ├── ThemeSettings.tsx    # 主題設定
 │   │   └── ColorThemeSelector.tsx # 顏色主題選擇器
 │   ├── i18n/

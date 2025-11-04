@@ -31,7 +31,7 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 │  │  │   Routes   │  │   Services   │  │   Data   │ │  │
 │  │  │ - Stock    │  │ - yfinance   │  │ - Company│ │  │
 │  │  │   Data API │  │   Integration│  │   Names  │ │  │
-│  │  │ - News API │  │ - Caching    │  │   JSON   │ │  │
+│  │  │            │  │ - Caching    │  │   JSON   │ │  │
 │  │  └────────────┘  └──────────────┘  └──────────┘ │  │
 │  └──────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
@@ -73,7 +73,6 @@ src/
 │   ├── StockManager.tsx       # Add/remove stocks
 │   ├── DashboardGrid.tsx      # Grid layout
 │   ├── TimeRangeSelector.tsx  # Date range picker
-│   ├── NewsPanel.tsx          # News sidebar
 │   ├── ThemeSettings.tsx      # Settings modal
 │   └── ColorThemeSelector.tsx # Color theme options
 ├── i18n/
@@ -141,7 +140,6 @@ Stock Symbol → Backend Service → JSON Lookup → Return Name
 
 ### Caching Strategy
 - Backend: 5-minute cache for stock data
-- Backend: 10-minute cache for news
 - Frontend: localStorage for user preferences
 
 ## Security Considerations

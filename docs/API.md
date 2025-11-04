@@ -75,56 +75,7 @@ Fetch historical stock data for a specific symbol.
 
 ---
 
-### 2. Get Stock News
-
-Fetch latest news articles for a specific stock.
-
-**Endpoint:** `GET /stock-news/{symbol}`
-
-**Path Parameters:**
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| symbol | string | Yes | Stock ticker symbol |
-
-**Query Parameters:**
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| limit | integer | No | 5 | Maximum number of news items to return (1-20) |
-
-**Example Request:**
-```
-GET /api/stock-news/AAPL?limit=5
-```
-
-**Response:** `200 OK`
-```json
-{
-  "symbol": "AAPL",
-  "news": [
-    {
-      "title": "Apple Announces New Product Launch",
-      "publisher": "TechCrunch",
-      "link": "https://example.com/article",
-      "published_date": "2024-10-31 14:30:00",
-      "thumbnail": "https://example.com/image.jpg"
-    },
-    ...
-  ]
-}
-```
-
-**Error Responses:**
-
-- `404 Not Found` - Symbol not found or no news available
-```json
-{
-  "error": "No news found for symbol INVALID"
-}
-```
-
----
-
-### 3. Get Batch Stock Data
+### 2. Get Batch Stock Data
 
 Fetch data for multiple stocks in a single request.
 
@@ -242,7 +193,6 @@ MarketVue supports various stock exchanges with specific ticker formats:
 The API implements caching to improve performance:
 
 - Stock data is cached for **5 minutes**
-- News data is cached for **10 minutes**
 - Cache is automatically invalidated on new requests after expiry
 
 ---
@@ -280,11 +230,6 @@ curl -X POST http://localhost:5001/api/stock-data \
     "start_date": "2024-10-01",
     "end_date": "2024-10-31"
   }'
-```
-
-### Fetch US Stock News
-```bash
-curl http://localhost:5001/api/stock-news/AAPL?limit=3
 ```
 
 ### Fetch Multiple Stocks

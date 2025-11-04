@@ -60,7 +60,6 @@
   stocks={['AAPL', 'GOOGL', 'MSFT']}
   startDate="2024-01-01"
   endDate="2024-10-22"
-  onNewsClick={(symbol, news) => console.log('Show news for:', symbol)}
 />
 ```
 
@@ -72,7 +71,6 @@
 - 當前價格和漲跌幅（紅綠色標示）
 - 價格走勢線圖（使用 Recharts）
 - 成交量柱狀圖
-- 新聞按鈕：點擊展開最新 5 筆新聞
 - 載入狀態和錯誤處理
 
 **特色:**
@@ -80,35 +78,6 @@
 - 響應式圖表設計
 - 綠色表示上漲，紅色表示下跌
 - 成交量自動格式化（K, M）
-
-### 5. 新聞面板 (NewsPanel)
-**位置:** `src/components/NewsPanel.tsx`
-
-**功能:**
-- 側邊欄模式顯示
-- 顯示標題、來源、發布時間
-- 新聞縮圖（如果有）
-- 點擊可開啟原文連結
-- 優雅的進入/退出動畫
-- 半透明背景遮罩
-
-**使用方式:**
-```typescript
-<NewsPanel
-  isOpen={true}
-  onClose={() => console.log('Close panel')}
-  symbol="AAPL"
-  news={[
-    {
-      title: 'Apple announces new product',
-      publisher: 'Reuters',
-      link: 'https://...',
-      published_date: '2024-10-22 10:30:00',
-      thumbnail: 'https://...'
-    }
-  ]}
-/>
-```
 
 ## 技術棧
 
@@ -156,11 +125,6 @@ Body: {
 }
 ```
 
-**獲取新聞:**
-```typescript
-GET /api/stock-news/{symbol}?limit=5
-```
-
 ## 檔案結構
 
 ```
@@ -169,8 +133,7 @@ src/
 │   ├── StockManager.tsx      # 股票管理
 │   ├── TimeRangeSelector.tsx # 時間選擇
 │   ├── DashboardGrid.tsx     # 網格佈局
-│   ├── StockCard.tsx         # 股票卡片
-│   └── NewsPanel.tsx         # 新聞面板
+│   └── StockCard.tsx         # 股票卡片
 ├── App.tsx                   # 主應用
 ├── App.css                   # 應用樣式
 ├── index.css                 # 全局樣式
@@ -187,9 +150,6 @@ const [stocks, setStocks] = useState<string[]>([]);
 
 // 時間範圍
 const [dateRange, setDateRange] = useState<DateRange>({...});
-
-// 新聞面板
-const [newsPanel, setNewsPanel] = useState<{...}>({...});
 ```
 
 ## 本地儲存
@@ -209,14 +169,13 @@ const savedStocks = localStorage.getItem('tracked-stocks');
 1. **新增股票:** 在股票管理器輸入代號（如 AAPL, GOOGL），點擊「Add」
 2. **選擇時間範圍:** 點擊快速選項或使用自定義日期
 3. **拖拉排列:** 在卡片頂部拖拉手柄拖動卡片
-4. **查看新聞:** 點擊卡片右上角的新聞圖標
-5. **刪除股票:** 在股票管理器點擊股票旁的 X
+4. **刪除股票:** 在股票管理器點擊股票旁的 X
 
 ## 響應式設計
 
 - **桌面:** 完整 3x3 網格佈局
 - **平板:** 自動調整卡片大小
-- **手機:** 新聞面板全屏顯示
+- **手機:** 自動調整卡片佈局
 
 ## 效能優化
 

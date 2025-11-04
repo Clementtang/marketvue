@@ -1,11 +1,10 @@
 # Stock Dashboard API
 
-Flask-based REST API for fetching stock market data and news using yfinance.
+Flask-based REST API for fetching stock market data using yfinance.
 
 ## Features
 
 - Historical stock data (OHLCV)
-- Latest stock news
 - Batch stock queries (up to 9 stocks)
 - Rate limiting (100 requests/hour)
 - Response caching
@@ -90,37 +89,7 @@ Fetch historical stock data for a symbol.
 }
 ```
 
-### 2. Get Stock News
-
-**GET** `/api/stock-news/{symbol}`
-
-Fetch latest news for a stock.
-
-**Query Parameters:**
-- `limit` (optional): Number of news items (default: 5, max: 20)
-
-**Example:**
-```
-GET /api/stock-news/AAPL?limit=5
-```
-
-**Response:**
-```json
-{
-  "symbol": "AAPL",
-  "news": [
-    {
-      "title": "Apple announces new product",
-      "publisher": "Reuters",
-      "link": "https://...",
-      "published_date": "2024-01-15 10:30:00",
-      "thumbnail": "https://..."
-    }
-  ]
-}
-```
-
-### 3. Batch Stock Query
+### 2. Batch Stock Query
 
 **POST** `/api/batch-stocks`
 
@@ -154,7 +123,7 @@ Note: `start_date` and `end_date` are optional. Defaults to last 30 days.
 }
 ```
 
-### 4. Health Check
+### 3. Health Check
 
 **GET** `/api/health`
 
@@ -179,7 +148,6 @@ Check API status.
 ## Caching
 
 - Stock data: 5 minutes (300 seconds)
-- News data: 15 minutes (900 seconds)
 - Configurable via environment variables
 
 ## Error Handling
@@ -237,9 +205,6 @@ Run the API and test with curl:
 curl -X POST http://localhost:5000/api/stock-data \
   -H "Content-Type: application/json" \
   -d '{"symbol": "AAPL", "start_date": "2024-01-01", "end_date": "2024-01-31"}'
-
-# Test stock news
-curl http://localhost:5000/api/stock-news/AAPL?limit=3
 
 # Test batch stocks
 curl -X POST http://localhost:5000/api/batch-stocks \

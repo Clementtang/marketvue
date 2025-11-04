@@ -36,10 +36,6 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - English (en-US)
   - Multi-language company name mapping (36+ companies)
 
-- 📰 **News Integration**
-  - Real-time stock-related news
-  - One-click access to latest information
-
 - 💾 **Local Storage**
   - Auto-save tracking list
   - Remember user preference settings
@@ -136,7 +132,6 @@ Backend API will run at `http://localhost:5001`
 3. **View Stock Information**
    - Check real-time prices and changes
    - Analyze moving average trends (MA20, MA60)
-   - Click news icon to view related news
    - Monitor volume trends
 
 4. **Customize Settings**
@@ -196,7 +191,6 @@ marketvue/
 │   │   ├── StockManager.tsx     # Stock manager component
 │   │   ├── TimeRangeSelector.tsx # Time range selector
 │   │   ├── DashboardGrid.tsx    # Dashboard grid
-│   │   ├── NewsPanel.tsx        # News panel
 │   │   ├── ThemeSettings.tsx    # Theme settings
 │   │   └── ColorThemeSelector.tsx # Color theme selector
 │   ├── i18n/
