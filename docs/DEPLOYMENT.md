@@ -30,12 +30,13 @@ marketvue.vercel.app  →   marketvue-api.onrender.com
 3. Connect your GitHub repository `marketvue`
 4. Configure the service:
    - **Name**: `marketvue-api` (or any name you prefer)
-   - **Region**: Choose closest to your users
+   - **Region**: Choose closest to your users (Singapore recommended for Asia)
    - **Branch**: `main`
    - **Root Directory**: `backend`
    - **Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:app`
+   - **Health Check Path**: `/api/health` (important for deployment reliability)
 
 ### Step 2: Set Environment Variables
 
@@ -172,12 +173,13 @@ marketvue.vercel.app  →   marketvue-api.onrender.com
 3. 連接你的 GitHub repository `marketvue`
 4. 配置服務：
    - **Name**: `marketvue-api`（或任何你喜歡的名稱）
-   - **Region**: 選擇最接近使用者的區域
+   - **Region**: 選擇最接近使用者的區域（亞洲用戶建議選擇 Singapore）
    - **Branch**: `main`
    - **Root Directory**: `backend`
    - **Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:app`
+   - **Health Check Path**: `/api/health`（對部署可靠性很重要）
 
 ### 步驟 2：設定環境變數
 

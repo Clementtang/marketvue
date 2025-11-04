@@ -33,6 +33,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Updated browser title in index.html
   - Updated all UI text in translations (English and Traditional Chinese)
   - Changed header subtitle to "Real-time Multi-Market Stock Dashboard" / "即時多市場股票追蹤儀表板"
+- **Render Deployment**: Updated backend deployment configuration
+  - Changed deployment region from Oregon to Singapore for better latency in Asia
+  - Configured health check path (/api/health) for improved deployment reliability
+  - Ensures faster API response times for Asian users
 - **Package Version**: Bumped version to 1.2.0
 
 ### Fixed
