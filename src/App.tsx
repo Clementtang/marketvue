@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { format, subMonths } from 'date-fns';
 import { Analytics } from '@vercel/analytics/react';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
 import type { DateRange } from './components/TimeRangeSelector';
@@ -251,6 +252,9 @@ function App() {
 
       {/* Vercel Analytics */}
       <Analytics />
+
+      {/* Vercel Speed Insights */}
+      <SpeedInsights />
     </div>
   );
 }

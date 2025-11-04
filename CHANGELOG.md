@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added @vercel/analytics package (v1.5.0)
   - Configured Analytics component for React/Vite
   - Enables page view and visitor analytics in Vercel dashboard
+- **Vercel Speed Insights**: Integrated Vercel Speed Insights for performance monitoring
+  - Added @vercel/speed-insights package (v1.2.0)
+  - Configured SpeedInsights component for React/Vite
+  - Enables Core Web Vitals and performance tracking in Vercel dashboard
 
 ### Changed
 - **Application Branding**: Updated application name from "Stock Dashboard" to "MarketVue"
