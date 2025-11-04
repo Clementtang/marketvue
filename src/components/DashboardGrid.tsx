@@ -3,7 +3,6 @@ import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import StockCard from './StockCard';
-import type { NewsItem } from './NewsPanel';
 import type { ColorTheme } from './ColorThemeSelector';
 import { useTranslation, type Language } from '../i18n/translations';
 
@@ -11,12 +10,11 @@ interface DashboardGridProps {
   stocks: string[];
   startDate: string;
   endDate: string;
-  onNewsClick: (symbol: string, news: NewsItem[]) => void;
   colorTheme: ColorTheme;
   language: Language;
 }
 
-const DashboardGrid = ({ stocks, startDate, endDate, onNewsClick, colorTheme, language }: DashboardGridProps) => {
+const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, language }: DashboardGridProps) => {
   const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
   const [containerWidth, setContainerWidth] = useState(1200);
   const t = useTranslation(language);
@@ -167,7 +165,6 @@ const DashboardGrid = ({ stocks, startDate, endDate, onNewsClick, colorTheme, la
               symbol={symbol}
               startDate={startDate}
               endDate={endDate}
-              onNewsClick={onNewsClick}
               colorTheme={colorTheme}
               language={language}
             />

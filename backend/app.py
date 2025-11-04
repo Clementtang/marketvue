@@ -77,7 +77,6 @@ def create_app(config_name='default'):
             'version': '1.0.0',
             'endpoints': {
                 'stock_data': '/api/stock-data',
-                'stock_news': '/api/stock-news/<symbol>',
                 'batch_stocks': '/api/batch-stocks',
                 'health': '/api/health'
             }

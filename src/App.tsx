@@ -6,8 +6,6 @@ import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
 import type { DateRange } from './components/TimeRangeSelector';
 import DashboardGrid from './components/DashboardGrid';
-import NewsPanel from './components/NewsPanel';
-import type { NewsItem } from './components/NewsPanel';
 import ThemeSettings from './components/ThemeSettings';
 import type { ThemeMode } from './components/ThemeSettings';
 import NotificationBanner from './components/NotificationBanner';
@@ -28,15 +26,6 @@ function App() {
   const [themeMode, setThemeMode] = useState<ThemeMode>('system'); // Default to system
   const [language, setLanguage] = useState<Language>('en-US'); // Default to English
   const [isInitialized, setIsInitialized] = useState(false);
-  const [newsPanel, setNewsPanel] = useState<{
-    isOpen: boolean;
-    symbol: string;
-    news: NewsItem[];
-  }>({
-    isOpen: false,
-    symbol: '',
-    news: [],
-  });
 
   // Get translations
   const t = useTranslation(language);
@@ -154,22 +143,6 @@ function App() {
     localStorage.setItem('language', lang);
   };
 
-  const handleNewsClick = (symbol: string, news: NewsItem[]) => {
-    setNewsPanel({
-      isOpen: true,
-      symbol,
-      news,
-    });
-  };
-
-  const handleCloseNews = () => {
-    setNewsPanel({
-      isOpen: false,
-      symbol: '',
-      news: [],
-    });
-  };
-
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
       {/* Notification Banner */}
@@ -232,20 +205,10 @@ function App() {
           stocks={stocks}
           startDate={dateRange.startDate}
           endDate={dateRange.endDate}
-          onNewsClick={handleNewsClick}
           colorTheme={colorTheme}
           language={language}
         />
       </main>
-
-      {/* News Panel */}
-      <NewsPanel
-        isOpen={newsPanel.isOpen}
-        onClose={handleCloseNews}
-        symbol={newsPanel.symbol}
-        news={newsPanel.news}
-        language={language}
-      />
 
       {/* Footer */}
       <Footer t={t} />

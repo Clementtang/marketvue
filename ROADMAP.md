@@ -6,13 +6,6 @@
 
 ---
 
-## 🚨 緊急修復 (Emergency Fixes)
-
-### ✅ 已完成
-- **修復新聞功能** - ✅ 已於 v1.2.1 修復，適配 yfinance API 新結構
-
----
-
 ## 🎯 Q1 2025 - 短期目標
 
 ### 核心功能增強
@@ -24,6 +17,14 @@
 ---
 
 ## 📊 Q2 2025 - 中期目標
+
+### 新聞功能重新設計 (高優先級)
+- **多語言新聞整合** - 重新實作新聞功能，支援中英文雙語
+  - 台股 (.TW, .TWO)：Google News RSS 提供繁體中文新聞
+  - 美股：NewsAPI.org 或 Google News RSS 提供英文新聞
+  - 港股 (.HK)：Google News RSS 提供中英文新聞
+  - 日股 (.T)：Google News RSS 提供日英文新聞
+  - 解決 v1.2.1 移除的 yfinance 新聞功能限制（僅英文、台股覆蓋不足）
 
 ### 進階功能
 - **技術指標擴充** - 新增 RSI、MACD、Bollinger Bands 等進階技術指標

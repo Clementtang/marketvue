@@ -62,14 +62,6 @@ class BatchStocksRequestSchema(Schema):
                 raise ValidationError(f'Invalid stock symbol format: {symbol}')
 
 
-class StockNewsRequestSchema(Schema):
-    """Schema for stock news request"""
-    limit = fields.Int(
-        load_default=5,
-        validate=validate.Range(min=1, max=20)
-    )
-
-
 class StockDataPointSchema(Schema):
     """Schema for a single stock data point"""
     date = fields.Str()
@@ -87,21 +79,6 @@ class StockDataResponseSchema(Schema):
     current_price = fields.Float(allow_none=True)
     change = fields.Float(allow_none=True)
     change_percent = fields.Float(allow_none=True)
-
-
-class NewsItemSchema(Schema):
-    """Schema for a single news item"""
-    title = fields.Str()
-    publisher = fields.Str()
-    link = fields.Str()
-    published_date = fields.Str()
-    thumbnail = fields.Str(allow_none=True)
-
-
-class StockNewsResponseSchema(Schema):
-    """Schema for stock news response"""
-    symbol = fields.Str()
-    news = fields.List(fields.Nested(NewsItemSchema))
 
 
 class BatchStocksResponseSchema(Schema):

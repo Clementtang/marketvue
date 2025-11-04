@@ -7,18 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.2.1] - 2025-11-04
 
-### Fixed
-- **News Feature**: Fixed broken news functionality by adapting to yfinance API changes
-  - Updated news data parsing to handle new nested structure (data now in `content` field)
-  - Fixed title, publisher, link, and thumbnail extraction from new API response format
-  - Changed date parsing from Unix timestamp to ISO 8601 format string
-  - All markets (US, Taiwan, Hong Kong, Japan) now display news correctly
-  - Resolves P0 priority issue from project roadmap
+### Removed
+- **News Feature**: Completely removed news functionality from the application
+  - Removed backend news API endpoint (`/api/stock-news/<symbol>`)
+  - Removed `StockService.get_stock_news()` method
+  - Removed all news-related schemas
+  - Deleted `NewsPanel.tsx` component
+  - Removed news buttons from stock cards
+  - Removed all news-related state management
 
-### Technical
-- Updated `StockService.get_stock_news()` in backend/services/stock_service.py
-- Added comprehensive comments explaining the new API structure
-- Improved date parsing with proper ISO format handling and error fallbacks
+### Rationale
+The yfinance news API has significant limitations that make it unsuitable for our user base:
+- ❌ **No Chinese language support**: Only provides English news
+- ❌ **Limited Taiwan stock coverage**: Small/mid-cap Taiwan stocks have no news
+- ❌ **Inconsistent quality**: News coverage varies greatly by market and stock size
+- ✅ **Better alternatives exist**: Google News RSS and NewsAPI.ai offer better multilingual support
+
+The news feature will be **re-implemented in Q2 2025** (P2 priority) using a hybrid news aggregation approach:
+- Taiwan stocks (.TW, .TWO) → Google News RSS (Traditional Chinese)
+- US stocks → NewsAPI.org or Google News RSS (English)
+- Hong Kong stocks (.HK) → Google News RSS (Chinese/English)
+- Japan stocks (.T) → Google News RSS (Japanese/English)
+
+This ensures all users, especially Chinese-speaking users, receive relevant news in their preferred language.
 
 ## [1.2.0] - 2025-11-04
 

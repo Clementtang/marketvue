@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
-import { TrendingUp, TrendingDown, Newspaper, Loader2 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import type { NewsItem } from './NewsPanel';
 import type { ColorTheme } from './ColorThemeSelector';
 import { useTranslation, type Language } from '../i18n/translations';
 
@@ -33,12 +32,11 @@ interface StockCardProps {
   symbol: string;
   startDate: string;
   endDate: string;
-  onNewsClick: (symbol: string, news: NewsItem[]) => void;
   colorTheme: ColorTheme;
   language: Language;
 }
 
-const StockCard = ({ symbol, startDate, endDate, onNewsClick, colorTheme, language }: StockCardProps) => {
+const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCardProps) => {
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -108,16 +106,6 @@ const StockCard = ({ symbol, startDate, endDate, onNewsClick, colorTheme, langua
       console.error('Error fetching stock data:', err);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleNewsClick = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/stock-news/${symbol}?limit=5`);
-      onNewsClick(symbol, response.data.news);
-    } catch (err) {
-      console.error('Error fetching news:', err);
-      onNewsClick(symbol, []);
     }
   };
 
@@ -222,14 +210,6 @@ const StockCard = ({ symbol, startDate, endDate, onNewsClick, colorTheme, langua
             )}
           </div>
         </div>
-
-        <button
-          onClick={handleNewsClick}
-          className="p-1.5 md:p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors flex-shrink-0"
-          title={t.viewNews}
-        >
-          <Newspaper size={18} className="md:w-5 md:h-5 text-gray-600 dark:text-gray-400" />
-        </button>
       </div>
 
       {/* Price Chart */}
