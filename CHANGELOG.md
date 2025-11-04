@@ -5,6 +5,14 @@ All notable changes to MarketVue will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1] - 2025-11-04
+
+### Fixed
+- **API URL Configuration**: Corrected duplicate `/api` path in environment variables
+  - Removed `/api` suffix from `VITE_API_URL` base URL
+  - Fixed double `/api/api` path issue causing API request failures in production
+  - Updated `.env.example` and `.env.production` with correct configuration
+
 ## [1.1.0] - 2025-11-03
 
 ### Added
