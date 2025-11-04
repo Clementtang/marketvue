@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Repository link with GitHub icon
   - Responsive layout for desktop and mobile
   - Replaced old footer that only showed yfinance attribution
+- **Vercel Analytics**: Integrated Vercel Analytics for visitor tracking
+  - Added @vercel/analytics package (v1.5.0)
+  - Configured Analytics component for React/Vite
+  - Enables page view and visitor analytics in Vercel dashboard
 
 ### Changed
 - **Application Branding**: Updated application name from "Stock Dashboard" to "MarketVue"

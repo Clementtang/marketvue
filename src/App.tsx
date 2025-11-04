@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, subMonths } from 'date-fns';
+import { Analytics } from '@vercel/analytics/react';
 import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
 import type { DateRange } from './components/TimeRangeSelector';
@@ -247,6 +248,9 @@ function App() {
 
       {/* Footer */}
       <Footer t={t} />
+
+      {/* Vercel Analytics */}
+      <Analytics />
     </div>
   );
 }
