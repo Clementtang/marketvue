@@ -169,7 +169,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
       {/* Notification Banner */}
       <NotificationBanner t={t} />
 
@@ -202,7 +202,7 @@ function App() {
       </header>
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-7xl">
+      <main className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
         {/* Stock Manager and Time Range Selector in a grid with 70/30 split */}
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 mb-6">
           {/* Stock Manager - 70% width on large screens */}

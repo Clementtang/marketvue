@@ -27,11 +27,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Changed header subtitle to "Real-time Multi-Market Stock Dashboard" / "即時多市場股票追蹤儀表板"
 - **Package Version**: Bumped version to 1.2.0
 
+### Fixed
+- **Dark Mode Styling**: Improved notification banner appearance in dark mode
+  - Adjusted background opacity from 20% to 30% for better visibility
+  - Changed border color to lighter yellow-700/50 to remove harsh orange line
+  - Brightened icon and text colors (yellow-400 and yellow-100) for better contrast
+  - Updated hover effects for better visual feedback
+- **Footer Layout**: Fixed footer positioning to stick to viewport bottom
+  - Added flexbox layout to App container (flex flex-col)
+  - Made main content area flexible with flex-grow
+  - Changed footer margin from mt-12 to mt-auto for proper alignment
+  - Footer now stays at bottom when content is short, without being sticky
+
 ### Technical
 - Created NotificationBanner component with localStorage integration
 - Created Footer component with bilingual link support
 - Added new translation keys: freeHostingNotice, madeBy, viewOnGitHub
 - Integrated new components into main App.tsx layout
+- Implemented flexbox-based footer positioning for responsive layouts
 
 ## [1.1.1] - 2025-11-04
 
