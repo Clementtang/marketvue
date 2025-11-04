@@ -57,6 +57,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added new translation keys: freeHostingNotice, madeBy, viewOnGitHub
 - Integrated new components into main App.tsx layout
 - Implemented flexbox-based footer positioning for responsive layouts
+- **Project Management**: Established TODO tracking system
+  - Created `.todo/` directory for internal task management (excluded from Git)
+  - Added `ROADMAP.md` for public-facing development roadmap
+  - Organized tasks with 6-dimensional classification (Phase, Category, Effort, Impact, Status, Module)
+  - Documented Q1-Q4 2025 feature planning
 
 ## [1.1.1] - 2025-11-04
 
@@ -121,24 +126,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## Future Roadmap
+## 🗺️ Future Development
 
-### Planned Features
-- [ ] Portfolio tracking and performance calculation
-- [ ] Price alerts and notifications
-- [ ] Technical indicator expansion (RSI, MACD, Bollinger Bands)
-- [ ] Candlestick charts
-- [ ] Stock comparison view
-- [ ] Export data functionality
-- [ ] User accounts and cloud sync
-- [ ] Mobile app (React Native)
+> 📍 **查看專案發展規劃：** [ROADMAP.md](./ROADMAP.md)
 
-### Under Consideration
-- [ ] Cryptocurrency support
-- [ ] Forex rates
-- [ ] Fundamental data integration
-- [ ] AI-powered insights
-- [ ] Social features (share watchlists, discuss stocks)
+本專案持續開發中，未來功能規劃請參考 [ROADMAP.md](./ROADMAP.md)，包含：
+- **Q1 2025**: K線圖、18檔股票支援、API優化
+- **Q2 2025**: 技術指標擴充、匯出數據、測試提升
+- **Q3-Q4 2025**: 投資組合追蹤、行動應用、AI洞察
 
 ---
 

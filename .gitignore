@@ -73,3 +73,6 @@ Thumbs.db
 .vite-temp/
 *.tmp
 *.temp
+
+# Internal TODO tracking (private)
+.todo/
