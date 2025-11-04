@@ -4,7 +4,7 @@ services:
     name: marketvue-api
     runtime: python
     env: python
-    region: oregon
+    region: singapore
     plan: free
     buildCommand: cd backend && pip install -r requirements.txt
     startCommand: cd backend && gunicorn --bind 0.0.0.0:$PORT app:app
