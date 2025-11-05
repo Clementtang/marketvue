@@ -73,11 +73,11 @@ const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, language }: Das
           i: symbol,
         };
       }
-      // Generate default 3x3 grid layout
+      // Generate default 6x3 grid layout (support up to 18 stocks)
       return {
         i: symbol,
         x: index % 3, // Column (0-2)
-        y: Math.floor(index / 3), // Row
+        y: Math.floor(index / 3), // Row (0-5 for 18 stocks)
         w: 1, // Width (1 unit = 1/3 of container)
         h: 1, // Height (1 unit = rowHeight)
         minW: 1,

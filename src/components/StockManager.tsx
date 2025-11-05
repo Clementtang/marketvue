@@ -23,7 +23,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock, language }: StockMana
       return;
     }
 
-    if (stocks.length >= 9) {
+    if (stocks.length >= 18) {
       setError(t.maxStocksReached);
       return;
     }
@@ -58,7 +58,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock, language }: StockMana
           />
           <button
             type="submit"
-            disabled={stocks.length >= 9}
+            disabled={stocks.length >= 18}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
           >
             <Plus size={20} />
@@ -69,7 +69,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock, language }: StockMana
           <p className="text-red-500 dark:text-red-400 text-sm mt-2">{error}</p>
         )}
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-          {stocks.length}/9 {t.stocksAdded}
+          {stocks.length}/18 {t.stocksAdded}
         </p>
       </form>
 

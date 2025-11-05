@@ -117,7 +117,7 @@ export const translations: Record<Language, Translations> = {
     stocksAdded: 'stocks added',
     trackedStocks: 'Tracked Stocks:',
     noStocksYet: 'No stocks added yet. Add your first stock to get started!',
-    maxStocksReached: 'Maximum 9 stocks allowed',
+    maxStocksReached: 'Maximum 18 stocks allowed',
     stockAlreadyAdded: 'Stock already added',
     pleaseEnterSymbol: 'Please enter a stock symbol',
 
@@ -207,7 +207,7 @@ export const translations: Record<Language, Translations> = {
     stocksAdded: '支股票已新增',
     trackedStocks: '追蹤中的股票：',
     noStocksYet: '尚未新增股票。新增第一支股票開始追蹤！',
-    maxStocksReached: '最多只能新增 9 支股票',
+    maxStocksReached: '最多只能新增 18 支股票',
     stockAlreadyAdded: '股票已新增',
     pleaseEnterSymbol: '請輸入股票代號',
 

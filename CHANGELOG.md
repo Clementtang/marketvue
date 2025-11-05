@@ -5,6 +5,39 @@ All notable changes to MarketVue will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- **18 Stock Support**: Increased maximum trackable stocks from 9 to 18
+  - Updated `StockManager` validation to allow up to 18 stocks
+  - Enhanced `DashboardGrid` layout to support 6x3 grid (18 stocks)
+  - Updated UI text and translations (English and Traditional Chinese)
+  - Improved scalability for users tracking multiple portfolios
+- **Enhanced Error Handling**: Significantly improved error handling and user feedback
+  - Auto-retry mechanism with exponential backoff (up to 3 retries)
+  - Specific error messages for different failure scenarios (timeout, 404, 500, network offline)
+  - Bilingual error messages (English and Traditional Chinese)
+  - Manual retry button for failed requests
+  - Improved loading state with retry counter display
+  - Visual error state with icon and helpful messaging
+  - 30-second request timeout to prevent indefinite waiting
+
+### Fixed
+- **Volume Display Bug**: Changed stock card footer to show average volume instead of last day volume
+  - Previously showed volume of the last trading day in the date range
+  - Issue: Volume appeared unchanged when switching time ranges with same end date
+  - Now displays average volume across the entire selected time range
+  - Average volume changes dynamically with different time ranges
+  - Better reflects trading activity over the period
+  - Bilingual labels: "平均成交量" (zh-TW) / "Avg Volume" (en-US)
+
+### Changed
+- Grid layout now supports up to 6 rows (previously 3 rows) for better 18-stock display
+- Stock counter now shows "X/18" instead of "X/9"
+- Error messages are now more specific and user-friendly
+- Loading state now shows retry progress when auto-retrying
+- Stock card footer now displays average volume instead of last day volume
+
 ## [1.2.1] - 2025-11-04
 
 ### Removed
