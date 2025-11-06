@@ -75,6 +75,7 @@ export interface Translations {
   viewNews: string;
   noDataAvailable: string;
   failedToFetch: string;
+  rateLimitExceeded: string;
 
   // News Panel
   latestNews: string;
@@ -167,6 +168,7 @@ export const translations: Record<Language, Translations> = {
     viewNews: 'View news',
     noDataAvailable: 'No data available',
     failedToFetch: 'Failed to fetch stock data',
+    rateLimitExceeded: 'Too many requests. Please wait a moment and try again.',
 
     // News Panel
     latestNews: 'Latest News',
@@ -257,6 +259,7 @@ export const translations: Record<Language, Translations> = {
     viewNews: '查看新聞',
     noDataAvailable: '無可用數據',
     failedToFetch: '無法取得股票數據',
+    rateLimitExceeded: '請求次數過多，請稍候片刻後再試',
 
     // News Panel
     latestNews: '最新新聞',

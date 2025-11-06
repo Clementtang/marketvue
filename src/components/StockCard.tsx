@@ -119,6 +119,9 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCa
         errorMessage = language === 'zh-TW'
           ? '服務可能正在啟動中（首次訪問需要 30-60 秒），請稍候...'
           : 'Service may be starting up (first visit takes 30-60 seconds), please wait...';
+      } else if (statusCode === 429) {
+        // Rate limit exceeded
+        errorMessage = t.rateLimitExceeded;
       } else if (statusCode === 404) {
         errorMessage = language === 'zh-TW'
           ? `找不到股票代號 ${symbol}，請檢查代號是否正確`
@@ -138,8 +141,8 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCa
       setError(errorMessage);
       console.error('Error fetching stock data:', err);
 
-      // Auto-retry logic (only for network errors, not for 404s)
-      if (!isRetry && retryCount < MAX_RETRIES && statusCode !== 404) {
+      // Auto-retry logic (only for network errors, not for 404s or 429s)
+      if (!isRetry && retryCount < MAX_RETRIES && statusCode !== 404 && statusCode !== 429) {
         // Smart retry delay based on error type
         let retryDelay: number;
 

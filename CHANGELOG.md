@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.2] - 2025-11-06
+
+### Fixed
+- **Rate Limit Error Handling**: Fixed incorrect error message for 429 (Too Many Requests) errors
+  - Issue: When backend rate limit was exceeded (429 status), frontend incorrectly displayed "Stock symbol not found" error
+  - Root cause: Missing 429 status code handling in error logic
+  - Solution: Added specific 429 error detection and bilingual error messages
+  - Behavior: 429 errors now display "請求次數過多，請稍候片刻後再試" (zh-TW) / "Too many requests. Please wait a moment and try again." (en-US)
+  - Auto-retry disabled for 429 errors to prevent worsening the rate limit situation
+  - Users can manually retry after waiting
+
+### Technical Details
+- Added `rateLimitExceeded` translation key to `translations.ts` (zh-TW + en-US)
+- Modified `StockCard.tsx` error handling to detect 429 status code
+- Updated retry logic to exclude 429 errors from automatic retries (along with 404)
+- No breaking changes, backward compatible
+
 ## [1.3.1] - 2025-11-06
 
 ### Improved
