@@ -7,12 +7,55 @@ from schemas.stock_schemas import (
     StockDataResponseSchema,
     BatchStocksResponseSchema
 )
+from utils.cache import cache
 import logging
 
 logger = logging.getLogger(__name__)
 
 # Create blueprint
 stock_bp = Blueprint('stock', __name__, url_prefix='/api')
+
+
+# Cache key functions
+def make_stock_data_cache_key():
+    """Generate cache key for stock data requests based on symbol and date range"""
+    try:
+        data = request.get_json()
+        if not data:
+            return None
+
+        symbol = data.get('symbol', '').upper()
+        start_date = data.get('start_date', '')
+        end_date = data.get('end_date', '')
+
+        # Create cache key from request parameters
+        cache_key = f"stock_data:{symbol}:{start_date}:{end_date}"
+        logger.debug(f"Generated cache key: {cache_key}")
+        return cache_key
+    except Exception as e:
+        logger.error(f"Error generating cache key: {e}")
+        return None
+
+
+def make_batch_stocks_cache_key():
+    """Generate cache key for batch stocks requests"""
+    try:
+        data = request.get_json()
+        if not data:
+            return None
+
+        symbols = sorted([s.upper() for s in data.get('symbols', [])])
+        start_date = data.get('start_date', 'none')
+        end_date = data.get('end_date', 'none')
+
+        # Create cache key from request parameters
+        symbols_str = ','.join(symbols)
+        cache_key = f"batch_stocks:{symbols_str}:{start_date}:{end_date}"
+        logger.debug(f"Generated cache key: {cache_key}")
+        return cache_key
+    except Exception as e:
+        logger.error(f"Error generating cache key: {e}")
+        return None
 
 # Initialize schemas
 stock_data_request_schema = StockDataRequestSchema()
@@ -22,6 +65,7 @@ batch_stocks_response_schema = BatchStocksResponseSchema()
 
 
 @stock_bp.route('/stock-data', methods=['POST'])
+@cache.cached(timeout=300, make_cache_key=make_stock_data_cache_key)
 def get_stock_data():
     """
     POST /api/stock-data
@@ -36,6 +80,9 @@ def get_stock_data():
 
     Returns:
         Stock data with OHLCV (Open, High, Low, Close, Volume)
+
+    Cache:
+        Cached for 5 minutes (300 seconds) based on symbol and date range
     """
     try:
         # Validate request data
@@ -74,10 +121,11 @@ def get_stock_data():
 
 
 @stock_bp.route('/batch-stocks', methods=['POST'])
+@cache.cached(timeout=300, make_cache_key=make_batch_stocks_cache_key)
 def get_batch_stocks():
     """
     POST /api/batch-stocks
-    Get data for multiple stocks (max 9)
+    Get data for multiple stocks (max 18)
 
     Request body:
         {
@@ -88,6 +136,9 @@ def get_batch_stocks():
 
     Returns:
         Data for all requested stocks
+
+    Cache:
+        Cached for 5 minutes (300 seconds) based on symbols and date range
     """
     try:
         # Validate request data
