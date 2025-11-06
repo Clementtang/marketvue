@@ -205,6 +205,19 @@ marketvue/
 └── README_EN.md
 ```
 
+## ⚠️ Important Notes
+
+### Free Hosting Service Limitations
+
+The backend API of this project is hosted on **Render Free Tier** with the following characteristics:
+
+- **Cold Start Time**: Service enters sleep mode after 15 minutes of inactivity
+- **First Visit**: Waking up the service takes 30-60 seconds, please be patient
+- **Auto Retry**: Frontend implements smart retry mechanism to automatically handle cold starts
+- **User Experience**: Displays a friendly "Service may be starting up" message on first load
+
+This is normal behavior, not an error. Subsequent visits will respond quickly.
+
 ## 📚 Documentation
 
 - [API Documentation](./docs/API.md) - Complete API endpoint reference

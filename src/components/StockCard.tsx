@@ -107,17 +107,23 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCa
       setRetryCount(0); // Reset retry count on success
     } catch (err: any) {
       let errorMessage = t.failedToFetch;
+      const statusCode = err.response?.status;
 
       // Provide more specific error messages
       if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
         errorMessage = language === 'zh-TW'
           ? '請求逾時，請稍後再試'
           : 'Request timeout, please try again later';
-      } else if (err.response?.status === 404) {
+      } else if (statusCode === 503) {
+        // Free tier cold start - friendly message
+        errorMessage = language === 'zh-TW'
+          ? '服務可能正在啟動中（首次訪問需要 30-60 秒），請稍候...'
+          : 'Service may be starting up (first visit takes 30-60 seconds), please wait...';
+      } else if (statusCode === 404) {
         errorMessage = language === 'zh-TW'
           ? `找不到股票代號 ${symbol}，請檢查代號是否正確`
           : `Stock symbol ${symbol} not found, please check the symbol`;
-      } else if (err.response?.status === 500) {
+      } else if (statusCode === 500) {
         errorMessage = language === 'zh-TW'
           ? '伺服器錯誤，請稍後再試'
           : 'Server error, please try again later';
@@ -133,8 +139,19 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCa
       console.error('Error fetching stock data:', err);
 
       // Auto-retry logic (only for network errors, not for 404s)
-      if (!isRetry && retryCount < MAX_RETRIES && err.response?.status !== 404) {
-        const retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // Exponential backoff, max 5s
+      if (!isRetry && retryCount < MAX_RETRIES && statusCode !== 404) {
+        // Smart retry delay based on error type
+        let retryDelay: number;
+
+        if (statusCode === 503) {
+          // 503: Cold start - longer delays (5s, 10s, 15s)
+          const coldStartDelays = [5000, 10000, 15000];
+          retryDelay = coldStartDelays[retryCount] || 15000;
+        } else {
+          // Other errors: Exponential backoff, max 5s
+          retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000);
+        }
+
         console.log(`Retrying in ${retryDelay}ms... (Attempt ${retryCount + 1}/${MAX_RETRIES})`);
 
         setTimeout(() => {

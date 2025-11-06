@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.1] - 2025-11-06
+
+### Improved
+- **Smart 503 Error Handling**: Optimized retry logic for Render Free tier cold starts
+  - Implemented status-code-specific retry delays
+  - 503 errors now use longer retry intervals (5s, 10s, 15s) to accommodate 30-60 second cold start time
+  - Other errors continue to use exponential backoff (1s, 2s, 4s)
+  - Better user experience when API service is waking up from sleep
+- **Enhanced Error Messages**: More user-friendly error messaging for service availability
+  - 503 errors now show: "Service may be starting up (first visit takes 30-60 seconds), please wait..."
+  - Bilingual support for all new messages (Traditional Chinese and English)
+  - Users are informed about expected wait times during cold starts
+
+### Technical Details
+- Modified `StockCard.tsx` retry mechanism to differentiate between error types
+- Cold start delays: [5000ms, 10000ms, 15000ms] for 503 errors
+- Standard delays: exponential backoff up to 5000ms for other errors
+- No breaking changes, backward compatible
+
 ## [1.3.0] - 2025-11-06
 
 ### Added
