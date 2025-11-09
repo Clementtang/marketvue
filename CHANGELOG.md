@@ -10,6 +10,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.4] - 2025-11-09
 
 ### Fixed
+- **Build Error**: Fixed TypeScript compilation error preventing Vercel deployment
+  - Issue: TS6133 error - 'domainMin' declared but never used in CandlestickChart component
+  - Location: src/components/CandlestickChart.tsx:36:45
+  - Root cause: Variable was destructured from props but not utilized in coordinate calculations
+  - Solution: Removed unused domainMin parameter from Candlestick component
+  - Impact: Deployment now completes successfully without TypeScript errors
+  - Only domainMax and priceRange are needed for current coordinate calculation implementation
+
+## [1.3.4] - 2025-11-09 (Earlier Fix)
+
+### Fixed
 - **Candlestick Chart Coordinate Calculation**: Fixed critical issue where high-volatility stocks rendered outside chart bounds
   - Issue: K-line charts for high-volatility stocks (e.g., 6763.TWO with 9.3% daily range) extended beyond the bottom of the chart area
   - Root cause: Initial implementation used fixed 10% estimation for price range, which failed for stocks with larger daily movements
