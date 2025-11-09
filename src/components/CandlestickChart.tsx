@@ -33,7 +33,7 @@ interface CandlestickChartProps {
  * Uses Recharts Bar's coordinate system to render OHLC data
  */
 const Candlestick = (props: any) => {
-  const { x, y, width, payload, colorTheme, domainMin, domainMax, priceRange } = props;
+  const { x, y, width, payload, colorTheme, domainMax, priceRange } = props;
 
   if (!payload) return null;
 
