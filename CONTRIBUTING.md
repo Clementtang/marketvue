@@ -56,6 +56,15 @@ pip install -r requirements.txt
 PORT=5001 python app.py
 ```
 
+#### 5. Personal Development Settings
+
+The following directories contain personal development configurations and are excluded from Git:
+
+- `.claude/` - Claude Code AI assistant settings (personal workspace configuration)
+- `.todo/` - Internal TODO tracking (private task management)
+
+These directories are for individual developer use and should not be committed to the repository. You can create your own local versions if needed.
+
 ### Development Guidelines
 
 #### Code Style
@@ -235,6 +244,15 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 PORT=5001 python app.py
 ```
+
+#### 5. 個人開發設定
+
+以下目錄包含個人開發配置，已從 Git 中排除：
+
+- `.claude/` - Claude Code AI 助理設定（個人工作區配置）
+- `.todo/` - 內部 TODO 追蹤（私人任務管理）
+
+這些目錄供個別開發者使用，不應提交到代碼庫。如有需要，您可以建立自己的本地版本。
 
 ### 開發指南
 
