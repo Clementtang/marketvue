@@ -4,6 +4,7 @@ import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import type { ColorTheme } from './ColorThemeSelector';
 import { useTranslation, type Language } from '../i18n/translations';
+import CandlestickChart from './CandlestickChart';
 
 interface StockDataPoint {
   date: string;
@@ -33,10 +34,11 @@ interface StockCardProps {
   startDate: string;
   endDate: string;
   colorTheme: ColorTheme;
+  chartType: 'line' | 'candlestick';
   language: Language;
 }
 
-const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCardProps) => {
+const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language }: StockCardProps) => {
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -299,7 +301,7 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCa
 
       {/* Price Chart */}
       <div className="mb-1" style={{ height: '145px' }}>
-        {isVisible && (
+        {isVisible && chartType === 'line' && (
           <ResponsiveContainer width="100%" height={145}>
             <LineChart data={stockData.data}>
             <XAxis
@@ -347,6 +349,14 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, language }: StockCa
             />
           </LineChart>
         </ResponsiveContainer>
+        )}
+        {isVisible && chartType === 'candlestick' && (
+          <CandlestickChart
+            data={stockData.data}
+            colorTheme={colorTheme}
+            language={language}
+            showMA={true}
+          />
         )}
       </div>
 

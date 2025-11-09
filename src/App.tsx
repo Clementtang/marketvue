@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
 import type { DateRange } from './components/TimeRangeSelector';
+import ChartTypeToggle from './components/ChartTypeToggle';
 import DashboardGrid from './components/DashboardGrid';
 import ThemeSettings from './components/ThemeSettings';
 import type { ThemeMode } from './components/ThemeSettings';
@@ -25,6 +26,7 @@ function App() {
   const [colorTheme, setColorTheme] = useState<ColorTheme>(COLOR_THEMES[1]); // Default to Western style
   const [themeMode, setThemeMode] = useState<ThemeMode>('system'); // Default to system
   const [language, setLanguage] = useState<Language>('en-US'); // Default to English
+  const [chartType, setChartType] = useState<'line' | 'candlestick'>('line'); // Default to line chart
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Get translations
@@ -75,6 +77,11 @@ function App() {
       } catch (e) {
         console.error('Failed to load saved date range:', e);
       }
+    }
+
+    const savedChartType = localStorage.getItem('chart-type');
+    if (savedChartType === 'candlestick' || savedChartType === 'line') {
+      setChartType(savedChartType);
     }
 
     // Mark as initialized
@@ -143,6 +150,11 @@ function App() {
     localStorage.setItem('language', lang);
   };
 
+  const handleChartTypeChange = (type: 'line' | 'candlestick') => {
+    setChartType(type);
+    localStorage.setItem('chart-type', type);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
       {/* Notification Banner */}
@@ -178,10 +190,10 @@ function App() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
-        {/* Stock Manager and Time Range Selector in a grid with 70/30 split */}
-        <div className="grid grid-cols-1 lg:grid-cols-10 gap-6 mb-6">
-          {/* Stock Manager - 70% width on large screens */}
-          <div className="lg:col-span-7">
+        {/* Stock Manager, Chart Type Toggle, and Time Range Selector in a grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
+          {/* Stock Manager - 50% width on large screens */}
+          <div className="lg:col-span-6">
             <StockManager
               stocks={stocks}
               onAddStock={handleAddStock}
@@ -190,8 +202,17 @@ function App() {
             />
           </div>
 
+          {/* Chart Type Toggle - 20% width on large screens */}
+          <div className="lg:col-span-2">
+            <ChartTypeToggle
+              chartType={chartType}
+              onChartTypeChange={handleChartTypeChange}
+              language={language}
+            />
+          </div>
+
           {/* Time Range Selector - 30% width on large screens */}
-          <div className="lg:col-span-3">
+          <div className="lg:col-span-4">
             <TimeRangeSelector
               currentRange={dateRange}
               onRangeChange={handleRangeChange}
@@ -206,6 +227,7 @@ function App() {
           startDate={dateRange.startDate}
           endDate={dateRange.endDate}
           colorTheme={colorTheme}
+          chartType={chartType}
           language={language}
         />
       </main>

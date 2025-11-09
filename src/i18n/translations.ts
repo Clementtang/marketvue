@@ -76,6 +76,11 @@ export interface Translations {
   noDataAvailable: string;
   failedToFetch: string;
   rateLimitExceeded: string;
+  chartType: string;
+  lineChart: string;
+  candlestickChart: string;
+  switchToLineChart: string;
+  switchToCandlestickChart: string;
 
   // News Panel
   latestNews: string;
@@ -169,6 +174,11 @@ export const translations: Record<Language, Translations> = {
     noDataAvailable: 'No data available',
     failedToFetch: 'Failed to fetch stock data',
     rateLimitExceeded: 'Too many requests. Please wait a moment and try again.',
+    chartType: 'Chart Type',
+    lineChart: 'Line Chart',
+    candlestickChart: 'Candlestick Chart',
+    switchToLineChart: 'Switch to line chart',
+    switchToCandlestickChart: 'Switch to candlestick chart',
 
     // News Panel
     latestNews: 'Latest News',
@@ -260,6 +270,11 @@ export const translations: Record<Language, Translations> = {
     noDataAvailable: '無可用數據',
     failedToFetch: '無法取得股票數據',
     rateLimitExceeded: '請求次數過多，請稍候片刻後再試',
+    chartType: '圖表類型',
+    lineChart: '線圖',
+    candlestickChart: 'K線圖',
+    switchToLineChart: '切換至線圖',
+    switchToCandlestickChart: '切換至K線圖',
 
     // News Panel
     latestNews: '最新新聞',

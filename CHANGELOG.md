@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.3] - 2025-11-09
+
+### Fixed
+- **Candlestick Chart Rendering**: Fixed critical React key duplication error in K-line chart
+  - Issue: Console showed "Encountered two children with the same key" errors for ErrorBar components
+  - Root cause: Using Bar + ErrorBar approach caused React key conflicts when rendering bullish/bearish candles
+  - Solution: Completely rewrote candlestick rendering using Recharts `Customized` component with direct SVG rendering
+  - Behavior: Candlesticks now render as pure SVG elements (rect for body, line for wicks) with unique keys
+  - Result: Eliminated all console errors and improved rendering performance
+
+### Technical Details
+- Removed `Bar` and `ErrorBar` components from candlestick implementation
+- Added new `Candlesticks` component that renders using `<Customized>` wrapper
+- Each candlestick consists of:
+  - Upper wick: SVG `<line>` from high to body top
+  - Body: SVG `<rect>` from open to close (minimum 1px for doji candles)
+  - Lower wick: SVG `<line>` from body bottom to low
+- Unique keys generated using `candle-${date}-${index}` pattern
+- Improved Y-axis domain to `['dataMin', 'dataMax']` for better chart scaling
+- No breaking changes, backward compatible
+
 ## [1.3.2] - 2025-11-06
 
 ### Fixed

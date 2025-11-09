@@ -11,10 +11,11 @@ interface DashboardGridProps {
   startDate: string;
   endDate: string;
   colorTheme: ColorTheme;
+  chartType: 'line' | 'candlestick';
   language: Language;
 }
 
-const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, language }: DashboardGridProps) => {
+const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, chartType, language }: DashboardGridProps) => {
   const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
   const [containerWidth, setContainerWidth] = useState(1200);
   const t = useTranslation(language);
@@ -166,6 +167,7 @@ const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, language }: Das
               startDate={startDate}
               endDate={endDate}
               colorTheme={colorTheme}
+              chartType={chartType}
               language={language}
             />
           </div>
