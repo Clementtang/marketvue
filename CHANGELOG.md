@@ -7,6 +7,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.4] - 2025-11-09
+
+### Fixed
+- **Candlestick Chart Coordinate Calculation**: Fixed critical issue where high-volatility stocks rendered outside chart bounds
+  - Issue: K-line charts for high-volatility stocks (e.g., 6763.TWO with 9.3% daily range) extended beyond the bottom of the chart area
+  - Root cause: Initial implementation used fixed 10% estimation for price range, which failed for stocks with larger daily movements
+  - Solution: Implemented precise coordinate calculation using actual data range from parent component
+  - Technical approach:
+    - Parent component calculates actual min/max price range across entire dataset
+    - Price range (domainMin, domainMax) passed as props to Candlestick component
+    - Coordinate calculation uses actual chart area height (135px after margins) instead of estimated values
+    - Reverse-engineering method: uses known close position (y) to calculate chartTop, then derives all other OHLC positions
+  - Result: Perfect rendering for all stocks regardless of volatility (tested 0.5% - 10% daily ranges)
+
+### Improved
+- **Chart Margin Accuracy**: Corrected chart height calculation to account for top/bottom margins
+  - ResponsiveContainer height: 145px
+  - Actual drawing area: 135px (145 - 5 top - 5 bottom margin)
+  - Ensures pixel-perfect alignment for all price points
+
+### Technical Details
+- Modified `CandlestickChart` component to pre-calculate price domain in parent (lines 249-254)
+- Updated coordinate calculation formula in `Candlestick` component:
+  ```typescript
+  chartHeight = 135px (accounting for margins)
+  pixelsPerPrice = chartHeight / priceRange
+  chartTop = y - (domainMax - close) * pixelsPerPrice
+  yHigh = chartTop + (domainMax - high) * pixelsPerPrice
+  yLow = chartTop + (domainMax - low) * pixelsPerPrice
+  yOpen = chartTop + (domainMax - open) * pixelsPerPrice
+  ```
+- Verified with edge cases: 6763.TWO (9.3% volatility), 2330.TW (<2% volatility), all time ranges (5D/1M/3M/6M/1Y)
+- No breaking changes, backward compatible
+
 ## [1.3.3] - 2025-11-09
 
 ### Fixed

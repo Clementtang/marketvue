@@ -5,7 +5,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Line,
-  Customized,
+  Bar,
 } from 'recharts';
 import type { ColorTheme } from './ColorThemeSelector';
 import type { Language } from '../i18n/translations';
@@ -29,79 +29,83 @@ interface CandlestickChartProps {
 }
 
 /**
- * Custom candlestick renderer using SVG shapes
- * Draws candlesticks directly using rect and line elements
+ * Custom candlestick shape component
+ * Uses Recharts Bar's coordinate system to render OHLC data
  */
-const Candlesticks = (props: any) => {
-  const { xAxisMap, yAxisMap, data, colorTheme } = props;
+const Candlestick = (props: any) => {
+  const { x, y, width, payload, colorTheme, domainMin, domainMax, priceRange } = props;
 
-  if (!xAxisMap || !yAxisMap || !data) return null;
+  if (!payload) return null;
 
-  const xAxis = xAxisMap[0];
-  const yAxis = yAxisMap[0];
+  const { open, high, low, close } = payload;
+  const isUp = close > open;
 
-  if (!xAxis || !yAxis) return null;
+  // Use the color theme object directly - it has up/down colors defined
+  const color = isUp ? colorTheme.up : colorTheme.down;
 
-  const upColor = colorTheme === 'asian' ? '#ef4444' : '#22c55e';
-  const downColor = colorTheme === 'asian' ? '#22c55e' : '#ef4444';
-
+  const centerX = x + width / 2;
   const candleWidth = 8;
+
+  // CORRECT APPROACH: Use the actual chart domain passed from parent
+  // The ResponsiveContainer height is 145px, but the actual chart area is smaller
+  // because of margins: top(5) + bottom(5) = 10px
+  // Actual chart area height = 145 - 10 = 135px
+
+  const chartHeight = 135; // Actual chart area height (145 - top margin - bottom margin)
+  const pixelsPerPrice = chartHeight / priceRange;
+
+  // Calculate the Y position for each price point
+  // Y increases downward in SVG, so higher prices have lower Y values
+  // Formula: y = chartTop + (domainMax - price) * pixelsPerPrice
+  // But we don't know chartTop directly. Instead, we use the known 'y' for close price.
+
+  // We know: y is the pixel position for 'close' price
+  // So: y = chartTop + (domainMax - close) * pixelsPerPrice
+  // Therefore: chartTop = y - (domainMax - close) * pixelsPerPrice
+
+  const chartTop = y - (domainMax - close) * pixelsPerPrice;
+
+  // Now calculate positions for all OHLC prices
+  const yHigh = chartTop + (domainMax - high) * pixelsPerPrice;
+  const yLow = chartTop + (domainMax - low) * pixelsPerPrice;
+  const yOpen = chartTop + (domainMax - open) * pixelsPerPrice;
+  const yClose = y; // We already know this
+
+  const bodyTop = Math.min(yOpen, yClose);
+  const bodyHeight = Math.abs(yClose - yOpen);
 
   return (
     <g>
-      {data.map((point: StockDataPoint, index: number) => {
-        const { open, high, low, close, date } = point;
+      {/* Upper wick: from high to top of body */}
+      <line
+        x1={centerX}
+        y1={yHigh}
+        x2={centerX}
+        y2={bodyTop}
+        stroke={color}
+        strokeWidth={1}
+      />
 
-        // Calculate positions
-        const x = xAxis.scale(date) as number;
-        const yHigh = yAxis.scale(high) as number;
-        const yLow = yAxis.scale(low) as number;
-        const yOpen = yAxis.scale(open) as number;
-        const yClose = yAxis.scale(close) as number;
+      {/* Body: rectangle from open to close */}
+      <rect
+        x={centerX - candleWidth / 2}
+        y={bodyTop}
+        width={candleWidth}
+        height={Math.max(bodyHeight, 1)}
+        fill={color}
+        stroke={color}
+        strokeWidth={1}
+      />
 
-        const isUp = close >= open;
-        const color = isUp ? upColor : downColor;
-
-        // Body dimensions
-        const bodyTop = Math.min(yOpen, yClose);
-        const bodyHeight = Math.abs(yClose - yOpen);
-        const bodyMinHeight = 1; // Minimum height for doji candles
-
-        return (
-          <g key={`candle-${date}-${index}`}>
-            {/* Upper wick */}
-            <line
-              x1={x}
-              y1={yHigh}
-              x2={x}
-              y2={bodyTop}
-              stroke={color}
-              strokeWidth={1}
-            />
-
-            {/* Lower wick */}
-            <line
-              x1={x}
-              y1={bodyTop + bodyHeight}
-              x2={x}
-              y2={yLow}
-              stroke={color}
-              strokeWidth={1}
-            />
-
-            {/* Body */}
-            <rect
-              x={x - candleWidth / 2}
-              y={bodyTop}
-              width={candleWidth}
-              height={Math.max(bodyHeight, bodyMinHeight)}
-              fill={color}
-              stroke={color}
-              strokeWidth={1}
-            />
-          </g>
-        );
-      })}
+      {/* Lower wick: from bottom of body to low */}
+      <line
+        x1={centerX}
+        y1={bodyTop + Math.max(bodyHeight, 1)}
+        x2={centerX}
+        y2={yLow}
+        stroke={color}
+        strokeWidth={1}
+      />
     </g>
   );
 };
@@ -113,11 +117,13 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
   if (!active || !payload || !payload[0]) return null;
 
   const data = payload[0].payload;
-  const isBullish = data.close >= data.open;
+  const isBullish = data.close > data.open;
 
-  // Color based on theme
-  const upColor = colorTheme === 'asian' ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
-  const downColor = colorTheme === 'asian' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+  // Convert hex color to Tailwind class based on the theme's up color
+  // Asian theme: up=#dc2626 (red), Western theme: up=#16a34a (green)
+  const isAsianTheme = colorTheme.up === '#dc2626';
+  const upColor = isAsianTheme ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
+  const downColor = isAsianTheme ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
   const priceClass = isBullish ? upColor : downColor;
 
   return (
@@ -197,6 +203,13 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
  * @param showMA - Whether to show MA20 and MA60 overlays (default: true)
  */
 const CandlestickChart = ({ data, colorTheme, language, showMA = true }: CandlestickChartProps) => {
+  // Calculate the price range for the entire dataset
+  const minLow = Math.min(...data.map(d => d.low));
+  const maxHigh = Math.max(...data.map(d => d.high));
+  const domainMin = minLow * 0.995; // 0.5% padding
+  const domainMax = maxHigh * 1.005; // 0.5% padding
+  const priceRange = domainMax - domainMin;
+
   return (
     <ResponsiveContainer width="100%" height={145}>
       <ComposedChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
@@ -211,7 +224,7 @@ const CandlestickChart = ({ data, colorTheme, language, showMA = true }: Candles
           }}
         />
         <YAxis
-          domain={['dataMin', 'dataMax']}
+          domain={[domainMin, domainMax]}
           tick={{ fontSize: 11, fill: 'currentColor' }}
           stroke="currentColor"
           className="text-gray-500 dark:text-gray-400"
@@ -222,8 +235,20 @@ const CandlestickChart = ({ data, colorTheme, language, showMA = true }: Candles
           cursor={{ stroke: 'currentColor', strokeWidth: 1, strokeDasharray: '3 3' }}
         />
 
-        {/* Candlesticks */}
-        <Customized component={<Candlesticks colorTheme={colorTheme} />} />
+        {/* Candlesticks - using Bar with custom shape */}
+        <Bar
+          dataKey="close"
+          shape={(props: any) => (
+            <Candlestick
+              {...props}
+              colorTheme={colorTheme}
+              domainMin={domainMin}
+              domainMax={domainMax}
+              priceRange={priceRange}
+            />
+          )}
+          isAnimationActive={false}
+        />
 
         {/* MA20 Line (optional) */}
         {showMA && (
