@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Backend Testing Infrastructure** (Phase 1 Day 1 - 2025-11-10)
+  - Established pytest testing framework with coverage reporting
+  - Created comprehensive test suite for StockService (10 tests, 70% service coverage)
+  - Added shared test fixtures (mock yfinance, Flask app, test client)
+  - Configured pytest.ini and .coveragerc for test automation
+  - Current overall coverage: 59% (baseline for Phase 1)
+  - Target: 70% coverage by end of Phase 1 (Day 7)
+
 ## [1.3.4] - 2025-11-09
 
 ### Fixed
