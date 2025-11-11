@@ -77,5 +77,8 @@ Thumbs.db
 # Internal TODO tracking (private)
 .todo/
 
+# Personal automation scripts (private)
+.scripts/
+
 # Claude Code settings (personal development configuration)
 .claude/
