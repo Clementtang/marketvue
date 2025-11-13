@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   ComposedChart,
   XAxis,
@@ -203,12 +204,18 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
  * @param showMA - Whether to show MA20 and MA60 overlays (default: true)
  */
 const CandlestickChart = ({ data, colorTheme, language, showMA = true }: CandlestickChartProps) => {
-  // Calculate the price range for the entire dataset
-  const minLow = Math.min(...data.map(d => d.low));
-  const maxHigh = Math.max(...data.map(d => d.high));
-  const domainMin = minLow * 0.995; // 0.5% padding
-  const domainMax = maxHigh * 1.005; // 0.5% padding
-  const priceRange = domainMax - domainMin;
+  // Memoize price range calculation to prevent recalculation on every render
+  const priceRangeInfo = useMemo(() => {
+    const minLow = Math.min(...data.map(d => d.low));
+    const maxHigh = Math.max(...data.map(d => d.high));
+    const domainMin = minLow * 0.995; // 0.5% padding
+    const domainMax = maxHigh * 1.005; // 0.5% padding
+    const priceRange = domainMax - domainMin;
+
+    return { minLow, maxHigh, domainMin, domainMax, priceRange };
+  }, [data]);
+
+  const { domainMin, domainMax, priceRange } = priceRangeInfo;
 
   return (
     <ResponsiveContainer width="100%" height={145}>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import axios from 'axios';
@@ -67,8 +67,8 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
     }
   }, [loading, stockData]);
 
-  // Calculate moving averages
-  const calculateMA = (data: StockDataPoint[], period: number): StockDataPoint[] => {
+  // Calculate moving averages (memoized to prevent recalculation on every render)
+  const calculateMA = useCallback((data: StockDataPoint[], period: number): StockDataPoint[] => {
     return data.map((point, index) => {
       if (index < period - 1) {
         return { ...point };
@@ -82,9 +82,9 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
         [`ma${period}`]: ma,
       };
     });
-  };
+  }, []);
 
-  const fetchStockData = async (isRetry = false) => {
+  const fetchStockData = useCallback(async (isRetry = false) => {
     setLoading(true);
     setError(null);
 
@@ -167,12 +167,12 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
     } finally {
       setLoading(false);
     }
-  };
+  }, [symbol, startDate, endDate, calculateMA, t, language, retryCount]);
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     setRetryCount(0);
     fetchStockData();
-  };
+  }, [fetchStockData]);
 
   if (loading) {
     return (
@@ -213,13 +213,10 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
     );
   }
 
-  const isPositive = (stockData.change ?? 0) >= 0;
-  const upColor = isPositive ? colorTheme.up : colorTheme.down;
-
-  // Get display name based on language
-  const getDisplayName = () => {
-    if (!stockData.company_name) {
-      return stockData.symbol;
+  // Memoized computed values to prevent recalculation on every render
+  const displayName = useMemo(() => {
+    if (!stockData || !stockData.company_name) {
+      return stockData?.symbol || symbol;
     }
 
     const companyName = language === 'zh-TW'
@@ -231,10 +228,29 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
     }
 
     return stockData.symbol;
-  };
+  }, [stockData, language, symbol]);
 
-  // Custom Tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
+  const priceInfo = useMemo(() => {
+    if (!stockData) return null;
+
+    const isPositive = (stockData.change ?? 0) >= 0;
+    const upColor = isPositive ? colorTheme.up : colorTheme.down;
+
+    return { isPositive, upColor };
+  }, [stockData, colorTheme]);
+
+  const averageVolume = useMemo(() => {
+    if (!stockData || stockData.data.length === 0) {
+      return 'N/A';
+    }
+
+    const sum = stockData.data.reduce((acc, d) => acc + d.volume, 0);
+    const avg = Math.round(sum / stockData.data.length);
+    return avg.toLocaleString();
+  }, [stockData]);
+
+  // Custom Tooltip (memoized to prevent recreation on every render)
+  const CustomTooltip = useCallback(({ active, payload }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
@@ -273,24 +289,24 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
       );
     }
     return null;
-  };
+  }, [t]);
 
   return (
     <div className="w-full h-full bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 flex flex-col transition-colors">
       {/* Header */}
       <div className="flex items-start justify-between mb-2 md:mb-3">
         <div className="min-w-0 flex-1">
-          <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-white truncate" title={getDisplayName()}>{getDisplayName()}</h3>
+          <h3 className="text-base md:text-lg font-bold text-gray-800 dark:text-white truncate" title={displayName}>{displayName}</h3>
           <div className="flex items-baseline gap-1 md:gap-2 flex-wrap">
             <span className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
               ${stockData.current_price?.toFixed(2) || 'N/A'}
             </span>
-            {stockData.change !== null && stockData.change_percent !== null && (
+            {stockData.change !== null && stockData.change_percent !== null && priceInfo && (
               <div className={`flex items-center gap-1 text-xs md:text-sm font-medium`}
-                   style={{ color: upColor }}>
-                {isPositive ? <TrendingUp size={14} className="md:w-4 md:h-4" /> : <TrendingDown size={14} className="md:w-4 md:h-4" />}
+                   style={{ color: priceInfo.upColor }}>
+                {priceInfo.isPositive ? <TrendingUp size={14} className="md:w-4 md:h-4" /> : <TrendingDown size={14} className="md:w-4 md:h-4" />}
                 <span className="whitespace-nowrap">
-                  {isPositive ? '+' : ''}{stockData.change.toFixed(2)}
+                  {priceInfo.isPositive ? '+' : ''}{stockData.change.toFixed(2)}
                   ({stockData.change_percent.toFixed(2)}%)
                 </span>
               </div>
@@ -324,7 +340,7 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
             <Line
               type="monotone"
               dataKey="close"
-              stroke={upColor}
+              stroke={priceInfo?.upColor || colorTheme.up}
               strokeWidth={2}
               dot={false}
               name={t.close}
@@ -390,11 +406,7 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
 
       {/* Footer */}
       <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 pt-1 pb-2 border-t border-gray-200 dark:border-gray-700">
-        {language === 'zh-TW' ? '平均成交量' : 'Avg Volume'}: {
-          stockData.data.length > 0
-            ? Math.round(stockData.data.reduce((sum, d) => sum + d.volume, 0) / stockData.data.length).toLocaleString()
-            : 'N/A'
-        }
+        {language === 'zh-TW' ? '平均成交量' : 'Avg Volume'}: {averageVolume}
       </div>
     </div>
   );

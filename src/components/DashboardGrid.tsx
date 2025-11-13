@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -20,15 +20,16 @@ const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, chartType, lang
   const [containerWidth, setContainerWidth] = useState(1200);
   const t = useTranslation(language);
 
+  // Memoized width update handler
+  const updateWidth = useCallback(() => {
+    const container = document.getElementById('grid-container');
+    if (container && container.offsetWidth > 0) {
+      setContainerWidth(container.offsetWidth);
+    }
+  }, []);
+
   // Update container width on resize
   useEffect(() => {
-    const updateWidth = () => {
-      const container = document.getElementById('grid-container');
-      if (container && container.offsetWidth > 0) {
-        setContainerWidth(container.offsetWidth);
-      }
-    };
-
     // Small delay to ensure DOM is fully rendered
     const timer = setTimeout(updateWidth, 100);
     window.addEventListener('resize', updateWidth);
@@ -36,7 +37,7 @@ const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, chartType, lang
       clearTimeout(timer);
       window.removeEventListener('resize', updateWidth);
     };
-  }, []);
+  }, [updateWidth]);
 
   // Generate layout for 3x3 grid
   useEffect(() => {
@@ -89,8 +90,8 @@ const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, chartType, lang
     setLayout(newLayout);
   }, [stocks]);
 
-  // Save layout to localStorage when it changes
-  const handleLayoutChange = (newLayout: GridLayout.Layout[]) => {
+  // Memoized layout change handler
+  const handleLayoutChange = useCallback((newLayout: GridLayout.Layout[]) => {
     // Check if all items are stacked vertically (all x=0)
     if (newLayout.length >= 3) {
       const allAtXZero = newLayout.filter(item => item.x === 0).length === newLayout.length;
@@ -109,7 +110,7 @@ const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, chartType, lang
 
     setLayout(newLayout);
     localStorage.setItem('dashboard-layout', JSON.stringify(newLayout));
-  };
+  }, []);
 
   if (stocks.length === 0) {
     return (
