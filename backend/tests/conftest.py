@@ -21,9 +21,20 @@ def app():
     Yields:
         Flask app configured for testing
     """
+    from utils.cache import cache
+
     flask_app.config.update({
         "TESTING": True,
+        "CACHE_TYPE": "NullCache",  # Disable caching in tests
+        "CACHE_NO_NULL_WARNING": True
     })
+
+    # Reinitialize cache with null cache for testing
+    cache.init_app(flask_app, config={
+        'CACHE_TYPE': 'NullCache',
+        'CACHE_NO_NULL_WARNING': True
+    })
+
     yield flask_app
 
 
