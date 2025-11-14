@@ -2,13 +2,25 @@
 
 ## 執行摘要
 
-基於代碼庫分析，MarketVue 是一個使用 React 19.1 + TypeScript + Vite 構建的現代化股票儀表板應用。雖然基礎架構良好，但存在多個性能優化機會。本計劃提供三個階段的優化方案和完整的測試策略。
+基於代碼庫分析，MarketVue 是一個使用 React 19.1 + TypeScript + Vite 構建的現代化股票儀表板應用。雖然基礎架構良好，但存在多個性能優化機會。本計劃提供兩個核心階段的優化方案和完整的測試策略。
+
+**優化目標優先級**（根據用戶需求確定）：
+1. 🥇 **用戶體驗** - 頁面載入速度、操作流暢度
+2. 🥈 **系統穩定性** - 錯誤處理、可靠性
+3. 🥉 **開發效率** - 代碼可維護性、測試覆蓋率
+4. **未來擴展** - 架構彈性
+5. **成本控制** - API 調用優化
+
+**實施方式**：協同合作 - 每步實施前說明，隨時接受反饋
 
 **預期成果**：
 - 渲染性能提升 30-50%
 - 首次內容繪製時間減少 40%
 - 記憶體使用優化 25%
 - 用戶體驗指標全面提升
+- 測試覆蓋率達到 80%
+
+**時間框架**：5-6 天（平衡方案）
 
 ---
 
@@ -62,11 +74,12 @@
 
 ---
 
-## 二、優化方案（三階段執行）
+## 二、優化方案（兩階段執行）
 
-### 第一階段：核心性能優化（1-2 天）
+### 第一階段：核心性能優化（2 天）
 
 **目標**：解決最嚴重的性能瓶頸，實現立即可見的效果
+**重點**：用戶體驗和系統穩定性
 
 #### 1.1 React 渲染優化
 
@@ -128,27 +141,33 @@ const handleDateRangeChange = useCallback((range: DateRange) => {
 - MA 計算性能提升 50%
 - 記憶體使用減少 20%
 
-#### 1.2 組件拆分
+#### 1.2 組件拆分（激進拆分策略）
 
 **任務 4: 拆分 StockCard 為子組件**
 ```
 src/components/stock-card/
-├── StockCard.tsx (主容器)
-├── StockCardHeader.tsx (標題、價格、變化)
-├── StockChartContainer.tsx (圖表容器)
-├── StockLineChart.tsx (折線圖)
-├── StockCandlestickChart.tsx (K線圖)
-├── StockVolumeChart.tsx (成交量圖)
-├── StockCustomTooltip.tsx (工具提示)
+├── StockCard.tsx (主容器，~80 行)
+├── StockCardHeader.tsx (標題、價格、變化，~50 行)
+├── StockChartContainer.tsx (圖表容器，~60 行)
+├── StockLineChart.tsx (折線圖，~80 行)
+├── StockCandlestickChart.tsx (K線圖，~100 行)
+├── StockVolumeChart.tsx (成交量圖，~50 行)
+├── StockCustomTooltip.tsx (工具提示，~40 行)
 └── hooks/
-    ├── useStockData.ts (數據獲取)
-    └── useMACalculation.ts (MA 計算)
+    ├── useStockData.ts (數據獲取邏輯)
+    └── useMACalculation.ts (MA 計算邏輯)
 ```
+
+**拆分原則**：
+- 單一職責：每個組件只負責一個功能
+- 可重用性：子組件可獨立使用
+- 易測試：每個組件可單獨測試
 
 **預期效果**：
 - 單一文件從 403 行減少到 < 100 行
 - 可測試性提升 80%
 - 代碼可讀性顯著改善
+- 維護成本降低 40%
 
 #### 1.3 生產環境清理
 
@@ -182,15 +201,83 @@ export const APP_CONFIG = {
 } as const;
 ```
 
+#### 1.4 localStorage 數據遷移優化
+
+**任務 7: 實現智能數據遷移（保留用戶數據）**
+
+目前問題：版本更新會直接清空用戶布局配置
+```typescript
+// DashboardGrid.tsx:43-50 (當前做法)
+if (layoutVersion !== CURRENT_VERSION) {
+  localStorage.removeItem('dashboard-layout'); // 直接刪除！
+}
+```
+
+**改進方案**：
+```typescript
+// src/utils/storageMigration.ts
+export const migrateLayoutData = (version: string) => {
+  const savedLayout = localStorage.getItem('dashboard-layout');
+  const savedVersion = localStorage.getItem('dashboard-layout-version');
+
+  if (!savedLayout || savedVersion === version) {
+    return null; // 無需遷移
+  }
+
+  try {
+    const layout = JSON.parse(savedLayout);
+
+    // 嘗試轉換舊格式到新格式
+    const migratedLayout = transformLayout(layout, savedVersion, version);
+
+    if (migratedLayout) {
+      localStorage.setItem('dashboard-layout', JSON.stringify(migratedLayout));
+      localStorage.setItem('dashboard-layout-version', version);
+      return migratedLayout;
+    }
+  } catch (error) {
+    console.warn('Layout migration failed, using defaults:', error);
+  }
+
+  // 遷移失敗才清空
+  localStorage.removeItem('dashboard-layout');
+  return null;
+};
+
+// 轉換邏輯
+const transformLayout = (layout: any, fromVersion: string, toVersion: string) => {
+  // 版本 4 -> 5: 添加新屬性，保留位置
+  if (fromVersion === '4' && toVersion === '5') {
+    return layout.map((item: any) => ({
+      ...item,
+      // 保留 x, y, w, h 位置
+      // 添加新屬性的默認值
+      minW: item.minW || 3,
+      minH: item.minH || 2,
+    }));
+  }
+
+  // 其他版本轉換邏輯
+  return layout;
+};
+```
+
+**預期效果**：
+- 版本更新時保留用戶布局
+- 提升用戶體驗
+- 減少用戶投訴
+
 ---
 
-### 第二階段：數據層優化（2-3 天）
+### 第二階段：數據層優化與測試（3-4 天）
 
-**目標**：優化數據獲取、緩存和狀態管理
+**目標**：使用 React Query 優化數據獲取、緩存和狀態管理
+**技術選型**：React Query（已確認）
+**方案**：純前端優化（無需後端配合）
 
-#### 2.1 實現請求緩存和去重
+#### 2.1 實現請求緩存和去重（React Query）
 
-**任務 7: 創建數據緩存層**
+**任務 8: 創建數據緩存層**
 ```typescript
 // src/hooks/useStockDataCache.ts
 import { useQuery } from '@tanstack/react-query';
@@ -207,12 +294,12 @@ export const useStockData = (symbol: string, startDate: string, endDate: string)
 };
 ```
 
-**任務 8: 安裝 React Query**
+**任務 9: 安裝 React Query**
 ```bash
 npm install @tanstack/react-query
 ```
 
-**任務 9: 設置 QueryClient Provider**
+**任務 10: 設置 QueryClient Provider**
 ```typescript
 // src/main.tsx
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -237,34 +324,30 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 ```
 
-**預期效果**：
-- 相同數據請求自動去重
-- 減少 60% 的 API 調用
-- 自動後台刷新和重試
-
-#### 2.2 優化 API 調用策略
-
-**任務 10: 實現批量請求接口（後端配合）**
+**配置說明**：
 ```typescript
-// src/api/stockApi.ts
-export const fetchMultipleStocks = async (
-  symbols: string[],
-  startDate: string,
-  endDate: string
-) => {
-  const response = await axios.post(`${API_BASE_URL}/api/stock-data/batch`, {
-    symbols,
-    start_date: startDate,
-    end_date: endDate,
-  }, {
-    timeout: 60000,
-  });
-
-  return response.data;
-};
+// React Query 配置策略
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,        // 5 分鐘內視為新鮮數據
+      cacheTime: 30 * 60 * 1000,       // 30 分鐘後清除緩存
+      refetchOnWindowFocus: false,     // 窗口聚焦不自動重新獲取
+      retry: 3,                        // 失敗重試 3 次
+    },
+  },
+});
 ```
 
-**任務 11: 實現數據預取**
+**預期效果**：
+- 相同數據請求自動去重
+- 減少 50-60% 的 API 調用（純前端緩存）
+- 自動後台刷新和重試
+- 改善用戶體驗（即時顯示緩存數據）
+
+#### 2.2 數據預取優化
+
+**任務 11: 實現智能數據預取**
 ```typescript
 // src/hooks/usePrefetchStocks.ts
 export const usePrefetchStocks = () => {
@@ -283,13 +366,11 @@ export const usePrefetchStocks = () => {
 };
 ```
 
----
+**預期效果**：
+- 用戶操作更流暢（預取下一個可能查看的數據）
+- 減少等待時間
 
-### 第三階段：進階優化（2-3 天）
-
-**目標**：實現進階特性和長期可維護性
-
-#### 3.1 錯誤處理增強
+#### 2.3 錯誤處理增強（系統穩定性優先）
 
 **任務 12: 創建錯誤邊界組件**
 ```typescript
@@ -336,7 +417,7 @@ export class ErrorBoundary extends Component<Props, State> {
 }
 ```
 
-**任務 13: 包裝關鍵組件**
+**任務 13: 包裝關鍵組件（提升系統穩定性）**
 ```typescript
 // src/App.tsx
 <DashboardGrid layout={layout} onLayoutChange={handleLayoutChange}>
@@ -356,7 +437,12 @@ export class ErrorBoundary extends Component<Props, State> {
 </DashboardGrid>
 ```
 
-#### 3.2 性能監控增強
+**預期效果**：
+- 單個股票卡片錯誤不影響其他卡片
+- 提升系統穩定性和可靠性
+- 改善用戶體驗（部分失敗不影響整體）
+
+#### 2.4 性能監控增強
 
 **任務 14: 添加自定義性能追蹤**
 ```typescript
@@ -403,9 +489,31 @@ export const reportWebVitals = () => {
 reportWebVitals();
 ```
 
-#### 3.3 構建優化
+#### 2.5 測試實施（標準測試策略）
 
-**任務 16: 配置代碼分割**
+**任務 16: 設置測試環境**
+```bash
+# 安裝測試依賴
+npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom
+npm install -D @playwright/test
+npm install -D @lhci/cli
+```
+
+**任務 17: 編寫單元測試**
+- 目標覆蓋率：80%
+- 重點：StockCard、hooks、工具函數
+
+**任務 18: 編寫 E2E 測試**
+- 15-20 個關鍵場景
+- 覆蓋：添加/刪除股票、主題切換、時間範圍、數據持久化
+
+**任務 19: 性能測試**
+- Lighthouse CI 自動化
+- 目標：Performance Score ≥ 90
+
+#### 2.6 構建優化（可選）
+
+**任務 20: 配置代碼分割**
 ```typescript
 // src/App.tsx
 import { lazy, Suspense } from 'react';
@@ -419,7 +527,7 @@ const ThemeSettings = lazy(() => import('./components/ThemeSettings'));
 </Suspense>
 ```
 
-**任務 17: Vite 構建優化**
+**任務 21: Vite 構建優化**
 ```typescript
 // vite.config.ts
 import { defineConfig } from 'vite';
@@ -458,7 +566,7 @@ export default defineConfig({
 });
 ```
 
-**任務 18: 安裝構建分析工具**
+**任務 22: 安裝構建分析工具**
 ```bash
 npm install -D rollup-plugin-visualizer
 ```
@@ -830,17 +938,15 @@ jobs:
 
 ### 4.2 測試時程表
 
-| 階段 | 測試類型 | 預計時間 | 責任人 |
-|------|---------|---------|--------|
-| **第一階段** | 單元測試（組件） | 1 天 | 開發團隊 |
-| | 單元測試（Hook） | 0.5 天 | 開發團隊 |
-| | 整合測試 | 0.5 天 | 開發團隊 |
-| **第二階段** | 性能測試 | 1 天 | QA 團隊 |
-| | E2E 測試 | 1 天 | QA 團隊 |
-| **第三階段** | 可訪問性測試 | 0.5 天 | QA 團隊 |
-| | 視覺回歸測試 | 0.5 天 | QA 團隊 |
-| | Lighthouse 審計 | 0.5 天 | DevOps |
-| **總計** | | **5.5 天** | |
+| 天數 | 主要任務 | 測試類型 | 預計時間 |
+|------|---------|---------|---------|
+| **Day 1** | React 性能優化 | - | 1 天 |
+| **Day 2** | 組件拆分 + localStorage 遷移 | 手動測試 | 1 天 |
+| **Day 3** | React Query 整合 | 集成測試 | 1 天 |
+| **Day 4** | 錯誤處理 + 性能監控 | - | 1 天 |
+| **Day 5** | 單元測試 + 整合測試 | Vitest | 1 天 |
+| **Day 6** | E2E 測試 + Lighthouse | Playwright + LHCI | 1 天 |
+| **總計** | | | **5-6 天** |
 
 ### 4.3 驗收標準
 
@@ -925,9 +1031,15 @@ trackPerformance('ma_calculation_time', calculationDuration);
 trackPerformance('chart_render_time', renderDuration);
 ```
 
-### 6.2 錯誤追蹤
+### 6.2 錯誤追蹤（可選 - 未來功能）
 
-**整合 Sentry**
+**整合 Sentry**（暫時不實施，但保留在計劃中供參考）
+
+> **註**：根據用戶決策，暫時不使用 Sentry，但保留此功能作為未來選項。
+> 當前使用 ErrorBoundary + console.error 進行錯誤處理。
+
+**如需啟用 Sentry，參考以下實施方案**：
+
 ```bash
 npm install @sentry/react
 ```
@@ -949,6 +1061,18 @@ if (import.meta.env.PROD) {
   });
 }
 ```
+
+**Sentry 優勢**：
+- 自動捕獲所有錯誤和未處理的 Promise rejection
+- Session Replay（錯誤發生時的用戶操作回放）
+- 性能追蹤和分析
+- 錯誤分組和趨勢分析
+- 免費方案：每月 5000 錯誤事件
+
+**何時考慮啟用**：
+- 用戶數量增長到一定規模
+- 需要更專業的錯誤監控
+- 需要了解生產環境的錯誤模式
 
 ### 6.3 持續性能審計
 
@@ -978,57 +1102,82 @@ jobs:
 
 ---
 
-## 七、實施檢查清單
+## 七、實施檢查清單（5-6 天平衡方案）
 
-### 第一階段（1-2 天）
+### 第一階段：核心性能優化（2 天）
+
+**Day 1: React 性能優化**
 - [ ] 為 StockCard 添加 React.memo
 - [ ] 為 MA 計算添加 useMemo
 - [ ] 為回調函數添加 useCallback
-- [ ] 拆分 StockCard 為子組件
-- [ ] 創建自定義 Hook（useStockData、useMACalculation）
 - [ ] 移除所有 console.log
 - [ ] 提取配置常量到 constants.ts
-- [ ] 編寫單元測試（覆蓋率 ≥ 70%）
+- [ ] 驗證性能提升（開發者工具 Profiler）
 
-### 第二階段（2-3 天）
-- [ ] 安裝並配置 React Query
-- [ ] 實現 useStockData Hook 使用 useQuery
+**Day 2: 組件拆分**
+- [ ] 創建 stock-card 目錄結構
+- [ ] 拆分 StockCardHeader
+- [ ] 拆分 StockChartContainer
+- [ ] 拆分圖表組件（Line、Candlestick、Volume）
+- [ ] 拆分 CustomTooltip
+- [ ] 創建自定義 Hook（useStockData、useMACalculation）
+- [ ] 實現 localStorage 智能遷移邏輯
+- [ ] 驗證功能正常（手動測試）
+
+### 第二階段：數據層優化與測試（3-4 天）
+
+**Day 3: React Query 整合**
+- [ ] 安裝 @tanstack/react-query
 - [ ] 設置 QueryClient Provider
-- [ ] 實現數據預取邏輯
-- [ ] （可選）實現批量請求 API
-- [ ] 編寫整合測試
-- [ ] 提升單元測試覆蓋率到 ≥ 80%
+- [ ] 實現 useStockData Hook（使用 useQuery）
+- [ ] 替換所有數據獲取邏輯
+- [ ] 配置 React Query Devtools
+- [ ] 測試緩存和去重功能
 
-### 第三階段（2-3 天）
+**Day 4: 錯誤處理與性能監控**
 - [ ] 創建 ErrorBoundary 組件
-- [ ] 包裝關鍵組件
-- [ ] 添加性能監控工具
+- [ ] 包裝關鍵組件（StockCard）
+- [ ] 添加自定義性能追蹤工具
 - [ ] 實現 Web Vitals 追蹤
-- [ ] 配置代碼分割（可選）
-- [ ] 優化 Vite 構建配置
-- [ ] 安裝構建分析工具
-- [ ] 編寫 E2E 測試
-- [ ] 執行可訪問性測試
-- [ ] 執行 Lighthouse 審計
-- [ ] 測試覆蓋率達到 ≥ 80%
+- [ ] 實現數據預取邏輯
 
-### 測試階段（並行進行）
+**Day 5: 測試實施**
 - [ ] 設置 Vitest 測試環境
-- [ ] 設置 Playwright E2E 環境
-- [ ] 設置 Lighthouse CI
-- [ ] 配置 CI/CD 測試流程
-- [ ] 執行完整測試套件
-- [ ] 修復所有失敗測試
-- [ ] 達到所有驗收標準
+- [ ] 編寫組件單元測試（StockCard、子組件）
+- [ ] 編寫 Hook 測試（useStockData、useMACalculation）
+- [ ] 編寫整合測試
+- [ ] 目標：測試覆蓋率達到 60-70%
 
-### 部署與監控
-- [ ] 整合 Sentry 錯誤追蹤
+**Day 6: E2E 測試與構建優化**
+- [ ] 設置 Playwright 環境
+- [ ] 編寫 E2E 測試（10-15 個關鍵場景）
+- [ ] 設置 Lighthouse CI
+- [ ] 執行 Lighthouse 審計
+- [ ] 優化 Vite 構建配置（可選）
+- [ ] 安裝構建分析工具
+- [ ] 提升測試覆蓋率到 ≥ 80%
+- [ ] 修復所有失敗測試
+
+### 驗收階段（並行進行）
+- [ ] 執行完整測試套件
+- [ ] 驗證所有驗收標準
+- [ ] 性能基準測試
+- [ ] 手動 QA 測試
+- [ ] 準備部署
+
+### 部署與監控（Day 6 下午或 Day 7）
 - [ ] 配置性能監控儀表板
 - [ ] 設置週期性性能審計
 - [ ] 部署到 staging 環境
-- [ ] Beta 用戶測試
+- [ ] Beta 用戶測試（可選）
 - [ ] 部署到 production 環境
 - [ ] 監控性能指標
+
+### 未來功能（暫不實施）
+- [ ] 整合 Sentry 錯誤追蹤
+- [ ] 視覺回歸測試
+- [ ] 代碼分割優化
+- [ ] 虛擬滾動支持
 
 ---
 
@@ -1093,9 +1242,12 @@ jobs:
 
 同時，完整的測試計劃確保所有優化不會破壞現有功能，並且達到高標準的代碼質量和性能指標。
 
-**總投入時間**: 7-8 天（開發 + 測試）
+**總投入時間**: 5-6 天（開發 + 測試）
 **預期效益**: 性能提升 30-50%，代碼質量顯著改善
 **風險等級**: 低（充分的測試和分階段實施）
+**實施方式**: 協同合作（每步實施前說明）
+**技術選型**: React Query（激進拆分 + 標準測試）
+**後端需求**: 無（純前端優化方案）
 
 ---
 
@@ -1123,6 +1275,28 @@ jobs:
 
 ---
 
-**文檔版本**: 1.0
+---
+
+## 十一、用戶決策記錄
+
+本優化計劃已根據用戶需求進行調整：
+
+| 決策項 | 選擇 | 說明 |
+|--------|------|------|
+| 優先級 | 用戶體驗 > 系統穩定性 > 開發效率 | 重點關注性能和可靠性 |
+| 時間框架 | 5-6 天平衡方案 | 兩階段核心優化 |
+| 數據緩存 | React Query | 自動緩存、去重、重試 |
+| 組件拆分 | 激進拆分 | 單文件 < 100 行 |
+| 測試深度 | 標準測試（80% 覆蓋率） | 單元測試 + E2E + Lighthouse |
+| localStorage | 保留用戶數據 | 智能遷移邏輯 |
+| 後端配合 | 純前端方案 | 無需後端改動 |
+| Sentry | 暫不使用 | 保留為未來選項 |
+| 依賴管理 | 平衡態度 | React Query + 測試工具 |
+| 實施方式 | 協同合作 | 每步說明，隨時反饋 |
+
+---
+
+**文檔版本**: 2.0（根據用戶決策更新）
 **最後更新**: 2025-11-14
-**狀態**: 待審核
+**狀態**: 已確認，準備實施
+**下一步**: 開始第一階段實施
