@@ -2,41 +2,15 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import axios from 'axios';
-import type { ColorTheme } from './ColorThemeSelector';
-import { useTranslation, type Language } from '../i18n/translations';
+import { useTranslation } from '../i18n/translations';
 import CandlestickChart from './CandlestickChart';
+import ChartTooltip from './common/ChartTooltip';
 
-interface StockDataPoint {
-  date: string;
-  open: number;
-  high: number;
-  low: number;
-  close: number;
-  volume: number;
-  ma20?: number;
-  ma60?: number;
-}
+// Import unified types
+import type { StockData, StockDataPoint, StockCardProps } from '../types/stock';
 
-interface StockData {
-  symbol: string;
-  company_name?: {
-    'zh-TW': string | null;
-    'en-US': string | null;
-  };
-  data: StockDataPoint[];
-  current_price: number | null;
-  change: number | null;
-  change_percent: number | null;
-}
-
-interface StockCardProps {
-  symbol: string;
-  startDate: string;
-  endDate: string;
-  colorTheme: ColorTheme;
-  chartType: 'line' | 'candlestick';
-  language: Language;
-}
+// Import utilities
+import { getErrorMessage, shouldRetry, calculateRetryDelay } from '../utils/errorHandlers';
 
 const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language }: StockCardProps) => {
   const [stockData, setStockData] = useState<StockData | null>(null);
@@ -108,54 +82,15 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
       });
       setRetryCount(0); // Reset retry count on success
     } catch (err: any) {
-      let errorMessage = t.failedToFetch;
-      const statusCode = err.response?.status;
-
-      // Provide more specific error messages
-      if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-        errorMessage = language === 'zh-TW'
-          ? '請求逾時，請稍後再試'
-          : 'Request timeout, please try again later';
-      } else if (statusCode === 503) {
-        // Free tier cold start - friendly message
-        errorMessage = language === 'zh-TW'
-          ? '服務可能正在啟動中（首次訪問需要 30-60 秒），請稍候...'
-          : 'Service may be starting up (first visit takes 30-60 seconds), please wait...';
-      } else if (statusCode === 429) {
-        // Rate limit exceeded
-        errorMessage = t.rateLimitExceeded;
-      } else if (statusCode === 404) {
-        errorMessage = language === 'zh-TW'
-          ? `找不到股票代號 ${symbol}，請檢查代號是否正確`
-          : `Stock symbol ${symbol} not found, please check the symbol`;
-      } else if (statusCode === 500) {
-        errorMessage = language === 'zh-TW'
-          ? '伺服器錯誤，請稍後再試'
-          : 'Server error, please try again later';
-      } else if (err.response?.data?.error) {
-        errorMessage = err.response.data.error;
-      } else if (!navigator.onLine) {
-        errorMessage = language === 'zh-TW'
-          ? '網路連線中斷，請檢查網路連線'
-          : 'Network connection lost, please check your connection';
-      }
-
+      // Use centralized error handling utility
+      const errorMessage = getErrorMessage(err, language, t);
       setError(errorMessage);
       console.error('Error fetching stock data:', err);
 
-      // Auto-retry logic (only for network errors, not for 404s or 429s)
-      if (!isRetry && retryCount < MAX_RETRIES && statusCode !== 404 && statusCode !== 429) {
-        // Smart retry delay based on error type
-        let retryDelay: number;
-
-        if (statusCode === 503) {
-          // 503: Cold start - longer delays (5s, 10s, 15s)
-          const coldStartDelays = [5000, 10000, 15000];
-          retryDelay = coldStartDelays[retryCount] || 15000;
-        } else {
-          // Other errors: Exponential backoff, max 5s
-          retryDelay = Math.min(1000 * Math.pow(2, retryCount), 5000);
-        }
+      // Auto-retry logic using utility functions
+      if (!isRetry && shouldRetry(err, retryCount, MAX_RETRIES)) {
+        const statusCode = err.response?.status;
+        const retryDelay = calculateRetryDelay(retryCount, statusCode);
 
         console.log(`Retrying in ${retryDelay}ms... (Attempt ${retryCount + 1}/${MAX_RETRIES})`);
 
@@ -249,46 +184,9 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
     return avg.toLocaleString();
   }, [stockData]);
 
-  // Custom Tooltip (memoized to prevent recreation on every render)
-  const CustomTooltip = useCallback(({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-3 text-xs z-50">
-          <p className="font-semibold text-gray-800 dark:text-gray-200 mb-1">
-            {new Date(data.date).toLocaleDateString()}
-          </p>
-          <div className="space-y-1">
-            <p className="text-gray-700 dark:text-gray-300">
-              <span className="font-medium">{t.open}:</span> ${data.open?.toFixed(2)}
-            </p>
-            <p className="text-gray-700 dark:text-gray-300">
-              <span className="font-medium">{t.high}:</span> ${data.high?.toFixed(2)}
-            </p>
-            <p className="text-gray-700 dark:text-gray-300">
-              <span className="font-medium">{t.low}:</span> ${data.low?.toFixed(2)}
-            </p>
-            <p className="text-gray-700 dark:text-gray-300">
-              <span className="font-medium">{t.close}:</span> ${data.close?.toFixed(2)}
-            </p>
-            {data.ma20 && (
-              <p className="text-blue-600 dark:text-blue-400">
-                <span className="font-medium">{t.ma20}:</span> ${data.ma20.toFixed(2)}
-              </p>
-            )}
-            {data.ma60 && (
-              <p className="text-purple-600 dark:text-purple-400">
-                <span className="font-medium">{t.ma60}:</span> ${data.ma60.toFixed(2)}
-              </p>
-            )}
-            <p className="text-gray-600 dark:text-gray-400 pt-1 border-t dark:border-gray-600">
-              <span className="font-medium">{t.volume}:</span> {data.volume?.toLocaleString()}
-            </p>
-          </div>
-        </div>
-      );
-    }
-    return null;
+  // Use unified ChartTooltip component (memoized to prevent recreation on every render)
+  const CustomTooltip = useCallback((props: any) => {
+    return <ChartTooltip {...props} t={t} showMovingAverages={true} />;
   }, [t]);
 
   return (
