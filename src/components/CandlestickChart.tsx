@@ -10,6 +10,7 @@ import {
 } from 'recharts';
 import type { ColorTheme } from './ColorThemeSelector';
 import type { Language } from '../i18n/translations';
+import { CHART_CONFIG } from '../config/constants';
 
 interface StockDataPoint {
   date: string;
@@ -48,11 +49,11 @@ const Candlestick = (props: any) => {
   const candleWidth = 8;
 
   // CORRECT APPROACH: Use the actual chart domain passed from parent
-  // The ResponsiveContainer height is 145px, but the actual chart area is smaller
-  // because of margins: top(5) + bottom(5) = 10px
-  // Actual chart area height = 145 - 10 = 135px
+  // The ResponsiveContainer height is from CHART_CONFIG, but the actual chart area is smaller
+  // because of margins: top + bottom
+  // Actual chart area height = CANDLESTICK_HEIGHT - (MARGINS.top + MARGINS.bottom)
 
-  const chartHeight = 135; // Actual chart area height (145 - top margin - bottom margin)
+  const chartHeight = CHART_CONFIG.CANDLESTICK_HEIGHT - (CHART_CONFIG.MARGINS.top + CHART_CONFIG.MARGINS.bottom);
   const pixelsPerPrice = chartHeight / priceRange;
 
   // Calculate the Y position for each price point
@@ -218,8 +219,8 @@ const CandlestickChart = ({ data, colorTheme, language, showMA = true }: Candles
   const { domainMin, domainMax, priceRange } = priceRangeInfo;
 
   return (
-    <ResponsiveContainer width="100%" height={145}>
-      <ComposedChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+    <ResponsiveContainer width="100%" height={CHART_CONFIG.CANDLESTICK_HEIGHT}>
+      <ComposedChart data={data} margin={CHART_CONFIG.MARGINS}>
         <XAxis
           dataKey="date"
           tick={{ fontSize: 11, fill: 'currentColor' }}

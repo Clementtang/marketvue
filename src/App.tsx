@@ -15,6 +15,7 @@ import { COLOR_THEMES } from './components/ColorThemeSelector';
 import type { ColorTheme } from './components/ColorThemeSelector';
 import { useTranslation, type Language } from './i18n/translations';
 import { TrendingUp } from 'lucide-react';
+import ErrorBoundary from './components/ErrorBoundary';
 
 function App() {
   const [stocks, setStocks] = useState<string[]>([]);
@@ -156,9 +157,10 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
-      {/* Notification Banner */}
-      <NotificationBanner t={t} />
+    <ErrorBoundary language={language}>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
+        {/* Notification Banner */}
+        <NotificationBanner t={t} />
 
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
@@ -240,7 +242,8 @@ function App() {
 
       {/* Vercel Speed Insights */}
       <SpeedInsights />
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 }
 

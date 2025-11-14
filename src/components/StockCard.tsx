@@ -12,6 +12,9 @@ import type { StockData, StockDataPoint, StockCardProps } from '../types/stock';
 // Import utilities
 import { getErrorMessage, shouldRetry, calculateRetryDelay } from '../utils/errorHandlers';
 
+// Import constants
+import { API_CONFIG, MA_PERIODS, CHART_CONFIG } from '../config/constants';
+
 const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language }: StockCardProps) => {
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -19,9 +22,6 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
   const [isVisible, setIsVisible] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const t = useTranslation(language);
-
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001';
-  const MAX_RETRIES = 3;
 
   useEffect(() => {
     fetchStockData();
@@ -63,18 +63,18 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
     setError(null);
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/api/stock-data`, {
+      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/stock-data`, {
         symbol: symbol,
         start_date: startDate,
         end_date: endDate,
       }, {
-        timeout: 30000, // 30 second timeout
+        timeout: API_CONFIG.TIMEOUT,
       });
 
       // Calculate moving averages
       let processedData = response.data.data;
-      processedData = calculateMA(processedData, 20);
-      processedData = calculateMA(processedData, 60);
+      processedData = calculateMA(processedData, MA_PERIODS.SHORT);
+      processedData = calculateMA(processedData, MA_PERIODS.LONG);
 
       setStockData({
         ...response.data,
@@ -88,11 +88,11 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
       console.error('Error fetching stock data:', err);
 
       // Auto-retry logic using utility functions
-      if (!isRetry && shouldRetry(err, retryCount, MAX_RETRIES)) {
+      if (!isRetry && shouldRetry(err, retryCount, API_CONFIG.RETRY_COUNT)) {
         const statusCode = err.response?.status;
         const retryDelay = calculateRetryDelay(retryCount, statusCode);
 
-        console.log(`Retrying in ${retryDelay}ms... (Attempt ${retryCount + 1}/${MAX_RETRIES})`);
+        console.log(`Retrying in ${retryDelay}ms... (Attempt ${retryCount + 1}/${API_CONFIG.RETRY_COUNT})`);
 
         setTimeout(() => {
           setRetryCount(prev => prev + 1);
@@ -119,8 +119,8 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
         {retryCount > 0 && (
           <p className="text-gray-500 dark:text-gray-500 text-xs mt-2">
             {language === 'zh-TW'
-              ? `重試中 (${retryCount}/${MAX_RETRIES})...`
-              : `Retrying (${retryCount}/${MAX_RETRIES})...`
+              ? `重試中 (${retryCount}/${API_CONFIG.RETRY_COUNT})...`
+              : `Retrying (${retryCount}/${API_CONFIG.RETRY_COUNT})...`
             }
           </p>
         )}
@@ -214,9 +214,9 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
       </div>
 
       {/* Price Chart */}
-      <div className="mb-1" style={{ height: '145px' }}>
+      <div className="mb-1" style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}>
         {isVisible && chartType === 'line' && (
-          <ResponsiveContainer width="100%" height={145}>
+          <ResponsiveContainer width="100%" height={CHART_CONFIG.CANDLESTICK_HEIGHT}>
             <LineChart data={stockData.data}>
             <XAxis
               dataKey="date"
@@ -275,9 +275,9 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
       </div>
 
       {/* Volume Chart */}
-      <div className="mb-1" style={{ height: '63px' }}>
+      <div className="mb-1" style={{ height: `${CHART_CONFIG.VOLUME_HEIGHT}px` }}>
         {isVisible && (
-          <ResponsiveContainer width="100%" height={63}>
+          <ResponsiveContainer width="100%" height={CHART_CONFIG.VOLUME_HEIGHT}>
             <BarChart data={stockData.data}>
             <XAxis
               dataKey="date"
