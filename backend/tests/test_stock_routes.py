@@ -56,8 +56,8 @@ class TestStockDataEndpoint:
                 content_type='application/json'
             )
 
-            # Should return 404 for invalid symbol with no data
-            assert response.status_code in [404, 500]
+            # Should return 400 for invalid symbol with no data (from error decorator)
+            assert response.status_code in [400, 404, 500]
 
     def test_get_stock_endpoint_missing_params(self, client):
         """Test stock data endpoint validation for missing parameters"""

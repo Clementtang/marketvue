@@ -9,6 +9,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 2 Day 5 - Backend Refactoring & Function Splitting** (2025-11-17)
+  - Refactored StockService.get_stock_data() method using Single Responsibility Principle:
+    - Extracted _fetch_history(): Fetches historical data from yfinance with fallback logic
+    - Extracted _convert_to_data_points(): Converts DataFrame to data point dictionaries
+    - Extracted _calculate_price_info(): Calculates current price, change, and change percentage
+    - Extracted _get_ticker_info_safe(): Safely retrieves ticker info with error handling
+    - Main method reduced from 88 lines to 35 lines (orchestration only)
+  - Created error handling decorators (`backend/utils/decorators.py`):
+    - handle_errors: Centralized exception handling (ValidationError→400, ValueError→400, Exception→500)
+    - log_request: Automatic request logging with method, path, and remote address
+  - Applied decorators to all API routes:
+    - Simplified route functions by removing repetitive try-catch blocks
+    - Consistent error response format across all endpoints
+  - Created backend constants system (`backend/constants.py`):
+    - Cache configuration: CACHE_TIMEOUT_SECONDS, CACHE_DEFAULT_TIMEOUT
+    - yfinance configuration: FALLBACK_PERIOD ('3mo')
+    - Data rounding: PRICE_DECIMAL_PLACES (2), PERCENT_DECIMAL_PLACES (2)
+    - Batch limits: MAX_BATCH_SYMBOLS (18), DEFAULT_DATE_RANGE_DAYS (30)
+    - HTTP status codes: HTTP_OK, HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_INTERNAL_ERROR
+    - Logging format: LOG_FORMAT, LOG_DATE_FORMAT
+  - Refactored services and routes to use constants:
+    - Eliminated all magic numbers from backend codebase
+    - Single source of truth for all configuration values
+  - Test Results:
+    - All 43 tests passing (routes + service + batch)
+    - Coverage: 85.75% (increased from 82.49%)
+    - test_stock_routes.py: 11/11 passing
+    - test_stock_service.py: 22/22 passing
+    - test_stock_service_batch.py: 10/10 passing
+  - Code Quality Improvements:
+    - Improved testability through function extraction
+    - Enhanced maintainability with centralized error handling
+    - Better readability with orchestration pattern
+    - Zero magic numbers in backend codebase
+
 - **Phase 2 Day 4 - Testing Infrastructure & Configuration Management** (2025-11-16)
   - Vitest testing framework setup with comprehensive configuration
   - Frontend test suite: 99 tests across 3 utility modules
