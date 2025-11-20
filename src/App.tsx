@@ -1,39 +1,32 @@
 import { useState, useEffect } from 'react';
-import { format, subMonths } from 'date-fns';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
-import type { DateRange } from './components/TimeRangeSelector';
 import ChartTypeToggle from './components/ChartTypeToggle';
 import DashboardGrid from './components/DashboardGrid';
 import ThemeSettings from './components/ThemeSettings';
-import type { ThemeMode } from './components/ThemeSettings';
 import NotificationBanner from './components/NotificationBanner';
 import Footer from './components/Footer';
-import { COLOR_THEMES } from './components/ColorThemeSelector';
-import type { ColorTheme } from './components/ColorThemeSelector';
-import { useTranslation, type Language } from './i18n/translations';
+import { useTranslation } from './i18n/translations';
 import { TrendingUp } from 'lucide-react';
 import ErrorBoundary from './components/ErrorBoundary';
+import { AppProvider, useApp } from './contexts/AppContext';
+import { ChartProvider, useChart } from './contexts/ChartContext';
 
-function App() {
+function AppContent() {
+  // Use Context hooks
+  const { language, colorTheme, setColorTheme, themeMode, setThemeMode, setLanguage } = useApp();
+  const { chartType, setChartType, dateRange, setDateRange } = useChart();
+
+  // Local state (stocks management)
   const [stocks, setStocks] = useState<string[]>([]);
-  const [dateRange, setDateRange] = useState<DateRange>({
-    startDate: format(subMonths(new Date(), 1), 'yyyy-MM-dd'),
-    endDate: format(new Date(), 'yyyy-MM-dd'),
-    preset: '1m',
-  });
-  const [colorTheme, setColorTheme] = useState<ColorTheme>(COLOR_THEMES[1]); // Default to Western style
-  const [themeMode, setThemeMode] = useState<ThemeMode>('system'); // Default to system
-  const [language, setLanguage] = useState<Language>('en-US'); // Default to English
-  const [chartType, setChartType] = useState<'line' | 'candlestick'>('line'); // Default to line chart
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Get translations
   const t = useTranslation(language);
 
-  // Load stocks, color theme, theme mode, and date range from localStorage
+  // Load stocks from localStorage (other settings handled by Context)
   useEffect(() => {
     const savedStocks = localStorage.getItem('tracked-stocks');
     if (savedStocks) {
@@ -43,49 +36,6 @@ function App() {
         console.error('Failed to load saved stocks:', e);
       }
     }
-
-    const savedColorTheme = localStorage.getItem('color-theme');
-    if (savedColorTheme) {
-      try {
-        setColorTheme(JSON.parse(savedColorTheme));
-      } catch (e) {
-        console.error('Failed to load saved color theme:', e);
-      }
-    }
-
-    const savedThemeMode = localStorage.getItem('theme-mode');
-    if (savedThemeMode) {
-      try {
-        setThemeMode(savedThemeMode as ThemeMode);
-      } catch (e) {
-        console.error('Failed to load saved theme mode:', e);
-      }
-    }
-
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage) {
-      try {
-        setLanguage(savedLanguage as Language);
-      } catch (e) {
-        console.error('Failed to load saved language:', e);
-      }
-    }
-
-    const savedDateRange = localStorage.getItem('date-range');
-    if (savedDateRange) {
-      try {
-        setDateRange(JSON.parse(savedDateRange));
-      } catch (e) {
-        console.error('Failed to load saved date range:', e);
-      }
-    }
-
-    const savedChartType = localStorage.getItem('chart-type');
-    if (savedChartType === 'candlestick' || savedChartType === 'line') {
-      setChartType(savedChartType);
-    }
-
-    // Mark as initialized
     setIsInitialized(true);
   }, []);
 
@@ -96,64 +46,12 @@ function App() {
     }
   }, [stocks, isInitialized]);
 
-  // Apply dark mode based on theme mode
-  useEffect(() => {
-    const applyTheme = (isDark: boolean) => {
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-    };
-
-    if (themeMode === 'dark') {
-      applyTheme(true);
-    } else if (themeMode === 'light') {
-      applyTheme(false);
-    } else {
-      // System mode
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      applyTheme(mediaQuery.matches);
-
-      const listener = (e: MediaQueryListEvent) => {
-        applyTheme(e.matches);
-      };
-      mediaQuery.addEventListener('change', listener);
-      return () => mediaQuery.removeEventListener('change', listener);
-    }
-  }, [themeMode]);
-
   const handleAddStock = (symbol: string) => {
     setStocks((prev) => [...prev, symbol]);
   };
 
   const handleRemoveStock = (symbol: string) => {
     setStocks((prev) => prev.filter((s) => s !== symbol));
-  };
-
-  const handleRangeChange = (range: DateRange) => {
-    setDateRange(range);
-    localStorage.setItem('date-range', JSON.stringify(range));
-  };
-
-  const handleColorThemeChange = (theme: ColorTheme) => {
-    setColorTheme(theme);
-    localStorage.setItem('color-theme', JSON.stringify(theme));
-  };
-
-  const handleThemeModeChange = (mode: ThemeMode) => {
-    setThemeMode(mode);
-    localStorage.setItem('theme-mode', mode);
-  };
-
-  const handleLanguageChange = (lang: Language) => {
-    setLanguage(lang);
-    localStorage.setItem('language', lang);
-  };
-
-  const handleChartTypeChange = (type: 'line' | 'candlestick') => {
-    setChartType(type);
-    localStorage.setItem('chart-type', type);
   };
 
   return (
@@ -179,11 +77,11 @@ function App() {
             {/* Settings Button */}
             <ThemeSettings
               colorTheme={colorTheme}
-              onColorThemeChange={handleColorThemeChange}
+              onColorThemeChange={setColorTheme}
               themeMode={themeMode}
-              onThemeModeChange={handleThemeModeChange}
+              onThemeModeChange={setThemeMode}
               language={language}
-              onLanguageChange={handleLanguageChange}
+              onLanguageChange={setLanguage}
               t={t}
             />
           </div>
@@ -208,7 +106,7 @@ function App() {
           <div className="lg:col-span-2">
             <ChartTypeToggle
               chartType={chartType}
-              onChartTypeChange={handleChartTypeChange}
+              onChartTypeChange={setChartType}
               language={language}
             />
           </div>
@@ -217,7 +115,7 @@ function App() {
           <div className="lg:col-span-4">
             <TimeRangeSelector
               currentRange={dateRange}
-              onRangeChange={handleRangeChange}
+              onRangeChange={setDateRange}
               language={language}
             />
           </div>
@@ -244,6 +142,16 @@ function App() {
       <SpeedInsights />
       </div>
     </ErrorBoundary>
+  );
+}
+
+function App() {
+  return (
+    <AppProvider>
+      <ChartProvider>
+        <AppContent />
+      </ChartProvider>
+    </AppProvider>
   );
 }
 
