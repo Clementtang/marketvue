@@ -19,13 +19,21 @@ logger = logging.getLogger(__name__)
 
 def create_app(config_name='default'):
     """
-    Application factory pattern
+    Application factory pattern for creating Flask app instances.
+
+    Creates and configures a Flask application with CORS, caching, rate limiting,
+    and error handling. This pattern allows for easier testing and multiple
+    app instances with different configurations.
 
     Args:
-        config_name: Configuration to use (development, production, default)
+        config_name: Configuration to use ('development', 'production', or 'default')
 
     Returns:
-        Configured Flask application
+        Flask: Configured Flask application instance with all extensions initialized
+
+    Examples:
+        >>> app = create_app('development')
+        >>> app = create_app('production')
     """
     # Create Flask app
     app = Flask(__name__)

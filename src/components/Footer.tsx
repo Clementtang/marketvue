@@ -1,11 +1,11 @@
 import { Github } from 'lucide-react';
-import type { Translations } from '../i18n/translations';
+import { useTranslation } from '../i18n/translations';
+import { useApp } from '../contexts/AppContext';
 
-interface FooterProps {
-  t: Translations;
-}
-
-const Footer = ({ t }: FooterProps) => {
+const Footer = () => {
+  // Use Context
+  const { language } = useApp();
+  const t = useTranslation(language);
   return (
     <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors mt-auto">
       <div className="container mx-auto px-4 py-6">

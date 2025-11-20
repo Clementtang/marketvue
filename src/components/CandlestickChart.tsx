@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import {
   ComposedChart,
   XAxis,
@@ -7,8 +8,8 @@ import {
   Line,
   Bar,
 } from 'recharts';
-import type { ColorTheme } from './ColorThemeSelector';
-import type { Language } from '../i18n/translations';
+import { CHART_CONFIG } from '../config/constants';
+import { useApp } from '../contexts/AppContext';
 
 interface StockDataPoint {
   date: string;
@@ -23,8 +24,6 @@ interface StockDataPoint {
 
 interface CandlestickChartProps {
   data: StockDataPoint[];
-  colorTheme: ColorTheme;
-  language: Language;
   showMA?: boolean;
 }
 
@@ -47,11 +46,11 @@ const Candlestick = (props: any) => {
   const candleWidth = 8;
 
   // CORRECT APPROACH: Use the actual chart domain passed from parent
-  // The ResponsiveContainer height is 145px, but the actual chart area is smaller
-  // because of margins: top(5) + bottom(5) = 10px
-  // Actual chart area height = 145 - 10 = 135px
+  // The ResponsiveContainer height is from CHART_CONFIG, but the actual chart area is smaller
+  // because of margins: top + bottom
+  // Actual chart area height = CANDLESTICK_HEIGHT - (MARGINS.top + MARGINS.bottom)
 
-  const chartHeight = 135; // Actual chart area height (145 - top margin - bottom margin)
+  const chartHeight = CHART_CONFIG.CANDLESTICK_HEIGHT - (CHART_CONFIG.MARGINS.top + CHART_CONFIG.MARGINS.bottom);
   const pixelsPerPrice = chartHeight / priceRange;
 
   // Calculate the Y position for each price point
@@ -202,17 +201,26 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
  * @param language - UI language ('zh-TW' or 'en-US')
  * @param showMA - Whether to show MA20 and MA60 overlays (default: true)
  */
-const CandlestickChart = ({ data, colorTheme, language, showMA = true }: CandlestickChartProps) => {
-  // Calculate the price range for the entire dataset
-  const minLow = Math.min(...data.map(d => d.low));
-  const maxHigh = Math.max(...data.map(d => d.high));
-  const domainMin = minLow * 0.995; // 0.5% padding
-  const domainMax = maxHigh * 1.005; // 0.5% padding
-  const priceRange = domainMax - domainMin;
+const CandlestickChart = ({ data, showMA = true }: CandlestickChartProps) => {
+  // Use Context
+  const { colorTheme, language } = useApp();
+
+  // Memoize price range calculation to prevent recalculation on every render
+  const priceRangeInfo = useMemo(() => {
+    const minLow = Math.min(...data.map(d => d.low));
+    const maxHigh = Math.max(...data.map(d => d.high));
+    const domainMin = minLow * 0.995; // 0.5% padding
+    const domainMax = maxHigh * 1.005; // 0.5% padding
+    const priceRange = domainMax - domainMin;
+
+    return { minLow, maxHigh, domainMin, domainMax, priceRange };
+  }, [data]);
+
+  const { domainMin, domainMax, priceRange } = priceRangeInfo;
 
   return (
-    <ResponsiveContainer width="100%" height={145}>
-      <ComposedChart data={data} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
+    <ResponsiveContainer width="100%" height={CHART_CONFIG.CANDLESTICK_HEIGHT}>
+      <ComposedChart data={data} margin={CHART_CONFIG.MARGINS}>
         <XAxis
           dataKey="date"
           tick={{ fontSize: 11, fill: 'currentColor' }}

@@ -1,19 +1,17 @@
 import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
-import type { Language } from '../i18n/translations';
 import { useTranslation } from '../i18n/translations';
+import { useApp } from '../contexts/AppContext';
+import { useChart } from '../contexts/ChartContext';
 
-interface ChartTypeToggleProps {
-  chartType: 'line' | 'candlestick';
-  onChartTypeChange: (type: 'line' | 'candlestick') => void;
-  language: Language;
-}
-
-const ChartTypeToggle = ({ chartType, onChartTypeChange, language }: ChartTypeToggleProps) => {
+const ChartTypeToggle = () => {
+  // Use Context
+  const { language } = useApp();
+  const { chartType, setChartType } = useChart();
   const t = useTranslation(language);
 
   const toggleChartType = () => {
     const newType = chartType === 'line' ? 'candlestick' : 'line';
-    onChartTypeChange(newType);
+    setChartType(newType);
   };
 
   return (
