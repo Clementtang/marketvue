@@ -9,6 +9,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 2 Day 6 - Dependency Injection & Comprehensive Docstrings** (2025-11-17)
+  - Implemented Dependency Injection pattern for StockService:
+    - Refactored StockService from static methods to instance methods
+    - Created get_stock_service() and set_stock_service() in stock_routes.py
+    - Enables easy mocking for testing and better separation of concerns
+    - Improved testability without changing external API behavior
+  - Added comprehensive Google-style docstrings to all backend modules:
+    - StockService: Complete method documentation with Args, Returns, Raises, Examples
+    - Routes: Enhanced endpoint documentation with request/response formats
+    - Config: Documented all configuration classes and attributes
+    - Constants: Added inline comments explaining each constant's purpose
+    - Decorators: Full documentation for error handling and logging decorators
+    - Cache key functions: Detailed documentation with examples
+    - App factory: Enhanced create_app() documentation
+  - Updated all tests for dependency injection:
+    - Added stock_service pytest fixture to test_stock_service.py
+    - Added stock_service pytest fixture to test_stock_service_batch.py
+    - Updated 32 test methods to use instance-based service calls
+    - All 43 tests passing with improved maintainability
+  - Test Results:
+    - All 43 tests passing (100% pass rate)
+    - Coverage: 91.36% (increased from 85.75%)
+    - Backend coverage breakdown:
+      - app.py: 86% coverage
+      - config.py: 100% coverage
+      - constants.py: 100% coverage
+      - routes/stock_routes.py: 90% coverage
+      - services/stock_service.py: 90% coverage
+      - utils/decorators.py: 100% coverage
+  - Code Quality Improvements:
+    - Improved dependency injection enables easier testing
+    - Complete documentation for all public APIs
+    - Better code discoverability through docstring examples
+    - Consistent documentation style across entire backend
+    - Facilitates future maintenance and onboarding
+
 - **Phase 2 Day 5 - Backend Refactoring & Function Splitting** (2025-11-17)
   - Refactored StockService.get_stock_data() method using Single Responsibility Principle:
     - Extracted _fetch_history(): Fetches historical data from yfinance with fallback logic

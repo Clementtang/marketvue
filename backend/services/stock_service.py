@@ -15,15 +15,26 @@ logger = logging.getLogger(__name__)
 
 
 class StockService:
-    """Service for fetching stock data using yfinance"""
+    """
+    Service for fetching stock data using yfinance.
 
-    # Cache for company name mappings
-    _company_names = None
+    This service provides methods to fetch historical stock data for individual
+    symbols or multiple symbols in batch. It uses yfinance as the data source
+    and includes caching for company name mappings.
 
-    @staticmethod
-    def _fetch_history(ticker: yf.Ticker, symbol: str, start_date: str, end_date: str):
+    Examples:
+        >>> service = StockService()
+        >>> data = service.get_stock_data('AAPL', '2024-01-01', '2024-12-31')
+        >>> batch_data = service.get_batch_stocks(['AAPL', 'GOOGL'], '2024-01-01', '2024-12-31')
+    """
+
+    def __init__(self):
+        """Initialize the StockService with empty company name cache."""
+        self._company_names = None
+
+    def _fetch_history(self, ticker: yf.Ticker, symbol: str, start_date: str, end_date: str):
         """
-        Fetch historical data from yfinance
+        Fetch historical data from yfinance.
 
         Args:
             ticker: yfinance Ticker object
@@ -48,17 +59,16 @@ class StockService:
 
         return hist
 
-    @staticmethod
-    def _convert_to_data_points(hist, symbol: str) -> List[Dict]:
+    def _convert_to_data_points(self, hist, symbol: str) -> List[Dict]:
         """
-        Convert DataFrame to list of data point dictionaries
+        Convert DataFrame to list of data point dictionaries.
 
         Args:
             hist: pandas DataFrame with historical data
             symbol: Stock ticker symbol (for logging)
 
         Returns:
-            List of data point dictionaries
+            List of data point dictionaries with OHLCV data
         """
         data_points = []
         for index, row in hist.iterrows():
@@ -84,10 +94,9 @@ class StockService:
 
         return data_points
 
-    @staticmethod
-    def _calculate_price_info(data_points: List[Dict]) -> tuple:
+    def _calculate_price_info(self, data_points: List[Dict]) -> tuple:
         """
-        Calculate current price, change, and change percentage
+        Calculate current price, change, and change percentage.
 
         Args:
             data_points: List of data point dictionaries
@@ -106,10 +115,9 @@ class StockService:
 
         return current_price, change, change_percent
 
-    @staticmethod
-    def _get_ticker_info_safe(ticker: yf.Ticker, symbol: str) -> Optional[Dict]:
+    def _get_ticker_info_safe(self, ticker: yf.Ticker, symbol: str) -> Optional[Dict]:
         """
-        Safely retrieve ticker info
+        Safely retrieve ticker info.
 
         Args:
             ticker: yfinance Ticker object
@@ -124,28 +132,31 @@ class StockService:
             logger.warning(f"Could not fetch ticker info for {symbol}: {str(e)}")
             return None
 
-    @classmethod
-    def _load_company_names(cls) -> Dict:
-        """Load company name mappings from JSON file"""
-        if cls._company_names is None:
+    def _load_company_names(self) -> Dict:
+        """
+        Load company name mappings from JSON file.
+
+        Returns:
+            Dictionary mapping stock symbols to company names in multiple languages
+        """
+        if self._company_names is None:
             try:
                 # Get the path to the JSON file
                 base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
                 json_path = os.path.join(base_dir, 'data', 'company_names.json')
 
                 with open(json_path, 'r', encoding='utf-8') as f:
-                    cls._company_names = json.load(f)
-                logger.info(f"Loaded {len(cls._company_names)} company name mappings")
+                    self._company_names = json.load(f)
+                logger.info(f"Loaded {len(self._company_names)} company name mappings")
             except Exception as e:
                 logger.warning(f"Failed to load company names: {str(e)}")
-                cls._company_names = {}
+                self._company_names = {}
 
-        return cls._company_names
+        return self._company_names
 
-    @classmethod
-    def get_company_name(cls, symbol: str, ticker_info: Dict = None) -> Dict[str, str]:
+    def get_company_name(self, symbol: str, ticker_info: Dict = None) -> Dict[str, str]:
         """
-        Get company name in multiple languages
+        Get company name in multiple languages.
 
         Args:
             symbol: Stock ticker symbol
@@ -153,9 +164,15 @@ class StockService:
 
         Returns:
             Dictionary with 'zh-TW' and 'en-US' company names
+
+        Examples:
+            >>> service = StockService()
+            >>> name = service.get_company_name('AAPL')
+            >>> print(name['en-US'])
+            'Apple Inc.'
         """
         # Load mappings
-        mappings = cls._load_company_names()
+        mappings = self._load_company_names()
 
         # Check if we have a mapping for this symbol
         if symbol in mappings:
@@ -177,40 +194,53 @@ class StockService:
 
         return result
 
-    @staticmethod
-    def get_stock_data(symbol: str, start_date: str, end_date: str) -> Dict:
+    def get_stock_data(self, symbol: str, start_date: str, end_date: str) -> Dict:
         """
-        Fetch historical stock data for a given symbol
+        Fetch historical stock data for a given symbol.
 
         Args:
-            symbol: Stock ticker symbol
+            symbol: Stock ticker symbol (e.g., 'AAPL', 'GOOGL')
             start_date: Start date in YYYY-MM-DD format
             end_date: End date in YYYY-MM-DD format
 
         Returns:
-            Dictionary containing stock data and metadata
+            Dictionary containing:
+                - symbol: Uppercased ticker symbol
+                - company_name: Dict with 'zh-TW' and 'en-US' names
+                - data: List of OHLCV data points
+                - current_price: Most recent closing price
+                - change: Price change from previous day
+                - change_percent: Percentage change from previous day
 
         Raises:
-            ValueError: If stock data cannot be fetched
+            ValueError: If stock data cannot be fetched or symbol is invalid
+
+        Examples:
+            >>> service = StockService()
+            >>> data = service.get_stock_data('AAPL', '2024-01-01', '2024-01-31')
+            >>> print(data['symbol'])
+            'AAPL'
+            >>> print(len(data['data']))
+            21
         """
         try:
             logger.info(f"Fetching stock data for {symbol} from {start_date} to {end_date}")
 
             # Initialize ticker and fetch historical data
             ticker = yf.Ticker(symbol)
-            hist = StockService._fetch_history(ticker, symbol, start_date, end_date)
+            hist = self._fetch_history(ticker, symbol, start_date, end_date)
 
             # Get ticker info for company name lookup
-            ticker_info = StockService._get_ticker_info_safe(ticker, symbol)
+            ticker_info = self._get_ticker_info_safe(ticker, symbol)
 
             # Convert historical data to data points
-            data_points = StockService._convert_to_data_points(hist, symbol)
+            data_points = self._convert_to_data_points(hist, symbol)
 
             # Calculate price information
-            current_price, change, change_percent = StockService._calculate_price_info(data_points)
+            current_price, change, change_percent = self._calculate_price_info(data_points)
 
             # Get company name
-            company_name = StockService.get_company_name(symbol.upper(), ticker_info)
+            company_name = self.get_company_name(symbol.upper(), ticker_info)
 
             # Build response
             result = {
@@ -229,22 +259,32 @@ class StockService:
             logger.error(f"Error fetching stock data for {symbol}: {str(e)}")
             raise ValueError(f"Failed to fetch stock data for {symbol}: {str(e)}")
 
-    @staticmethod
-    def get_batch_stocks(symbols: List[str], start_date: Optional[str] = None,
+    def get_batch_stocks(self, symbols: List[str], start_date: Optional[str] = None,
                         end_date: Optional[str] = None) -> Dict:
         """
-        Fetch data for multiple stocks
+        Fetch data for multiple stocks.
 
         Args:
-            symbols: List of stock ticker symbols (max 9)
+            symbols: List of stock ticker symbols (max 18 per request)
             start_date: Optional start date in YYYY-MM-DD format
             end_date: Optional end date in YYYY-MM-DD format
 
         Returns:
-            Dictionary containing data for all stocks
+            Dictionary containing:
+                - stocks: List of stock data dictionaries
+                - timestamp: ISO format timestamp of the request
+                - errors: List of error dictionaries (null if no errors)
 
         Raises:
             ValueError: If batch data cannot be fetched
+
+        Examples:
+            >>> service = StockService()
+            >>> batch = service.get_batch_stocks(['AAPL', 'GOOGL'], '2024-01-01', '2024-01-31')
+            >>> print(len(batch['stocks']))
+            2
+            >>> print(batch['errors'])
+            None
         """
         try:
             logger.info(f"Fetching batch data for {len(symbols)} stocks")
@@ -260,7 +300,7 @@ class StockService:
 
             for symbol in symbols:
                 try:
-                    stock_data = StockService.get_stock_data(symbol, start_date, end_date)
+                    stock_data = self.get_stock_data(symbol, start_date, end_date)
                     stocks_data.append(stock_data)
                 except ValueError as e:
                     logger.warning(f"Failed to fetch data for {symbol}: {str(e)}")

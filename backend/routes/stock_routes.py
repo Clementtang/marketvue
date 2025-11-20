@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from marshmallow import ValidationError
 from services.stock_service import StockService
 from schemas.stock_schemas import (
@@ -17,10 +17,50 @@ logger = logging.getLogger(__name__)
 # Create blueprint
 stock_bp = Blueprint('stock', __name__, url_prefix='/api')
 
+# Stock service instance (injected via create_stock_routes or default)
+_stock_service = None
+
+
+def get_stock_service() -> StockService:
+    """
+    Get the StockService instance for dependency injection.
+
+    Returns:
+        StockService: The injected or default stock service instance
+    """
+    global _stock_service
+    if _stock_service is None:
+        _stock_service = StockService()
+    return _stock_service
+
+
+def set_stock_service(service: StockService):
+    """
+    Set the StockService instance for dependency injection (used in testing).
+
+    Args:
+        service: StockService instance to inject
+    """
+    global _stock_service
+    _stock_service = service
+
 
 # Cache key functions
 def make_stock_data_cache_key():
-    """Generate cache key for stock data requests based on symbol and date range"""
+    """
+    Generate cache key for stock data requests.
+
+    Creates a unique cache key based on symbol and date range from the request JSON.
+    Returns None if request data is invalid or an error occurs.
+
+    Returns:
+        str: Cache key in format "stock_data:{SYMBOL}:{start_date}:{end_date}"
+        None: If request data is invalid
+
+    Examples:
+        >>> # For request: {"symbol": "AAPL", "start_date": "2024-01-01", "end_date": "2024-01-31"}
+        >>> # Returns: "stock_data:AAPL:2024-01-01:2024-01-31"
+    """
     try:
         data = request.get_json()
         if not data:
@@ -40,7 +80,21 @@ def make_stock_data_cache_key():
 
 
 def make_batch_stocks_cache_key():
-    """Generate cache key for batch stocks requests"""
+    """
+    Generate cache key for batch stocks requests.
+
+    Creates a unique cache key based on sorted symbols list and date range.
+    Symbols are sorted alphabetically to ensure consistent cache keys regardless
+    of the order they appear in the request.
+
+    Returns:
+        str: Cache key in format "batch_stocks:{SYMBOL1,SYMBOL2}:{start_date}:{end_date}"
+        None: If request data is invalid
+
+    Examples:
+        >>> # For request: {"symbols": ["GOOGL", "AAPL"], "start_date": "2024-01-01"}
+        >>> # Returns: "batch_stocks:AAPL,GOOGL:2024-01-01:none"
+    """
     try:
         data = request.get_json()
         if not data:
@@ -99,8 +153,9 @@ def get_stock_data():
     start_date = data['start_date'].strftime('%Y-%m-%d')
     end_date = data['end_date'].strftime('%Y-%m-%d')
 
-    # Fetch stock data
-    result = StockService.get_stock_data(
+    # Fetch stock data using injected service
+    stock_service = get_stock_service()
+    result = stock_service.get_stock_data(
         symbol=data['symbol'].upper(),
         start_date=start_date,
         end_date=end_date
@@ -149,8 +204,9 @@ def get_batch_stocks():
     if start_date and end_date and end_date < start_date:
         raise ValueError('end_date must be after start_date')
 
-    # Fetch batch data
-    result = StockService.get_batch_stocks(
+    # Fetch batch data using injected service
+    stock_service = get_stock_service()
+    result = stock_service.get_batch_stocks(
         symbols=symbols,
         start_date=start_date,
         end_date=end_date
