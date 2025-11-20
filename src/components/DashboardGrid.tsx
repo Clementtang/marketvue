@@ -3,22 +3,22 @@ import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import StockCard from './StockCard';
-import type { ColorTheme } from './ColorThemeSelector';
-import { useTranslation, type Language } from '../i18n/translations';
+import { useTranslation } from '../i18n/translations';
+import { useApp } from '../contexts/AppContext';
 
 interface DashboardGridProps {
   stocks: string[];
   startDate: string;
   endDate: string;
-  colorTheme: ColorTheme;
-  chartType: 'line' | 'candlestick';
-  language: Language;
 }
 
-const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, chartType, language }: DashboardGridProps) => {
+const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
+  // Use Context
+  const { language } = useApp();
+  const t = useTranslation(language);
+
   const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
   const [containerWidth, setContainerWidth] = useState(1200);
-  const t = useTranslation(language);
 
   // Memoized width update handler
   const updateWidth = useCallback(() => {
@@ -167,9 +167,6 @@ const DashboardGrid = ({ stocks, startDate, endDate, colorTheme, chartType, lang
               symbol={symbol}
               startDate={startDate}
               endDate={endDate}
-              colorTheme={colorTheme}
-              chartType={chartType}
-              language={language}
             />
           </div>
         ))}

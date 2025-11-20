@@ -17,7 +17,7 @@ import { ChartProvider, useChart } from './contexts/ChartContext';
 function AppContent() {
   // Use Context hooks
   const { language, colorTheme, setColorTheme, themeMode, setThemeMode, setLanguage } = useApp();
-  const { chartType, setChartType, dateRange, setDateRange } = useChart();
+  const { dateRange } = useChart();
 
   // Local state (stocks management)
   const [stocks, setStocks] = useState<string[]>([]);
@@ -98,26 +98,17 @@ function AppContent() {
               stocks={stocks}
               onAddStock={handleAddStock}
               onRemoveStock={handleRemoveStock}
-              language={language}
             />
           </div>
 
           {/* Chart Type Toggle - 20% width on large screens */}
           <div className="lg:col-span-2">
-            <ChartTypeToggle
-              chartType={chartType}
-              onChartTypeChange={setChartType}
-              language={language}
-            />
+            <ChartTypeToggle />
           </div>
 
           {/* Time Range Selector - 30% width on large screens */}
           <div className="lg:col-span-4">
-            <TimeRangeSelector
-              currentRange={dateRange}
-              onRangeChange={setDateRange}
-              language={language}
-            />
+            <TimeRangeSelector />
           </div>
         </div>
 
@@ -126,14 +117,11 @@ function AppContent() {
           stocks={stocks}
           startDate={dateRange.startDate}
           endDate={dateRange.endDate}
-          colorTheme={colorTheme}
-          chartType={chartType}
-          language={language}
         />
       </main>
 
       {/* Footer */}
-      <Footer t={t} />
+      <Footer />
 
       {/* Vercel Analytics */}
       <Analytics />

@@ -7,7 +7,7 @@ import CandlestickChart from './CandlestickChart';
 import ChartTooltip from './common/ChartTooltip';
 
 // Import unified types
-import type { StockData, StockDataPoint, StockCardProps } from '../types/stock';
+import type { StockData, StockDataPoint } from '../types/stock';
 
 // Import utilities
 import { getErrorMessage, shouldRetry, calculateRetryDelay } from '../utils/errorHandlers';
@@ -15,13 +15,27 @@ import { getErrorMessage, shouldRetry, calculateRetryDelay } from '../utils/erro
 // Import constants
 import { API_CONFIG, MA_PERIODS, CHART_CONFIG } from '../config/constants';
 
-const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language }: StockCardProps) => {
+// Import Context hooks
+import { useApp } from '../contexts/AppContext';
+import { useChart } from '../contexts/ChartContext';
+
+interface StockCardProps {
+  symbol: string;
+  startDate: string;
+  endDate: string;
+}
+
+const StockCard = ({ symbol, startDate, endDate }: StockCardProps) => {
+  // Use Context
+  const { language, colorTheme } = useApp();
+  const { chartType } = useChart();
+  const t = useTranslation(language);
+
   const [stockData, setStockData] = useState<StockData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isVisible, setIsVisible] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const t = useTranslation(language);
 
   useEffect(() => {
     fetchStockData();
@@ -267,8 +281,6 @@ const StockCard = ({ symbol, startDate, endDate, colorTheme, chartType, language
         {isVisible && chartType === 'candlestick' && (
           <CandlestickChart
             data={stockData.data}
-            colorTheme={colorTheme}
-            language={language}
             showMA={true}
           />
         )}

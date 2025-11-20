@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { Plus, X } from 'lucide-react';
-import { useTranslation, type Language } from '../i18n/translations';
+import { useTranslation } from '../i18n/translations';
+import { useApp } from '../contexts/AppContext';
 
 interface StockManagerProps {
   stocks: string[];
   onAddStock: (symbol: string) => void;
   onRemoveStock: (symbol: string) => void;
-  language: Language;
 }
 
-const StockManager = ({ stocks, onAddStock, onRemoveStock, language }: StockManagerProps) => {
+const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) => {
+  // Use Context
+  const { language } = useApp();
+  const t = useTranslation(language);
+
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
-  const t = useTranslation(language);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -8,9 +8,8 @@ import {
   Line,
   Bar,
 } from 'recharts';
-import type { ColorTheme } from './ColorThemeSelector';
-import type { Language } from '../i18n/translations';
 import { CHART_CONFIG } from '../config/constants';
+import { useApp } from '../contexts/AppContext';
 
 interface StockDataPoint {
   date: string;
@@ -25,8 +24,6 @@ interface StockDataPoint {
 
 interface CandlestickChartProps {
   data: StockDataPoint[];
-  colorTheme: ColorTheme;
-  language: Language;
   showMA?: boolean;
 }
 
@@ -204,7 +201,10 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
  * @param language - UI language ('zh-TW' or 'en-US')
  * @param showMA - Whether to show MA20 and MA60 overlays (default: true)
  */
-const CandlestickChart = ({ data, colorTheme, language, showMA = true }: CandlestickChartProps) => {
+const CandlestickChart = ({ data, showMA = true }: CandlestickChartProps) => {
+  // Use Context
+  const { colorTheme, language } = useApp();
+
   // Memoize price range calculation to prevent recalculation on every render
   const priceRangeInfo = useMemo(() => {
     const minLow = Math.min(...data.map(d => d.low));

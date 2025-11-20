@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { Calendar } from 'lucide-react';
 import { format, subMonths, subYears, subDays, startOfYear } from 'date-fns';
-import { useTranslation, type Language } from '../i18n/translations';
+import { useTranslation } from '../i18n/translations';
+import { useApp } from '../contexts/AppContext';
+import { useChart } from '../contexts/ChartContext';
 
 export interface DateRange {
   startDate: string;
@@ -9,17 +11,15 @@ export interface DateRange {
   preset?: string;
 }
 
-interface TimeRangeSelectorProps {
-  onRangeChange: (range: DateRange) => void;
-  currentRange: DateRange;
-  language: Language;
-}
+const TimeRangeSelector = () => {
+  // Use Context
+  const { language } = useApp();
+  const { dateRange, setDateRange } = useChart();
+  const t = useTranslation(language);
 
-const TimeRangeSelector = ({ onRangeChange, currentRange, language }: TimeRangeSelectorProps) => {
   const [customMode, setCustomMode] = useState(false);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const t = useTranslation(language);
 
   const presets = [
     { label: '1D', value: '1d', days: 1 },
@@ -55,7 +55,7 @@ const TimeRangeSelector = ({ onRangeChange, currentRange, language }: TimeRangeS
       preset: preset.value,
     };
 
-    onRangeChange(range);
+    setDateRange(range);
     setCustomMode(false);
   };
 
@@ -72,7 +72,7 @@ const TimeRangeSelector = ({ onRangeChange, currentRange, language }: TimeRangeS
       return;
     }
 
-    onRangeChange({
+    setDateRange({
       startDate,
       endDate,
       preset: 'custom',
@@ -90,7 +90,7 @@ const TimeRangeSelector = ({ onRangeChange, currentRange, language }: TimeRangeS
             key={preset.value}
             onClick={() => handlePresetClick(preset)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              currentRange.preset === preset.value
+              dateRange.preset === preset.value
                 ? 'bg-blue-600 text-white'
                 : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
@@ -101,7 +101,7 @@ const TimeRangeSelector = ({ onRangeChange, currentRange, language }: TimeRangeS
         <button
           onClick={() => setCustomMode(!customMode)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-            currentRange.preset === 'custom'
+            dateRange.preset === 'custom'
               ? 'bg-blue-600 text-white'
               : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
           }`}
@@ -152,7 +152,7 @@ const TimeRangeSelector = ({ onRangeChange, currentRange, language }: TimeRangeS
       {/* Current Range Display */}
       <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
         <span className="font-medium">{t.currentRange}</span>{' '}
-        {currentRange.startDate} {t.to} {currentRange.endDate}
+        {dateRange.startDate} {t.to} {dateRange.endDate}
       </div>
     </div>
   );
