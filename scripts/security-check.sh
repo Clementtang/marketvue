@@ -44,6 +44,14 @@ check "vercel.json 存在"
 test -f backend/requirements.txt
 check "requirements.txt 存在"
 
+# 檢查 flask-talisman 已安裝
+if grep -q "flask-talisman" backend/requirements.txt; then
+    check "flask-talisman in requirements.txt"
+else
+    echo -e "${RED}✗${NC} flask-talisman not in requirements.txt"
+    ((FAIL++))
+fi
+
 # 檢查環境變數範例
 if grep -q "your-secret-key-here-change-me" backend/.env.example 2>/dev/null; then
     warn ".env.example 包含提示文字(正常)"
