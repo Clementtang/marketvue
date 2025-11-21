@@ -7,7 +7,6 @@
  * API Configuration
  */
 export const API_CONFIG = {
-  // Use environment variable or fallback to localhost in development
   BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5001',
   TIMEOUT: 30000, // 30 seconds
   RETRY_COUNT: 3,
