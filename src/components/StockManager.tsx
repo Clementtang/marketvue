@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo, useCallback } from 'react';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
@@ -9,6 +9,11 @@ interface StockManagerProps {
   onRemoveStock: (symbol: string) => void;
 }
 
+/**
+ * StockManager Component - Manages adding and removing stocks
+ * Memoized to prevent unnecessary re-renders when props don't change
+ */
+
 const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) => {
   // Use Context
   const { language } = useApp();
@@ -17,7 +22,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     const symbol = inputValue.trim().toUpperCase();
 
@@ -39,7 +44,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
     onAddStock(symbol);
     setInputValue('');
     setError('');
-  };
+  }, [inputValue, stocks, onAddStock, t]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors h-full">
@@ -109,4 +114,8 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   );
 };
 
-export default StockManager;
+/**
+ * Export memoized component
+ * Only re-renders when stocks, onAddStock, or onRemoveStock props change
+ */
+export default memo(StockManager);

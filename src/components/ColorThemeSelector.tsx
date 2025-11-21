@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Palette } from 'lucide-react';
 
 export interface ColorTheme {
@@ -15,6 +16,11 @@ interface ColorThemeSelectorProps {
   currentTheme: ColorTheme;
   onThemeChange: (theme: ColorTheme) => void;
 }
+
+/**
+ * ColorThemeSelector Component - Allows users to select color theme
+ * Memoized to prevent unnecessary re-renders
+ */
 
 const ColorThemeSelector = ({ currentTheme, onThemeChange }: ColorThemeSelectorProps) => {
   return (
@@ -59,4 +65,8 @@ const ColorThemeSelector = ({ currentTheme, onThemeChange }: ColorThemeSelectorP
   );
 };
 
-export default ColorThemeSelector;
+/**
+ * Export memoized component
+ * Only re-renders when currentTheme or onThemeChange props change
+ */
+export default memo(ColorThemeSelector);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo, useMemo, useCallback } from 'react';
 import { Calendar } from 'lucide-react';
 import { format, subMonths, subYears, subDays, startOfYear } from 'date-fns';
 import { useTranslation } from '../i18n/translations';
@@ -11,6 +11,11 @@ export interface DateRange {
   preset?: string;
 }
 
+/**
+ * TimeRangeSelector Component - Allows users to select date ranges for stock data
+ * Memoized to prevent unnecessary re-renders
+ */
+
 const TimeRangeSelector = () => {
   // Use Context
   const { language } = useApp();
@@ -21,7 +26,8 @@ const TimeRangeSelector = () => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const presets = [
+  // Memoize presets array to prevent recreation on every render
+  const presets = useMemo(() => [
     { label: '1D', value: '1d', days: 1 },
     { label: '5D', value: '5d', days: 5 },
     { label: '1M', value: '1m', months: 1 },
@@ -31,9 +37,9 @@ const TimeRangeSelector = () => {
     { label: '1Y', value: '1y', years: 1 },
     { label: '5Y', value: '5y', years: 5 },
     { label: 'ALL', value: 'all', years: 50 }, // 50 years as "all available data"
-  ];
+  ], []);
 
-  const handlePresetClick = (preset: typeof presets[0]) => {
+  const handlePresetClick = useCallback((preset: typeof presets[0]) => {
     const endDate = new Date();
     let startDate: Date;
 
@@ -57,9 +63,9 @@ const TimeRangeSelector = () => {
 
     setDateRange(range);
     setCustomMode(false);
-  };
+  }, [setDateRange]);
 
-  const handleCustomSubmit = (e: React.FormEvent) => {
+  const handleCustomSubmit = useCallback((e: React.FormEvent) => {
     e.preventDefault();
 
     if (!startDate || !endDate) {
@@ -77,7 +83,7 @@ const TimeRangeSelector = () => {
       endDate,
       preset: 'custom',
     });
-  };
+  }, [startDate, endDate, setDateRange]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors h-full">
@@ -158,4 +164,8 @@ const TimeRangeSelector = () => {
   );
 };
 
-export default TimeRangeSelector;
+/**
+ * Export memoized component
+ * Re-renders only when context values change (language, dateRange, setDateRange)
+ */
+export default memo(TimeRangeSelector);

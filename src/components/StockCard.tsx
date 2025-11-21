@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { TrendingUp, TrendingDown, Loader2 } from 'lucide-react';
 import axios from 'axios';
@@ -24,6 +24,11 @@ interface StockCardProps {
   startDate: string;
   endDate: string;
 }
+
+/**
+ * StockCard Component - Displays stock information with price chart and volume chart
+ * Memoized to prevent unnecessary re-renders when props don't change
+ */
 
 const StockCard = ({ symbol, startDate, endDate }: StockCardProps) => {
   // Use Context
@@ -322,4 +327,8 @@ const StockCard = ({ symbol, startDate, endDate }: StockCardProps) => {
   );
 };
 
-export default StockCard;
+/**
+ * Export memoized component
+ * Only re-renders when symbol, startDate, or endDate props change
+ */
+export default memo(StockCard);

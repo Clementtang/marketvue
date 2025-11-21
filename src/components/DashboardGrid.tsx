@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -11,6 +11,11 @@ interface DashboardGridProps {
   startDate: string;
   endDate: string;
 }
+
+/**
+ * DashboardGrid Component - Manages the grid layout of stock cards
+ * Memoized to prevent unnecessary re-renders when props don't change
+ */
 
 const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   // Use Context
@@ -175,4 +180,8 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   );
 };
 
-export default DashboardGrid;
+/**
+ * Export memoized component
+ * Only re-renders when stocks, startDate, or endDate props change
+ */
+export default memo(DashboardGrid);

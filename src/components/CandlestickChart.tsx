@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 import {
   ComposedChart,
   XAxis,
@@ -290,4 +290,8 @@ const CandlestickChart = ({ data, showMA = true }: CandlestickChartProps) => {
   );
 };
 
-export default CandlestickChart;
+/**
+ * Export memoized component
+ * Only re-renders when data or showMA props change
+ */
+export default memo(CandlestickChart);

@@ -1,18 +1,23 @@
+import { memo, useCallback } from 'react';
 import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
 
+/**
+ * ChartTypeToggle Component - Allows users to switch between chart types
+ * Memoized to prevent unnecessary re-renders
+ */
 const ChartTypeToggle = () => {
   // Use Context
   const { language } = useApp();
   const { chartType, setChartType } = useChart();
   const t = useTranslation(language);
 
-  const toggleChartType = () => {
+  const toggleChartType = useCallback(() => {
     const newType = chartType === 'line' ? 'candlestick' : 'line';
     setChartType(newType);
-  };
+  }, [chartType, setChartType]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 transition-colors">
@@ -42,4 +47,8 @@ const ChartTypeToggle = () => {
   );
 };
 
-export default ChartTypeToggle;
+/**
+ * Export memoized component
+ * Re-renders only when context values change
+ */
+export default memo(ChartTypeToggle);
