@@ -7,7 +7,9 @@
  * API Configuration
  */
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5001',
+  // In production (Vercel), use empty string for same-origin requests
+  // In development, use localhost:5001
+  BASE_URL: import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5001' : ''),
   TIMEOUT: 30000, // 30 seconds
   RETRY_COUNT: 3,
   RETRY_DELAY_BASE: 2000, // 2 seconds base delay for exponential backoff
