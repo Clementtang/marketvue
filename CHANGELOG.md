@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **React Hooks Ordering Violation** (2025-11-21)
+  - Fixed critical production error: "Rendered more hooks than during the previous render"
+  - Issue: `useMemo` and `useCallback` hooks in StockCard were placed AFTER conditional early returns
+  - Root cause: Hooks at lines 166-202 only executed when loading/error states were false, violating Rules of Hooks
+  - Solution: Moved 4 hooks (displayName, priceInfo, averageVolume, CustomTooltip) to BEFORE early returns
+  - Impact: All hooks now execute unconditionally in the same order on every render
+  - Location: `src/components/StockCard.tsx:127-165`
+  - User report: Production frontend showed hook ordering error on https://marketvue.vercel.app
+  - Verification: Local testing confirmed clean console logs with no React errors
+
 ### Added
 
 - **Phase 3 Day 2 - Component Context Migration (Part 2)** (2025-11-20)
