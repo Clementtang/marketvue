@@ -52,6 +52,13 @@
   - ⚠️ 閒置 15 分鐘後睡眠，冷啟動需 30-60 秒
   - 前端已實作智能重試機制（503 錯誤特殊處理）
 
+⚠️ **部署配置重要原則**：
+1. **永遠優先使用 MCP 確認狀態**：在修改任何部署相關配置前，必須先使用 MCP 工具檢查當前狀態
+   - Vercel: `mcp__vercel__get_project`, `mcp__vercel__list_deployments`
+   - Render: `mcp__render__get_service`, `mcp__render__list_services`
+2. **參考配置文件**：詳細的部署配置記錄在 `.claude/deployment-config.md`
+3. **避免錯誤假設**：不要假設需要重新配置已經正常運作的服務
+
 ### 核心功能
 
 - **股票追蹤**：最多 18 檔股票（6x3 網格）
@@ -301,17 +308,44 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ### 部署流程
 
+⚠️ **在任何部署操作前，必須先用 MCP 確認當前狀態！**
+
 #### 前端（Vercel）
-1. 確認變更（測試通過、文件更新、版本號更新）
-2. `git push origin main`
-3. Vercel 自動建構部署（1-2 分鐘）
-4. 檢查 https://marketvue.vercel.app
+1. **檢查狀態**：
+   ```bash
+   mcp__vercel__get_project(
+     projectId="prj_rsbQtqLdXJGJIkZXa7uYud603dk5",
+     teamId="team_3hW0eIvgcozexFfsxMd60TNj"
+   )
+   ```
+2. 確認變更（測試通過、文件更新、版本號更新）
+3. `git push origin main`
+4. Vercel 自動建構部署（1-2 分鐘）
+5. **驗證部署**：
+   ```bash
+   mcp__vercel__list_deployments(...)
+   # Check: readyState === "READY"
+   ```
+6. 檢查 https://marketvue.vercel.app
 
 #### 後端（Render）
-1. 確認變更（requirements.txt 更新、環境變數設定）
-2. `git push origin main`
-3. 手動部署（如需要）：Render Dashboard → Manual Deploy
-4. 檢查 https://marketvue-api.onrender.com/api/health
+1. **檢查狀態**：
+   ```bash
+   mcp__render__get_service(serviceId="srv-d447klili9vc73dt8h1g")
+   # Check: suspended === "not_suspended"
+   ```
+2. 確認變更（requirements.txt 更新、環境變數設定）
+3. `git push origin main`
+4. 手動部署（如需要）：Render Dashboard → Manual Deploy
+5. **驗證健康狀態**：
+   ```bash
+   curl https://marketvue-api.onrender.com/api/health
+   # Expected: {"service":"stock-dashboard-api","status":"healthy"}
+   ```
+
+#### 部署配置詳情
+- 完整的部署配置和 IDs 記錄在：`.claude/deployment-config.md`
+- MCP 命令參考和故障排除檢查清單也在該文件中
 
 ---
 
