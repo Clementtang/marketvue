@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
-import StockCard from './StockCard';
+import StockCard from './stock-card';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 
