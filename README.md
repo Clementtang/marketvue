@@ -55,12 +55,16 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
 - **Axios** - HTTP 請求客戶端
 - **date-fns** - 日期處理工具
 - **Lucide Icons** - 美觀的圖示庫
+- **Context API** - 全局狀態管理 (AppContext, ChartContext, ToastContext)
+- **Custom Hooks** - 可重用邏輯 (useRetry, useStockData, useToast)
 
 ### 後端
 - **Flask** - 輕量級 Python Web 框架
 - **yfinance** - Yahoo Finance 股票數據 API
 - **Flask-CORS** - 跨域資源共享支援
 - **Flask-Caching** - 資料快取優化
+- **Gunicorn** - Production WSGI 伺服器
+- **SOLID 架構** - 單一職責服務設計
 
 ## 📦 安裝步驟
 
@@ -178,29 +182,65 @@ marketvue/
 ├── backend/                       # Flask 後端
 │   ├── app.py                    # Flask 主應用
 │   ├── config.py                 # 配置檔案
+│   ├── constants.py              # 常數定義
 │   ├── requirements.txt          # Python 依賴
 │   ├── data/
 │   │   └── company_names.json   # 公司名稱多語言對照表
 │   ├── routes/
 │   │   └── stock_routes.py      # API 路由
-│   └── services/
-│       └── stock_service.py     # yfinance 整合
+│   ├── schemas/
+│   │   └── stock_schemas.py     # 請求/回應 Schema
+│   ├── services/                 # SOLID 架構服務層
+│   │   ├── stock_service.py     # 協調器 (Facade)
+│   │   ├── stock_data_fetcher.py    # 資料擷取
+│   │   ├── stock_data_transformer.py # 資料轉換
+│   │   ├── price_calculator.py      # 價格計算
+│   │   └── company_name_service.py  # 公司名稱服務
+│   ├── utils/
+│   │   ├── decorators.py        # 錯誤處理裝飾器
+│   │   └── error_handlers.py    # 錯誤處理器
+│   └── tests/                    # 後端測試 (73 tests)
 ├── src/                          # React 前端
 │   ├── components/
-│   │   ├── StockCard.tsx        # 股票卡片組件
-│   │   ├── StockManager.tsx     # 股票管理組件
-│   │   ├── TimeRangeSelector.tsx # 時間範圍選擇器
-│   │   ├── DashboardGrid.tsx    # 儀表板網格
-│   │   ├── ThemeSettings.tsx    # 主題設定
-│   │   └── ColorThemeSelector.tsx # 顏色主題選擇器
+│   │   ├── stock-card/          # 股票卡片模組
+│   │   │   ├── StockCard.tsx    # 主組件
+│   │   │   ├── StockCardHeader.tsx
+│   │   │   ├── StockCardChart.tsx
+│   │   │   ├── StockVolumeChart.tsx
+│   │   │   ├── StockCardFooter.tsx
+│   │   │   ├── StockCardLoading.tsx
+│   │   │   ├── StockCardError.tsx
+│   │   │   └── hooks/useStockData.ts
+│   │   ├── common/
+│   │   │   └── Toast.tsx        # Toast 通知組件
+│   │   ├── StockManager.tsx
+│   │   ├── TimeRangeSelector.tsx
+│   │   ├── DashboardGrid.tsx
+│   │   ├── ThemeSettings.tsx
+│   │   └── ErrorBoundary.tsx    # 錯誤邊界
+│   ├── contexts/                 # React Context
+│   │   ├── AppContext.tsx       # 應用設定
+│   │   ├── ChartContext.tsx     # 圖表設定
+│   │   └── ToastContext.tsx     # Toast 通知
+│   ├── hooks/                    # Custom Hooks
+│   │   ├── useRetry.ts          # 重試邏輯
+│   │   └── index.ts
+│   ├── config/
+│   │   └── chartTheme.ts        # 統一主題配置
 │   ├── i18n/
 │   │   └── translations.ts      # 多語言翻譯
 │   ├── App.tsx                   # 根組件
 │   └── main.tsx                  # 入口點
 ├── docs/                         # 文件
 │   ├── API.md                   # API 文件
-│   └── ARCHITECTURE.md          # 架構文件
+│   ├── ARCHITECTURE.md          # 架構文件
+│   ├── DEPLOYMENT.md            # 部署指南
+│   ├── security/                # 安全文件
+│   └── work-log-*.md            # 工作日誌
+├── scripts/
+│   └── security-check.sh        # 安全檢查腳本
 ├── package.json
+├── vercel.json                   # Vercel 配置
 ├── README.md
 └── README_EN.md
 ```
@@ -222,8 +262,23 @@ marketvue/
 
 - [API 文件](./docs/API.md) - 完整的 API 端點說明
 - [架構文件](./docs/ARCHITECTURE.md) - 系統架構與技術選型
+- [部署指南](./docs/DEPLOYMENT.md) - Vercel + Render 部署設定
+- [安全指南](./docs/security/README.md) - 安全審計與實作
 - [貢獻指南](./CONTRIBUTING.md) - 如何參與專案開發
 - [變更日誌](./CHANGELOG.md) - 版本變更記錄
+
+## 🧪 測試
+
+```bash
+# 前端測試 (130 tests)
+npm test
+
+# 後端測試 (73 tests)
+cd backend && source venv/bin/activate
+python -m pytest tests/ -v
+```
+
+測試覆蓋率：前端 85%+ / 後端 87%+
 
 ## 🤝 貢獻
 
