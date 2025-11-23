@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import type { StockData, StockDataPoint } from '../../../types/stock';
-import { getErrorMessage, shouldRetry, calculateRetryDelay } from '../../../utils/errorHandlers';
+import { getErrorMessage, shouldRetry as checkShouldRetry, calculateRetryDelay } from '../../../utils/errorHandlers';
 import { API_CONFIG, MA_PERIODS } from '../../../config/constants';
 import type { Translations, Language } from '../../../i18n/translations';
+import { useRetry } from '../../../hooks/useRetry';
 
 /**
  * Calculate moving averages for stock data
@@ -42,7 +43,7 @@ interface UseStockDataReturn {
 
 /**
  * Custom hook for fetching and managing stock data
- * Handles loading states, error handling, and automatic retries
+ * Uses useRetry hook for automatic retry logic with exponential backoff
  */
 export function useStockData({
   symbol,
@@ -52,68 +53,131 @@ export function useStockData({
   t,
 }: UseStockDataOptions): UseStockDataReturn {
   const [stockData, setStockData] = useState<StockData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const fetchStockData = useCallback(async (isRetry = false) => {
-    setLoading(true);
-    setError(null);
+  /**
+   * Async function to fetch stock data from API
+   */
+  const fetchStockData = useCallback(async (): Promise<StockData> => {
+    const response = await axios.post(`${API_CONFIG.BASE_URL}/api/stock-data`, {
+      symbol: symbol,
+      start_date: startDate,
+      end_date: endDate,
+    }, {
+      timeout: API_CONFIG.TIMEOUT,
+    });
 
-    try {
-      const response = await axios.post(`${API_CONFIG.BASE_URL}/api/stock-data`, {
-        symbol: symbol,
-        start_date: startDate,
-        end_date: endDate,
-      }, {
-        timeout: API_CONFIG.TIMEOUT,
-      });
+    // Calculate moving averages
+    let processedData = response.data.data;
+    processedData = calculateMA(processedData, MA_PERIODS.SHORT);
+    processedData = calculateMA(processedData, MA_PERIODS.LONG);
 
-      // Calculate moving averages
-      let processedData = response.data.data;
-      processedData = calculateMA(processedData, MA_PERIODS.SHORT);
-      processedData = calculateMA(processedData, MA_PERIODS.LONG);
-
-      setStockData({
-        ...response.data,
-        data: processedData,
-      });
-      setRetryCount(0);
-    } catch (err: any) {
-      const errorMessage = getErrorMessage(err, language, t);
-      setError(errorMessage);
-      console.error('Error fetching stock data:', err);
-
-      // Auto-retry logic
-      if (!isRetry && shouldRetry(err, retryCount, API_CONFIG.RETRY_COUNT)) {
-        const statusCode = err.response?.status;
-        const retryDelay = calculateRetryDelay(retryCount, statusCode);
-
-        console.log(`Retrying in ${retryDelay}ms... (Attempt ${retryCount + 1}/${API_CONFIG.RETRY_COUNT})`);
-
-        setTimeout(() => {
-          setRetryCount(prev => prev + 1);
-          fetchStockData(true);
-        }, retryDelay);
-      }
-    } finally {
-      setLoading(false);
-    }
-  }, [symbol, startDate, endDate, language, t, retryCount]);
-
-  useEffect(() => {
-    fetchStockData();
+    return {
+      ...response.data,
+      data: processedData,
+    };
   }, [symbol, startDate, endDate]);
 
+  /**
+   * Custom shouldRetry function using existing error handlers
+   */
+  const shouldRetry = useCallback((error: any, attemptCount: number) => {
+    return checkShouldRetry(error, attemptCount, API_CONFIG.RETRY_COUNT);
+  }, []);
+
+  /**
+   * Custom calculateDelay function using existing error handlers
+   */
+  const calculateDelay = useCallback((error: any, attemptCount: number) => {
+    const statusCode = error?.response?.status;
+    return calculateRetryDelay(attemptCount, statusCode);
+  }, []);
+
+  /**
+   * Callback when retry starts
+   */
+  const onRetry = useCallback((attemptCount: number, _error: Error) => {
+    console.log(`Retrying... (Attempt ${attemptCount}/${API_CONFIG.RETRY_COUNT})`);
+  }, []);
+
+  /**
+   * Callback when max retries reached
+   */
+  const onMaxRetriesReached = useCallback((error: any) => {
+    console.error('Max retries reached:', error.message);
+  }, []);
+
+  /**
+   * Use the useRetry hook for automatic retry logic
+   */
+  const {
+    execute,
+    isLoading,
+    retryCount,
+    error,
+    data,
+    reset,
+  } = useRetry(fetchStockData, {
+    maxRetries: API_CONFIG.RETRY_COUNT,
+    shouldRetry,
+    calculateDelay,
+    onRetry,
+    onMaxRetriesReached,
+  });
+
+  /**
+   * Update stockData when data changes
+   */
+  useEffect(() => {
+    if (data) {
+      setStockData(data);
+      setErrorMessage(null);
+    }
+  }, [data]);
+
+  /**
+   * Update error message when error changes
+   */
+  useEffect(() => {
+    if (error) {
+      const message = getErrorMessage(error, language, t);
+      setErrorMessage(message);
+    } else {
+      setErrorMessage(null);
+    }
+  }, [error, language, t]);
+
+  /**
+   * Fetch data when symbol or date range changes
+   */
+  useEffect(() => {
+    reset();
+    setStockData(null);
+    setErrorMessage(null);
+    execute();
+  }, [symbol, startDate, endDate]);
+
+  /**
+   * Manual retry handler
+   */
   const handleRetry = useCallback(() => {
-    setRetryCount(0);
-    fetchStockData();
-  }, [fetchStockData]);
+    reset();
+    setErrorMessage(null);
+    execute();
+  }, [reset, execute]);
+
+  /**
+   * Memoize the loading state
+   * Show loading if executing and no cached data
+   */
+  const loading = useMemo(() => {
+    return isLoading && !stockData;
+  }, [isLoading, stockData]);
 
   return {
     stockData,
     loading,
-    error,
+    error: errorMessage,
     retryCount,
     handleRetry,
   };

@@ -9,6 +9,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 3 Day 4 - useRetry Hook Extraction** (2025-11-23)
+  - Created reusable `useRetry` hook for async operations with automatic retry
+  - Features:
+    - Generic TypeScript support for any async function
+    - Configurable max retries, initial delay, and backoff multiplier
+    - Exponential backoff with maximum delay cap
+    - Special handling for 503 (cold start) with extended delays
+    - Special handling for 429 (rate limit) with retry-after header support
+    - Non-retryable errors: 400, 401, 403, 404
+    - Cancellation support for pending retries
+    - Callbacks: onRetry, onMaxRetriesReached
+    - Custom shouldRetry and calculateDelay functions
+  - Created `src/hooks/useRetry.ts` (256 lines)
+  - Created `src/hooks/index.ts` for clean exports
+  - Refactored `useStockData` to use the new `useRetry` hook
+  - Comprehensive test suite: 46 tests covering all scenarios
+  - Total frontend tests: 130 passing
+  - Build verification: ✅ TypeScript compilation successful, production build ok
+
 - **Phase 3 Day 3 - StockCard Component Complete Splitting** (2025-11-23)
   - Refactored 326-line monolithic StockCard.tsx into 9 smaller modules
   - New folder structure: `src/components/stock-card/`
