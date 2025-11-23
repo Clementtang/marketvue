@@ -9,6 +9,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 3 Day 6 - Backend Service Layer Separation** (2025-11-24)
+  - Refactored monolithic StockService (324 lines) into 5 single-responsibility services
+  - New services created:
+    - `StockDataFetcher` (95 lines) - yfinance API data retrieval
+    - `StockDataTransformer` (100 lines) - DataFrame to dict transformation
+    - `PriceCalculator` (105 lines) - Price calculations and metrics
+    - `CompanyNameService` (138 lines) - Multilingual company name resolution
+    - `StockService` (228 lines) - Coordinator with Dependency Injection
+  - Applied SOLID principles (Single Responsibility, Dependency Inversion)
+  - Implemented Facade pattern for backward compatibility
+  - New unit tests: 35 tests for new services
+  - Test coverage improved: 82.83% → 87.77% (+4.94%)
+  - Total backend tests: 73 passing (was 43)
+  - Benefits: Better testability, maintainability, and flexibility
+
 - **Phase 3 Day 5 - Theme System + Toast Notifications** (2025-11-24)
   - Created unified chart theme configuration (`src/config/chartTheme.ts`)
     - Centralized chart colors (MA lines, volume, grid, axis)
