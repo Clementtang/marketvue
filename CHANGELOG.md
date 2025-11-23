@@ -33,6 +33,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Render Deployment - Missing gunicorn** (2025-11-23)
+  - Fixed deployment failure on Render with exit status 127
+  - Error: `bash: line 1: gunicorn: command not found`
+  - Root cause: `gunicorn` was not included in `backend/requirements.txt`
+  - Solution: Added `gunicorn==21.2.0` to requirements.txt
+  - Impact: Render deployments now complete successfully
+  - Note: Previous instance was running on old build; new deployments failed
+
 - **React Hooks Ordering Violation** (2025-11-21)
   - Fixed critical production error: "Rendered more hooks than during the previous render"
   - Issue: `useMemo` and `useCallback` hooks in StockCard were placed AFTER conditional early returns

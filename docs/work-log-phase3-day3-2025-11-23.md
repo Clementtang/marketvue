@@ -136,6 +136,27 @@ Note: Failed tests are unrelated localStorage tests (Vitest environment issue)
 ### Deleted (1 file)
 - `src/components/StockCard.tsx` - original monolithic file
 
+## Bug Fix: Render Deployment Failure
+
+### Issue Discovered
+After pushing the StockCard refactoring, discovered that Render deployments were failing with:
+```
+bash: line 1: gunicorn: command not found
+==> Exited with status 127
+```
+
+### Root Cause Analysis
+- Render's start command: `gunicorn --bind 0.0.0.0:$PORT app:app`
+- `gunicorn` was **not** included in `backend/requirements.txt`
+- The old instance was still running on a previous successful build
+- New deployments failed because gunicorn wasn't installed
+
+### Solution
+Added `gunicorn==21.2.0` to `backend/requirements.txt`
+
+### Commit
+`736057b` - fix(backend): add gunicorn to requirements.txt for Render deployment
+
 ## Next Steps (Day 4+)
 
 Per plan-phase3-execution.md:
