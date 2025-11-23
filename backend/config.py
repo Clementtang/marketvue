@@ -18,7 +18,6 @@ class Config:
     Environment-specific configs inherit from this class.
 
     Attributes:
-        SECRET_KEY: Flask secret key for session encryption
         DEBUG: Debug mode flag
         CORS_ORIGINS: List of allowed CORS origins
         CACHE_TYPE: Type of cache backend to use
@@ -32,8 +31,37 @@ class Config:
         LOG_LEVEL: Logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
     """
     # Flask settings
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
+
+    @property
+    def SECRET_KEY(self):
+        """
+        Get SECRET_KEY from environment with validation.
+        Raises ValueError if not set properly in production.
+
+        Returns:
+            str: The secret key for Flask session encryption
+
+        Raises:
+            ValueError: If SECRET_KEY is not properly set in production
+        """
+        secret = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+
+        # In production, ensure SECRET_KEY is properly set
+        if not self.DEBUG and (not secret or secret == 'dev-secret-key-change-in-production'):
+            raise ValueError(
+                "SECRET_KEY must be set in production environment. "
+                "Generate one using: python -c 'import secrets; print(secrets.token_hex(32))'"
+            )
+
+        # Validate minimum length for security
+        if not self.DEBUG and len(secret) < 32:
+            raise ValueError(
+                "SECRET_KEY must be at least 32 characters long. "
+                "Generate one using: python -c 'import secrets; print(secrets.token_hex(32))'"
+            )
+
+        return secret
 
     # CORS settings
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173').split(',')
@@ -71,14 +99,50 @@ class ProductionConfig(Config):
     Production environment configuration.
 
     Disables debug mode and uses strict settings for production deployment.
-    CORS origins should be explicitly set via CORS_ORIGINS environment variable.
+    Validates critical configuration values on initialization.
 
     Examples:
         CORS_ORIGINS=https://marketvue.vercel.app,https://marketvue-staging.vercel.app
+        SECRET_KEY=<64-character-hex-string>
     """
     DEBUG = False
-    # Production CORS should be set via CORS_ORIGINS environment variable
-    # Example: CORS_ORIGINS=https://marketvue.vercel.app,https://marketvue-staging.vercel.app
+
+    def __init__(self):
+        """Initialize and validate production configuration."""
+        super().__init__()
+        self._validate_production_config()
+
+    def _validate_production_config(self):
+        """
+        Validate critical production configuration.
+
+        Raises:
+            ValueError: If any critical configuration is missing or invalid
+        """
+        # Validate CORS
+        cors_origins = os.getenv('CORS_ORIGINS')
+        if not cors_origins:
+            raise ValueError(
+                "CORS_ORIGINS must be explicitly set in production. "
+                "Example: CORS_ORIGINS=https://marketvue.vercel.app"
+            )
+
+        # Check for localhost in CORS (should not be in production)
+        if 'localhost' in cors_origins.lower() or '127.0.0.1' in cors_origins:
+            raise ValueError(
+                "CORS_ORIGINS must not contain localhost in production. "
+                "Only production URLs should be allowed."
+            )
+
+        # Validate SECRET_KEY (will raise if invalid)
+        _ = self.SECRET_KEY
+
+        # Validate other critical settings
+        if self.CACHE_TYPE == 'SimpleCache':
+            import logging
+            logging.warning(
+                "Using SimpleCache in production. Consider using Redis or Memcached for better performance."
+            )
 
 
 # Configuration dictionary

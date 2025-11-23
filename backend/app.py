@@ -4,6 +4,7 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_talisman import Talisman
 from config import config
 from utils.cache import cache
 from utils.error_handlers import register_error_handlers
@@ -49,7 +50,9 @@ def create_app(config_name='default'):
         r"/api/*": {
             "origins": app.config['CORS_ORIGINS'],
             "methods": ["GET", "POST", "OPTIONS"],
-            "allow_headers": ["Content-Type", "Authorization"]
+            "allow_headers": ["Content-Type", "Authorization"],
+            "supports_credentials": False,
+            "max_age": 600
         }
     })
 
@@ -70,6 +73,54 @@ def create_app(config_name='default'):
 
     # Apply rate limiting to stock routes
     limiter.limit("1000 per hour")(stock_bp)
+    limiter.limit("100 per minute")(stock_bp)
+
+    # Security headers
+    if not app.config['DEBUG']:
+        # Production: Use Talisman for comprehensive security headers
+        csp = {
+            'default-src': "'self'",
+            'script-src': [
+                "'self'",
+                "'unsafe-inline'",  # Required for inline scripts
+                "https://cdn.jsdelivr.net"
+            ],
+            'style-src': [
+                "'self'",
+                "'unsafe-inline'"  # Required for inline styles
+            ],
+            'img-src': ["'self'", "data:", "https:"],
+            'font-src': ["'self'", "data:"],
+            'connect-src': ["'self'"],
+            'frame-ancestors': "'none'",
+        }
+
+        Talisman(
+            app,
+            force_https=True,
+            strict_transport_security=True,
+            strict_transport_security_max_age=31536000,  # 1 year
+            content_security_policy=csp,
+            content_security_policy_nonce_in=['script-src'],
+            referrer_policy='strict-origin-when-cross-origin',
+            feature_policy={
+                'geolocation': "'none'",
+                'camera': "'none'",
+                'microphone': "'none'"
+            }
+        )
+        logger.info("Security headers enabled (Talisman)")
+    else:
+        # Development: Add basic security headers without HTTPS enforcement
+        @app.after_request
+        def add_security_headers(response):
+            response.headers['X-Content-Type-Options'] = 'nosniff'
+            response.headers['X-Frame-Options'] = 'DENY'
+            response.headers['X-XSS-Protection'] = '1; mode=block'
+            response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+            return response
+
+        logger.info("Development security headers enabled")
 
     # Register blueprints
     app.register_blueprint(stock_bp)

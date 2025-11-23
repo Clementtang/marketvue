@@ -1,5 +1,5 @@
-from marshmallow import Schema, fields, validate, validates, ValidationError
-from datetime import datetime
+from marshmallow import Schema, fields, validate, validates, ValidationError, validates_schema
+from datetime import datetime, timedelta
 
 
 class StockDataRequestSchema(Schema):
@@ -23,15 +23,57 @@ class StockDataRequestSchema(Schema):
     @validates('symbol')
     def validate_symbol(self, value):
         """Validate stock symbol format"""
-        if not value.replace('.', '').replace('-', '').isalnum():
-            raise ValidationError('Invalid stock symbol format')
+        # Allow alphanumeric, dots, hyphens, and carets (for indices like ^GSPC)
+        allowed_chars = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-^')
+        if not all(c in allowed_chars for c in value.upper()):
+            raise ValidationError(
+                'Invalid stock symbol format. Only letters, numbers, dots, hyphens, and carets allowed.'
+            )
+
+        # Additional length check
+        if len(value) > 10:
+            raise ValidationError('Stock symbol cannot exceed 10 characters')
+
         return value.upper()
 
+    @validates('start_date')
+    def validate_start_date(self, value):
+        """Validate start date"""
+        today = datetime.now().date()
+
+        # Prevent querying too far in the past (performance/abuse prevention)
+        max_history = today - timedelta(days=365 * 20)  # 20 years
+        if value < max_history:
+            raise ValidationError('Start date cannot be more than 20 years ago')
+
+        # Prevent future dates
+        if value > today:
+            raise ValidationError('Start date cannot be in the future')
+
+        return value
+
     @validates('end_date')
-    def validate_date_range(self, value):
-        """Validate that end_date is after start_date"""
-        # This will be checked after both dates are loaded
-        pass
+    def validate_end_date(self, value):
+        """Validate end date"""
+        if value > datetime.now().date():
+            raise ValidationError('End date cannot be in the future')
+        return value
+
+    @validates_schema
+    def validate_date_range(self, data, **kwargs):
+        """Validate date range"""
+        if 'start_date' in data and 'end_date' in data:
+            if data['end_date'] < data['start_date']:
+                raise ValidationError(
+                    {'end_date': ['End date must be after start date']}
+                )
+
+            # Prevent excessively large date ranges (performance)
+            max_range = timedelta(days=365 * 5)  # 5 years
+            if (data['end_date'] - data['start_date']) > max_range:
+                raise ValidationError(
+                    {'date_range': ['Date range cannot exceed 5 years']}
+                )
 
 
 class BatchStocksRequestSchema(Schema):
@@ -47,19 +89,86 @@ class BatchStocksRequestSchema(Schema):
     )
     start_date = fields.Date(
         format='%Y-%m-%d',
-        load_default=None
+        load_default=None,
+        allow_none=True
     )
     end_date = fields.Date(
         format='%Y-%m-%d',
-        load_default=None
+        load_default=None,
+        allow_none=True
     )
 
     @validates('symbols')
     def validate_symbols(self, value):
         """Validate each symbol in the list"""
+        allowed_chars = set('ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.-^')
+
         for symbol in value:
-            if not symbol.replace('.', '').replace('-', '').isalnum():
-                raise ValidationError(f'Invalid stock symbol format: {symbol}')
+            if not symbol:
+                raise ValidationError('Empty symbol not allowed')
+
+            if not all(c in allowed_chars for c in symbol.upper()):
+                raise ValidationError(
+                    f'Invalid stock symbol format: {symbol}. '
+                    'Only letters, numbers, dots, hyphens, and carets allowed.'
+                )
+
+            if len(symbol) > 10:
+                raise ValidationError(f'Symbol too long: {symbol}')
+
+        # Check for duplicates
+        upper_symbols = [s.upper() for s in value]
+        if len(upper_symbols) != len(set(upper_symbols)):
+            raise ValidationError('Duplicate symbols not allowed')
+
+        return upper_symbols
+
+    @validates('start_date')
+    def validate_start_date(self, value):
+        """Validate start date if provided"""
+        if value is None:
+            return value
+
+        today = datetime.now().date()
+        max_history = today - timedelta(days=365 * 20)
+
+        if value < max_history:
+            raise ValidationError('Start date cannot be more than 20 years ago')
+
+        if value > today:
+            raise ValidationError('Start date cannot be in the future')
+
+        return value
+
+    @validates('end_date')
+    def validate_end_date(self, value):
+        """Validate end date if provided"""
+        if value is None:
+            return value
+
+        if value > datetime.now().date():
+            raise ValidationError('End date cannot be in the future')
+
+        return value
+
+    @validates_schema
+    def validate_date_range(self, data, **kwargs):
+        """Validate date range if both dates provided"""
+        start = data.get('start_date')
+        end = data.get('end_date')
+
+        if start and end:
+            if end < start:
+                raise ValidationError(
+                    {'end_date': ['End date must be after start date']}
+                )
+
+            # Prevent excessively large date ranges
+            max_range = timedelta(days=365 * 5)
+            if (end - start) > max_range:
+                raise ValidationError(
+                    {'date_range': ['Date range cannot exceed 5 years']}
+                )
 
 
 class StockDataPointSchema(Schema):
