@@ -4,6 +4,7 @@ import { format, subMonths, subYears, subDays, startOfYear } from 'date-fns';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
+import { useToast } from '../contexts/ToastContext';
 
 export interface DateRange {
   startDate: string;
@@ -15,6 +16,7 @@ const TimeRangeSelector = () => {
   // Use Context
   const { language } = useApp();
   const { dateRange, setDateRange } = useChart();
+  const { showToast } = useToast();
   const t = useTranslation(language);
 
   const [customMode, setCustomMode] = useState(false);
@@ -63,12 +65,12 @@ const TimeRangeSelector = () => {
     e.preventDefault();
 
     if (!startDate || !endDate) {
-      alert('Please select both start and end dates');
+      showToast('warning', language === 'zh-TW' ? '請選擇開始和結束日期' : 'Please select both start and end dates');
       return;
     }
 
     if (new Date(startDate) > new Date(endDate)) {
-      alert('Start date must be before end date');
+      showToast('error', language === 'zh-TW' ? '開始日期必須早於結束日期' : 'Start date must be before end date');
       return;
     }
 

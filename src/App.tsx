@@ -13,6 +13,8 @@ import { TrendingUp } from 'lucide-react';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { ChartProvider, useChart } from './contexts/ChartContext';
+import { ToastProvider } from './contexts/ToastContext';
+import { ToastContainer } from './components/common/Toast';
 
 function AppContent() {
   // Use Context hooks
@@ -137,7 +139,10 @@ function App() {
   return (
     <AppProvider>
       <ChartProvider>
-        <AppContent />
+        <ToastProvider>
+          <AppContent />
+          <ToastContainer />
+        </ToastProvider>
       </ChartProvider>
     </AppProvider>
   );

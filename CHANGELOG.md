@@ -9,6 +9,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 3 Day 5 - Theme System + Toast Notifications** (2025-11-24)
+  - Created unified chart theme configuration (`src/config/chartTheme.ts`)
+    - Centralized chart colors (MA lines, volume, grid, axis)
+    - Price themes (Asian/Western conventions)
+    - UI theme colors (light/dark mode)
+    - Toast notification colors (success, error, warning, info)
+    - Helper functions: `getPriceColor()`, `getPriceBgColor()`
+  - Created Toast notification system
+    - `ToastContext` and `useToast()` hook
+    - `ToastContainer` component with animations
+    - Features: Auto-dismiss (4s), stacking (max 5), bilingual
+    - Accessible: ARIA attributes for screen readers
+  - Replaced browser `alert()` with Toast notifications
+    - `TimeRangeSelector.tsx`: 2 alerts replaced with toasts
+    - Bilingual messages (English/Chinese)
+  - Build verification: ✅ TypeScript compilation successful, production build ok
+  - Test results: 130/130 frontend tests passing
+
 - **Phase 3 Day 4 - useRetry Hook Extraction** (2025-11-23)
   - Created reusable `useRetry` hook for async operations with automatic retry
   - Features:
