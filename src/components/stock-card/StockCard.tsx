@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { useChart } from '../../contexts/ChartContext';
 import { useTranslation } from '../../i18n/translations';
@@ -29,7 +30,7 @@ interface StockCardProps {
  *
  * Data fetching is handled by the useStockData custom hook.
  */
-const StockCard = ({ symbol, startDate, endDate }: StockCardProps) => {
+const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockCardProps) {
   // Get context values
   const { language, colorTheme } = useApp();
   const { chartType } = useChart();
@@ -109,6 +110,6 @@ const StockCard = ({ symbol, startDate, endDate }: StockCardProps) => {
       />
     </div>
   );
-};
+});
 
 export default StockCard;

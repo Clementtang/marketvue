@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { Language, Translations } from '../../i18n/translations';
 
 interface StockCardErrorProps {
@@ -12,13 +13,13 @@ interface StockCardErrorProps {
  * Error state component for StockCard
  * Shows error message and retry button
  */
-const StockCardError = ({
+const StockCardError = memo(function StockCardError({
   error,
   symbol,
   language,
   t,
   onRetry,
-}: StockCardErrorProps) => {
+}: StockCardErrorProps) {
   return (
     <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex flex-col items-center justify-center transition-colors">
       <div className="text-red-500 dark:text-red-400 mb-2">
@@ -48,6 +49,6 @@ const StockCardError = ({
       </button>
     </div>
   );
-};
+});
 
 export default StockCardError;

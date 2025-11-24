@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Loader2 } from 'lucide-react';
 import type { Language } from '../../i18n/translations';
 import { API_CONFIG } from '../../config/constants';
@@ -11,7 +12,7 @@ interface StockCardLoadingProps {
  * Loading state component for StockCard
  * Shows spinner and retry count if applicable
  */
-const StockCardLoading = ({ language, retryCount }: StockCardLoadingProps) => {
+const StockCardLoading = memo(function StockCardLoading({ language, retryCount }: StockCardLoadingProps) {
   return (
     <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex flex-col items-center justify-center transition-colors">
       <Loader2 className="animate-spin text-blue-600 dark:text-blue-400 mb-3" size={32} />
@@ -27,6 +28,6 @@ const StockCardLoading = ({ language, retryCount }: StockCardLoadingProps) => {
       )}
     </div>
   );
-};
+});
 
 export default StockCardLoading;

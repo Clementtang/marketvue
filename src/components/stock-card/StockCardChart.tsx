@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import {
   LineChart,
   Line,
@@ -27,13 +27,13 @@ interface StockCardChartProps {
  * Chart component for StockCard
  * Renders either line chart or candlestick chart based on chartType
  */
-const StockCardChart = ({
+const StockCardChart = memo(function StockCardChart({
   data,
   chartType,
   colorTheme,
   t,
   isVisible,
-}: StockCardChartProps) => {
+}: StockCardChartProps) {
   // Memoized price color based on last data point
   const priceColor = useMemo(() => {
     if (data.length < 2) return colorTheme.up;
@@ -97,6 +97,6 @@ const StockCardChart = ({
       {chartType === 'candlestick' && <CandlestickChart data={data} showMA={true} />}
     </div>
   );
-};
+});
 
 export default StockCardChart;

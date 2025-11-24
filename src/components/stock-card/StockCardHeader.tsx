@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 import type { StockData } from '../../types/stock';
 import type { Language } from '../../i18n/translations';
@@ -15,12 +15,12 @@ interface StockCardHeaderProps {
  * Header component for StockCard
  * Displays company name, current price, and price change
  */
-const StockCardHeader = ({
+const StockCardHeader = memo(function StockCardHeader({
   stockData,
   symbol,
   language,
   colorTheme,
-}: StockCardHeaderProps) => {
+}: StockCardHeaderProps) {
   // Memoized display name
   const displayName = useMemo(() => {
     if (!stockData.company_name) {
@@ -78,6 +78,6 @@ const StockCardHeader = ({
       </div>
     </div>
   );
-};
+});
 
 export default StockCardHeader;

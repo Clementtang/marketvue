@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import StockManager from './components/StockManager';
@@ -48,13 +48,13 @@ function AppContent() {
     }
   }, [stocks, isInitialized]);
 
-  const handleAddStock = (symbol: string) => {
+  const handleAddStock = useCallback((symbol: string) => {
     setStocks((prev) => [...prev, symbol]);
-  };
+  }, []);
 
-  const handleRemoveStock = (symbol: string) => {
+  const handleRemoveStock = useCallback((symbol: string) => {
     setStocks((prev) => prev.filter((s) => s !== symbol));
-  };
+  }, []);
 
   return (
     <ErrorBoundary language={language}>

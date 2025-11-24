@@ -95,9 +95,10 @@ export function useStockData({
 
   /**
    * Callback when retry starts
+   * Note: We use an empty callback here to avoid console noise in production
    */
-  const onRetry = useCallback((attemptCount: number, _error: Error) => {
-    console.log(`Retrying... (Attempt ${attemptCount}/${API_CONFIG.RETRY_COUNT})`);
+  const onRetry = useCallback((_attemptCount: number, _error: Error) => {
+    // Retry logic is handled by useRetry hook, no logging needed
   }, []);
 
   /**

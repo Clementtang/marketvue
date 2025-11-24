@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { memo, useCallback } from 'react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import type { StockDataPoint } from '../../types/stock';
 import type { Translations } from '../../i18n/translations';
@@ -15,7 +15,7 @@ interface StockVolumeChartProps {
  * Volume chart component for StockCard
  * Displays trading volume as a bar chart
  */
-const StockVolumeChart = ({ data, t, isVisible }: StockVolumeChartProps) => {
+const StockVolumeChart = memo(function StockVolumeChart({ data, t, isVisible }: StockVolumeChartProps) {
   // Custom tooltip component
   const CustomTooltip = useCallback(
     (props: any) => <ChartTooltip {...props} t={t} showMovingAverages={false} />,
@@ -49,6 +49,6 @@ const StockVolumeChart = ({ data, t, isVisible }: StockVolumeChartProps) => {
       </ResponsiveContainer>
     </div>
   );
-};
+});
 
 export default StockVolumeChart;
