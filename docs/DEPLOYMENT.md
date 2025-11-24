@@ -305,3 +305,171 @@ Vercel 和 Render 都已配置自動部署：
 ### 升級選項（如需要）
 - **Render Starter**: $7/月（無休眠，512MB RAM）
 - **Vercel Pro**: $20/月（更多流量，優先支援）
+
+---
+
+## Redis Cache Configuration (Optional)
+
+MarketVue supports Redis cache for improved performance in production environments.
+
+### Environment Variables for Redis
+
+| Key | Value | Description |
+|-----|-------|-------------|
+| `CACHE_TYPE` | `redis` | Enable Redis cache |
+| `REDIS_URL` | `redis://localhost:6379/0` | Redis connection URL |
+| `CACHE_KEY_PREFIX` | `marketvue:` | Cache key prefix |
+| `CACHE_DEFAULT_TIMEOUT` | `300` | Default cache timeout (seconds) |
+
+### Using Render Redis Add-on
+
+1. Go to your Render service dashboard
+2. Click **Add-ons** → **Redis**
+3. Select plan (Free tier available)
+4. Render automatically sets `REDIS_URL` environment variable
+5. Update your service to use Redis:
+   ```
+   CACHE_TYPE=redis
+   CACHE_KEY_PREFIX=marketvue:
+   ```
+
+### Fallback Behavior
+
+If Redis connection fails, the application automatically falls back to SimpleCache (in-memory cache). This ensures the application remains functional even if Redis is unavailable.
+
+---
+
+## Docker Deployment (Local/Self-hosted)
+
+MarketVue provides Docker Compose configuration for easy local development and self-hosted deployments.
+
+### Quick Start
+
+```bash
+# Start backend with Redis
+docker-compose up -d redis backend
+
+# View logs
+docker-compose logs -f backend
+
+# Stop services
+docker-compose down
+```
+
+### Available Services
+
+| Service | Port | Description |
+|---------|------|-------------|
+| `redis` | 6379 | Redis cache server |
+| `backend` | 5001 | Flask API server |
+| `frontend` | 5173 | Vite dev server (optional) |
+
+### Environment Configuration
+
+Create a `.env` file in the project root:
+
+```env
+# Backend
+FLASK_ENV=development
+CACHE_TYPE=redis
+REDIS_URL=redis://redis:6379/0
+CORS_ORIGINS=http://localhost:5173
+
+# Frontend
+VITE_API_BASE_URL=http://localhost:5001
+```
+
+### Production with Docker
+
+For production deployments:
+
+```bash
+# Build production images
+docker-compose -f docker-compose.yml build
+
+# Run with production settings
+docker-compose up -d
+```
+
+### Docker Volume Management
+
+```bash
+# View volumes
+docker volume ls
+
+# Remove data (fresh start)
+docker-compose down -v
+```
+
+---
+
+## Redis 快取配置（選擇性）
+
+MarketVue 支援 Redis 快取以提升生產環境效能。
+
+### Redis 環境變數
+
+| Key | Value | 描述 |
+|-----|-------|------|
+| `CACHE_TYPE` | `redis` | 啟用 Redis 快取 |
+| `REDIS_URL` | `redis://localhost:6379/0` | Redis 連接 URL |
+| `CACHE_KEY_PREFIX` | `marketvue:` | 快取鍵前綴 |
+| `CACHE_DEFAULT_TIMEOUT` | `300` | 預設快取時間（秒） |
+
+### 使用 Render Redis 附加服務
+
+1. 進入 Render 服務控制台
+2. 點擊 **Add-ons** → **Redis**
+3. 選擇方案（有免費方案）
+4. Render 會自動設定 `REDIS_URL` 環境變數
+5. 更新服務使用 Redis：
+   ```
+   CACHE_TYPE=redis
+   CACHE_KEY_PREFIX=marketvue:
+   ```
+
+### 降級行為
+
+如果 Redis 連接失敗，應用程式會自動降級到 SimpleCache（記憶體快取）。這確保即使 Redis 不可用，應用程式仍然可以正常運作。
+
+---
+
+## Docker 部署（本地/自託管）
+
+MarketVue 提供 Docker Compose 配置，方便本地開發和自託管部署。
+
+### 快速開始
+
+```bash
+# 啟動後端和 Redis
+docker-compose up -d redis backend
+
+# 查看日誌
+docker-compose logs -f backend
+
+# 停止服務
+docker-compose down
+```
+
+### 可用服務
+
+| 服務 | 端口 | 描述 |
+|------|------|------|
+| `redis` | 6379 | Redis 快取伺服器 |
+| `backend` | 5001 | Flask API 伺服器 |
+| `frontend` | 5173 | Vite 開發伺服器（選擇性） |
+
+### 環境配置
+
+在專案根目錄建立 `.env` 檔案：
+
+```env
+# 後端
+FLASK_ENV=development
+CACHE_TYPE=redis
+REDIS_URL=redis://redis:6379/0
+CORS_ORIGINS=http://localhost:5173
+
+# 前端
+VITE_API_BASE_URL=http://localhost:5001
+```

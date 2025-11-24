@@ -7,6 +7,7 @@ from flask_limiter.util import get_remote_address
 from flask_talisman import Talisman
 from config import config
 from utils.cache import cache
+from utils.cache_factory import get_cache_config
 from utils.error_handlers import register_error_handlers
 from routes.stock_routes import stock_bp
 
@@ -56,11 +57,9 @@ def create_app(config_name='default'):
         }
     })
 
-    # Initialize cache
-    cache.init_app(app, config={
-        'CACHE_TYPE': app.config['CACHE_TYPE'],
-        'CACHE_DEFAULT_TIMEOUT': app.config['CACHE_DEFAULT_TIMEOUT']
-    })
+    # Initialize cache with configuration from factory (supports Redis with fallback)
+    cache_config = get_cache_config(app)
+    cache.init_app(app, config=cache_config)
 
     # Initialize rate limiter
     limiter = Limiter(

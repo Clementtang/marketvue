@@ -1,10 +1,19 @@
+"""
+Cache utilities module.
+
+Provides caching helpers and decorators for route caching.
+Supports multiple backends (SimpleCache, Redis) via Flask-Caching.
+"""
 from flask_caching import Cache
 from functools import wraps
 from flask import request
 import hashlib
 import json
+import logging
 
-# Initialize cache instance
+logger = logging.getLogger(__name__)
+
+# Initialize cache instance - will be configured by app.py
 cache = Cache()
 
 
@@ -35,10 +44,13 @@ def make_cache_key(*args, **kwargs):
 
 def cached_route(timeout=300):
     """
-    Decorator for caching route responses
+    Decorator for caching route responses.
 
     Args:
         timeout: Cache timeout in seconds (default: 300)
+
+    Returns:
+        Decorated function with caching enabled
     """
     def decorator(f):
         @wraps(f)
@@ -48,6 +60,7 @@ def cached_route(timeout=300):
             # Try to get from cache
             cached_response = cache.get(cache_key)
             if cached_response is not None:
+                logger.debug(f"Cache hit for key: {cache_key}")
                 return cached_response
 
             # Generate response
@@ -55,6 +68,7 @@ def cached_route(timeout=300):
 
             # Cache the response
             cache.set(cache_key, response, timeout=timeout)
+            logger.debug(f"Cached response for key: {cache_key}")
 
             return response
 

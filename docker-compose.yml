@@ -1,0 +1,74 @@
+# Docker Compose configuration for MarketVue
+# Includes backend API with Redis cache support
+#
+# Usage:
+#   Development: docker-compose up
+#   Production:  docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+#
+# Environment variables can be set in .env file
+
+version: '3.8'
+
+services:
+  # Redis cache service
+  redis:
+    image: redis:7-alpine
+    container_name: marketvue-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: marketvue-backend
+    restart: unless-stopped
+    ports:
+      - "5001:5001"
+    environment:
+      - FLASK_ENV=development
+      - PORT=5001
+      - CACHE_TYPE=redis
+      - REDIS_URL=redis://redis:6379/0
+      - CACHE_KEY_PREFIX=marketvue:
+      - CACHE_DEFAULT_TIMEOUT=300
+      - CORS_ORIGINS=http://localhost:5173,http://localhost:4173
+      - LOG_LEVEL=INFO
+    depends_on:
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: gunicorn --bind 0.0.0.0:5001 --workers 2 --threads 4 app:app
+
+  # Frontend development server (optional)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: marketvue-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:5001
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+    profiles:
+      - frontend
+
+volumes:
+  redis_data:
+    driver: local

@@ -32,36 +32,7 @@ class Config:
     """
     # Flask settings
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-
-    @property
-    def SECRET_KEY(self):
-        """
-        Get SECRET_KEY from environment with validation.
-        Raises ValueError if not set properly in production.
-
-        Returns:
-            str: The secret key for Flask session encryption
-
-        Raises:
-            ValueError: If SECRET_KEY is not properly set in production
-        """
-        secret = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
-
-        # In production, ensure SECRET_KEY is properly set
-        if not self.DEBUG and (not secret or secret == 'dev-secret-key-change-in-production'):
-            raise ValueError(
-                "SECRET_KEY must be set in production environment. "
-                "Generate one using: python -c 'import secrets; print(secrets.token_hex(32))'"
-            )
-
-        # Validate minimum length for security
-        if not self.DEBUG and len(secret) < 32:
-            raise ValueError(
-                "SECRET_KEY must be at least 32 characters long. "
-                "Generate one using: python -c 'import secrets; print(secrets.token_hex(32))'"
-            )
-
-        return secret
+    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
 
     # CORS settings
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173').split(',')
@@ -70,6 +41,10 @@ class Config:
     CACHE_TYPE = os.getenv('CACHE_TYPE', 'SimpleCache')
     CACHE_DEFAULT_TIMEOUT = int(os.getenv('CACHE_DEFAULT_TIMEOUT', '300'))  # 5 minutes
     CACHE_NEWS_TIMEOUT = int(os.getenv('CACHE_NEWS_TIMEOUT', '900'))  # 15 minutes
+
+    # Redis settings (used when CACHE_TYPE='redis')
+    CACHE_REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+    CACHE_KEY_PREFIX = os.getenv('CACHE_KEY_PREFIX', 'marketvue:')
 
     # Rate limiting settings
     RATELIMIT_STORAGE_URL = os.getenv('RATELIMIT_STORAGE_URL', 'memory://')
@@ -134,8 +109,18 @@ class ProductionConfig(Config):
                 "Only production URLs should be allowed."
             )
 
-        # Validate SECRET_KEY (will raise if invalid)
-        _ = self.SECRET_KEY
+        # Validate SECRET_KEY
+        secret_key = os.getenv('SECRET_KEY')
+        if not secret_key or secret_key == 'dev-secret-key-change-in-production':
+            raise ValueError(
+                "SECRET_KEY must be set in production environment. "
+                "Generate one using: python -c 'import secrets; print(secrets.token_hex(32))'"
+            )
+        if len(secret_key) < 32:
+            raise ValueError(
+                "SECRET_KEY must be at least 32 characters long. "
+                "Generate one using: python -c 'import secrets; print(secrets.token_hex(32))'"
+            )
 
         # Validate other critical settings
         if self.CACHE_TYPE == 'SimpleCache':
@@ -143,6 +128,15 @@ class ProductionConfig(Config):
             logging.warning(
                 "Using SimpleCache in production. Consider using Redis or Memcached for better performance."
             )
+
+        # Validate Redis URL if using Redis cache
+        if self.CACHE_TYPE.lower() == 'redis':
+            redis_url = os.getenv('REDIS_URL')
+            if not redis_url:
+                raise ValueError(
+                    "REDIS_URL must be set when using Redis cache. "
+                    "Example: REDIS_URL=redis://localhost:6379/0"
+                )
 
 
 # Configuration dictionary
