@@ -14,6 +14,8 @@ from utils.request_context import init_request_context
 from utils.logger import configure_logging, get_logger
 from utils.config_validator import validate_config
 from routes.stock_routes import stock_bp
+from routes.health_routes import health_bp
+from routes.legacy_routes import legacy_bp
 
 # Initial basic logging (will be reconfigured in create_app)
 logging.basicConfig(
@@ -134,7 +136,11 @@ def create_app(config_name='default'):
         logger.info("Development security headers enabled")
 
     # Register blueprints
-    app.register_blueprint(stock_bp)
+    # API v1 routes (primary)
+    app.register_blueprint(stock_bp)      # /api/v1/stock-data, /api/v1/batch-stocks
+    app.register_blueprint(health_bp)     # /api/v1/health, /api/v1/health/detailed
+    # Legacy routes for backward compatibility (deprecated)
+    app.register_blueprint(legacy_bp)     # /api/stock-data, /api/batch-stocks, /api/health
 
     # Register error handlers
     register_error_handlers(app)
@@ -145,10 +151,21 @@ def create_app(config_name='default'):
         return jsonify({
             'message': 'Stock Dashboard API',
             'version': '1.0.0',
+            'api_version': 'v1',
             'endpoints': {
-                'stock_data': '/api/stock-data',
-                'batch_stocks': '/api/batch-stocks',
-                'health': '/api/health'
+                'v1': {
+                    'stock_data': '/api/v1/stock-data',
+                    'batch_stocks': '/api/v1/batch-stocks',
+                    'health': '/api/v1/health',
+                    'health_detailed': '/api/v1/health/detailed',
+                    'health_ready': '/api/v1/health/ready',
+                    'health_live': '/api/v1/health/live',
+                },
+                'deprecated': {
+                    'stock_data': '/api/stock-data (use /api/v1/stock-data)',
+                    'batch_stocks': '/api/batch-stocks (use /api/v1/batch-stocks)',
+                    'health': '/api/health (use /api/v1/health)',
+                },
             }
         })
 

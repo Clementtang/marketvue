@@ -14,8 +14,8 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Create blueprint
-stock_bp = Blueprint('stock', __name__, url_prefix='/api')
+# Create blueprint with versioned API prefix
+stock_bp = Blueprint('stock', __name__, url_prefix='/api/v1')
 
 # Stock service instance (injected via create_stock_routes or default)
 _stock_service = None
@@ -215,10 +215,4 @@ def get_batch_stocks():
     return jsonify(result), HTTP_OK
 
 
-@stock_bp.route('/health', methods=['GET'])
-def health_check():
-    """Health check endpoint"""
-    return jsonify({
-        'status': 'healthy',
-        'service': 'stock-dashboard-api'
-    }), HTTP_OK
+# Note: Health check endpoint moved to health_routes.py for API v1

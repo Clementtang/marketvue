@@ -59,7 +59,7 @@ export function useStockData({
    * Async function to fetch stock data from API
    */
   const fetchStockData = useCallback(async (): Promise<StockData> => {
-    const response = await axios.post(`${API_CONFIG.BASE_URL}/api/stock-data`, {
+    const response = await axios.post(`${API_CONFIG.BASE_URL}/api/v1/stock-data`, {
       symbol: symbol,
       start_date: startDate,
       end_date: endDate,
