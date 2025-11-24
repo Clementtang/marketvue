@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import StockManager from './components/StockManager';
@@ -15,6 +16,7 @@ import { AppProvider, useApp } from './contexts/AppContext';
 import { ChartProvider, useChart } from './contexts/ChartContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { ToastContainer } from './components/common/Toast';
+import { queryClient } from './config/queryClient';
 
 function AppContent() {
   // Use Context hooks
@@ -137,14 +139,16 @@ function AppContent() {
 
 function App() {
   return (
-    <AppProvider>
-      <ChartProvider>
-        <ToastProvider>
-          <AppContent />
-          <ToastContainer />
-        </ToastProvider>
-      </ChartProvider>
-    </AppProvider>
+    <QueryClientProvider client={queryClient}>
+      <AppProvider>
+        <ChartProvider>
+          <ToastProvider>
+            <AppContent />
+            <ToastContainer />
+          </ToastProvider>
+        </ChartProvider>
+      </AppProvider>
+    </QueryClientProvider>
   );
 }
 
