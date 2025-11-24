@@ -62,9 +62,12 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
 - **Flask** - 輕量級 Python Web 框架
 - **yfinance** - Yahoo Finance 股票數據 API
 - **Flask-CORS** - 跨域資源共享支援
-- **Flask-Caching** - 資料快取優化
+- **Flask-Caching** - 資料快取優化（支援 Redis）
+- **Flask-Limiter** - API 速率限制
+- **Marshmallow** - 請求驗證
 - **Gunicorn** - Production WSGI 伺服器
 - **SOLID 架構** - 單一職責服務設計
+- **API v1** - 版本化 REST API (`/api/v1/*`)
 
 ## 📦 安裝步驟
 

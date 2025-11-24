@@ -36,7 +36,7 @@ marketvue.vercel.app  →   marketvue-api.onrender.com
    - **Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:app`
-   - **Health Check Path**: `/api/health` (important for deployment reliability)
+   - **Health Check Path**: `/api/v1/health` (or `/api/health` for legacy support)
 
 ### Step 2: Set Environment Variables
 
@@ -179,7 +179,7 @@ marketvue.vercel.app  →   marketvue-api.onrender.com
    - **Runtime**: `Python 3`
    - **Build Command**: `pip install -r requirements.txt`
    - **Start Command**: `gunicorn --bind 0.0.0.0:$PORT app:app`
-   - **Health Check Path**: `/api/health`（對部署可靠性很重要）
+   - **Health Check Path**: `/api/v1/health`（或 `/api/health` 以支援舊版）
 
 ### 步驟 2：設定環境變數
 

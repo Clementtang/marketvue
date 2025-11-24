@@ -60,7 +60,10 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 - **Flask 3.0**: Lightweight Python web framework
 - **yfinance**: Yahoo Finance market data downloader
 - **Flask-CORS**: Handle cross-origin requests
-- **Flask-Caching**: SimpleCache for performance
+- **Flask-Caching**: SimpleCache/Redis for performance
+- **Flask-Limiter**: Rate limiting
+- **Flask-Talisman**: Security headers
+- **Marshmallow**: Request validation
 
 ## Component Structure
 
@@ -81,18 +84,63 @@ src/
 └── main.tsx                   # Application entry
 ```
 
-### Backend Services
+### Backend Services (SOLID Architecture)
 
 ```
 backend/
-├── app.py                     # Flask application
-├── config.py                  # Configuration
+├── app.py                         # Flask application factory
+├── config.py                      # Environment configuration
+├── constants.py                   # Magic numbers & constants
 ├── routes/
-│   └── stock_routes.py       # API endpoints
-├── services/
-│   └── stock_service.py      # Business logic
+│   ├── stock_routes.py            # /api/v1/stock-data, /api/v1/batch-stocks
+│   ├── health_routes.py           # /api/v1/health/* endpoints
+│   └── legacy_routes.py           # /api/* backward compatibility
+├── services/                      # Single Responsibility Services
+│   ├── stock_service.py           # Facade/Coordinator (DI)
+│   ├── stock_data_fetcher.py      # yfinance API calls
+│   ├── stock_data_transformer.py  # DataFrame → Dict conversion
+│   ├── price_calculator.py        # Price metrics calculation
+│   └── company_name_service.py    # Multi-language name resolution
+├── schemas/
+│   └── stock_schemas.py           # Marshmallow request validation
+├── utils/
+│   ├── cache.py                   # Flask-Caching wrapper
+│   ├── cache_factory.py           # Redis/SimpleCache factory
+│   ├── decorators.py              # @handle_errors, @log_request
+│   ├── request_context.py         # Request ID middleware
+│   ├── logger.py                  # Structured logging
+│   ├── config_validator.py        # Startup config validation
+│   └── error_handlers.py          # Global error handlers
 └── data/
-    └── company_names.json    # Multi-language names
+    └── company_names.json         # Multi-language company names
+```
+
+### Service Layer Design
+
+The backend follows **SOLID principles** with **Dependency Injection**:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    StockService (Facade)                     │
+│  Coordinates all operations with injected dependencies       │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐ │
+│  │ StockData   │  │ StockData   │  │ Company             │ │
+│  │ Fetcher     │  │ Transformer │  │ NameService         │ │
+│  │             │  │             │  │                     │ │
+│  │ yfinance    │  │ DataFrame   │  │ JSON + yfinance     │ │
+│  │ API calls   │  │ → Dict      │  │ fallback            │ │
+│  └─────────────┘  └─────────────┘  └─────────────────────┘ │
+│                                                             │
+│  ┌─────────────┐                                            │
+│  │ Price       │                                            │
+│  │ Calculator  │                                            │
+│  │             │                                            │
+│  │ Metrics &   │                                            │
+│  │ changes     │                                            │
+│  └─────────────┘                                            │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ## Data Flow
@@ -140,6 +188,8 @@ Stock Symbol → Backend Service → JSON Lookup → Return Name
 
 ### Caching Strategy
 - Backend: 5-minute cache for stock data
+- Cache backends: SimpleCache (default) or Redis (production)
+- Automatic fallback to SimpleCache if Redis fails
 - Frontend: localStorage for user preferences
 
 ## Security Considerations
@@ -176,11 +226,13 @@ Stock Symbol → Backend Service → JSON Lookup → Return Name
 ## Future Architecture Enhancements
 
 - [ ] Real-time WebSocket updates
-- [ ] Redis for distributed caching
+- [x] Redis for distributed caching (Phase 3 Day 7)
 - [ ] PostgreSQL for user data
 - [ ] Microservices for scaling
 - [ ] GraphQL API option
 - [ ] Server-side rendering (SSR)
+- [x] API versioning (Phase 3 Day 9)
+- [x] Kubernetes-ready health endpoints (Phase 3 Day 9)
 
 ---
 

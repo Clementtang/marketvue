@@ -5,8 +5,27 @@ This document describes the REST API endpoints provided by the MarketVue backend
 ## Base URL
 
 ```
+# Current version (recommended)
+http://localhost:5001/api/v1
+
+# Legacy (deprecated - will be removed in future versions)
 http://localhost:5001/api
 ```
+
+## API Versioning
+
+MarketVue uses URL-based API versioning. The current version is **v1**.
+
+| Version | Status | Base Path |
+|---------|--------|-----------|
+| v1 | Current | `/api/v1` |
+| (none) | Deprecated | `/api` |
+
+**Deprecation Notice:** The legacy `/api/*` endpoints still work but return deprecation headers:
+- `X-API-Deprecated: true`
+- `X-API-Deprecation-Notice: This endpoint is deprecated. Please use /api/v1/* instead.`
+
+---
 
 ## Endpoints
 
@@ -14,7 +33,7 @@ http://localhost:5001/api
 
 Fetch historical stock data for a specific symbol.
 
-**Endpoint:** `POST /stock-data`
+**Endpoint:** `POST /api/v1/stock-data`
 
 **Request Body:**
 ```json
@@ -79,7 +98,7 @@ Fetch historical stock data for a specific symbol.
 
 Fetch data for multiple stocks in a single request.
 
-**Endpoint:** `POST /batch-stocks`
+**Endpoint:** `POST /api/v1/batch-stocks`
 
 **Request Body:**
 ```json
@@ -130,6 +149,78 @@ Fetch data for multiple stocks in a single request.
       "error": "No data found for symbol INVALID"
     }
   ]
+}
+```
+
+---
+
+### 3. Health Check Endpoints
+
+Monitor service health and readiness.
+
+#### Basic Health Check
+**Endpoint:** `GET /api/v1/health`
+
+**Response:** `200 OK`
+```json
+{
+  "status": "healthy",
+  "service": "stock-dashboard-api",
+  "version": "1.0.0"
+}
+```
+
+#### Detailed Health Check
+**Endpoint:** `GET /api/v1/health/detailed`
+
+**Response:** `200 OK`
+```json
+{
+  "status": "healthy",
+  "service": "stock-dashboard-api",
+  "version": "1.0.0",
+  "api_version": "v1",
+  "timestamp": "2025-11-24T04:30:00Z",
+  "uptime": {
+    "seconds": 3600,
+    "formatted": "0d 1h 0m 0s",
+    "started_at": "2025-11-24T03:30:00"
+  },
+  "environment": {
+    "debug": false,
+    "python_version": "3.9.6"
+  },
+  "dependencies": {
+    "cache": {"status": "healthy", "backend": "SimpleCache"}
+  },
+  "config": {
+    "rate_limit": "1000 per hour",
+    "cache_timeout": 300
+  }
+}
+```
+
+#### Kubernetes Readiness Probe
+**Endpoint:** `GET /api/v1/health/ready`
+
+**Response:** `200 OK` (ready) or `503 Service Unavailable` (not ready)
+```json
+{
+  "ready": true,
+  "checks": {
+    "cache": "healthy"
+  }
+}
+```
+
+#### Kubernetes Liveness Probe
+**Endpoint:** `GET /api/v1/health/live`
+
+**Response:** `200 OK`
+```json
+{
+  "alive": true,
+  "timestamp": "2025-11-24T04:30:00Z"
 }
 ```
 
@@ -223,7 +314,7 @@ All error responses follow this format:
 
 ### Fetch Taiwan Stock (TSMC)
 ```bash
-curl -X POST http://localhost:5001/api/stock-data \
+curl -X POST http://localhost:5001/api/v1/stock-data \
   -H "Content-Type: application/json" \
   -d '{
     "symbol": "2330.TW",
@@ -234,13 +325,19 @@ curl -X POST http://localhost:5001/api/stock-data \
 
 ### Fetch Multiple Stocks
 ```bash
-curl -X POST http://localhost:5001/api/batch-stocks \
+curl -X POST http://localhost:5001/api/v1/batch-stocks \
   -H "Content-Type: application/json" \
   -d '{
     "symbols": ["AAPL", "2330.TW", "0700.HK"],
     "start_date": "2024-10-01",
     "end_date": "2024-10-31"
   }'
+```
+
+### Check Service Health
+```bash
+curl http://localhost:5001/api/v1/health
+curl http://localhost:5001/api/v1/health/detailed
 ```
 
 ---
