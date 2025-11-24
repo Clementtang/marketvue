@@ -1,6 +1,7 @@
 import os
 import logging
-from flask import Flask, jsonify
+from datetime import datetime
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
@@ -9,9 +10,12 @@ from config import config
 from utils.cache import cache
 from utils.cache_factory import get_cache_config
 from utils.error_handlers import register_error_handlers
+from utils.request_context import init_request_context
+from utils.logger import configure_logging, get_logger
+from utils.config_validator import validate_config
 from routes.stock_routes import stock_bp
 
-# Configure logging
+# Initial basic logging (will be reconfigured in create_app)
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -43,8 +47,16 @@ def create_app(config_name='default'):
     # Load configuration
     app.config.from_object(config[config_name])
 
-    # Set log level from config
-    logging.getLogger().setLevel(app.config['LOG_LEVEL'])
+    # Configure enhanced logging with request context
+    configure_logging(app)
+
+    # Initialize request context middleware (adds request_id)
+    init_request_context(app)
+
+    # Add request timing
+    @app.before_request
+    def start_timer():
+        request.start_time = datetime.now()
 
     # Initialize CORS
     CORS(app, resources={
@@ -139,6 +151,16 @@ def create_app(config_name='default'):
                 'health': '/api/health'
             }
         })
+
+    # Validate configuration
+    try:
+        validate_config(app)
+        logger.info("Configuration validation passed")
+    except Exception as e:
+        logger.error(f"Configuration validation failed: {e}")
+        # Continue anyway in development, but log the error
+        if not app.config['DEBUG']:
+            raise
 
     # Log startup
     logger.info(f"Flask app created with config: {config_name}")
