@@ -9,6 +9,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Frontend Optimization Day 1 + Day 3** (2025-11-24)
+  - Day 1: React Performance Optimization
+    - Added `React.memo` to StockCard and all 6 sub-components
+    - Added `useCallback` to App.tsx handlers (handleAddStock, handleRemoveStock)
+    - Removed debug `console.log` from useStockData retry callback
+    - Fixed localStorage mock in test setup
+  - Day 2: Skipped (architecture already clean from Phase 2 refactoring)
+    - Rationale: App.tsx only 152 lines, StockCard already split into 6 components
+    - Avoiding over-engineering and unnecessary file proliferation
+  - Day 3: React Query Integration
+    - Installed `@tanstack/react-query` for data fetching
+    - Created `src/config/queryClient.ts` with optimized configuration
+    - Created `src/api/stockApi.ts` for API function extraction
+    - Refactored `useStockData.ts` to use `useQuery` (49% code reduction)
+    - Benefits: automatic caching, request deduplication, background refetching
+  - New files:
+    - `src/config/queryClient.ts` - QueryClient configuration
+    - `src/api/stockApi.ts` - Stock API functions
+    - `docs/work-log-frontend-optimization-2025-11-24.md` - Work log
+  - Test results: 145 frontend tests passing
+  - Commits: `1209955`, `780b63b`
+
 - **Phase 3 Day 9 - API Version Control + Health Check Enhancement** (2025-11-24)
   - Implemented API versioning with `/api/v1` prefix
   - Created enhanced health check endpoints for production readiness
