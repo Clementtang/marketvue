@@ -5,15 +5,16 @@
  * candlesticks from being squeezed together when the date range is too long.
  *
  * Aggregation Rules (aligned with industry standards):
- * - ≤ 60 days (~2 months): Daily (no aggregation)
- * - 61-365 days (2 months - 1 year): Weekly aggregation
- * - > 365 days (> 1 year): Monthly aggregation
+ * - ≤ 90 days (~3 months): Daily (no aggregation)
+ * - 91-180 days (3-6 months): Weekly aggregation
+ * - > 180 days (> 6 months): Monthly aggregation
  *
  * Examples:
  * - 1M (30 days) → Daily
- * - 3M (90 days) → Weekly (industry standard)
+ * - 3M (90 days) → Daily
  * - 6M (180 days) → Weekly
- * - 1Y (365 days) → Weekly
+ * - YTD (~330 days) → Monthly (prevents overlapping)
+ * - 1Y (365 days) → Monthly
  * - 5Y (1825 days) → Monthly
  */
 
@@ -25,15 +26,15 @@ export type TimeInterval = 'daily' | 'weekly' | 'monthly';
 /**
  * Determine appropriate time interval based on number of data points.
  *
- * Thresholds are based on industry standards (TradingView, Yahoo Finance):
- * - Up to 2 months: Daily view for detailed short-term analysis
- * - 2 months to 1 year: Weekly view for medium-term trends
- * - Over 1 year: Monthly view for long-term patterns
+ * Thresholds are optimized to prevent candlestick overlapping:
+ * - Up to 3 months: Daily view for detailed short-term analysis
+ * - 3-6 months: Weekly view for medium-term trends
+ * - Over 6 months: Monthly view for long-term patterns (prevents YTD overlapping)
  */
 export function determineTimeInterval(dataLength: number): TimeInterval {
-  if (dataLength <= 60) {
+  if (dataLength <= 90) {
     return 'daily';
-  } else if (dataLength <= 365) {
+  } else if (dataLength <= 180) {
     return 'weekly';
   } else {
     return 'monthly';

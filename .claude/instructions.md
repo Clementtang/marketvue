@@ -56,7 +56,7 @@
 1. **永遠優先使用 MCP 確認狀態**：在修改任何部署相關配置前，必須先使用 MCP 工具檢查當前狀態
    - Vercel: `mcp__vercel__get_project`, `mcp__vercel__list_deployments`
    - Render: `mcp__render__get_service`, `mcp__render__list_services`
-2. **參考配置文件**：詳細的部署配置記錄在 `.claude/deployment-config.md`
+2. **參考配置文件**：詳細的部署配置記錄在 `docs/DEPLOYMENT_CONFIG.md`
 3. **避免錯誤假設**：不要假設需要重新配置已經正常運作的服務
 
 ### 核心功能
@@ -107,27 +107,64 @@ const translations = useTranslation(language);
 ├── backend/                          # Flask 後端
 │   ├── app.py                        # 主應用
 │   ├── config.py                     # 設定
+│   ├── constants.py                  # 常數定義
 │   ├── requirements.txt              # Python 依賴
 │   ├── data/company_names.json       # 36+ 公司名稱對照
 │   ├── routes/stock_routes.py        # API 路由
-│   └── services/stock_service.py     # yfinance 整合
+│   ├── schemas/stock_schemas.py      # 請求/回應 Schema
+│   ├── services/                     # SOLID 架構服務層
+│   │   ├── stock_service.py          # 協調器 (Facade + DI)
+│   │   ├── stock_data_fetcher.py     # 資料擷取
+│   │   ├── stock_data_transformer.py # 資料轉換
+│   │   ├── price_calculator.py       # 價格計算
+│   │   └── company_name_service.py   # 公司名稱服務
+│   ├── utils/
+│   │   ├── decorators.py             # 錯誤處理裝飾器
+│   │   └── error_handlers.py         # 錯誤處理器
+│   └── tests/                        # 後端測試 (73 tests, 87%+ coverage)
 │
 ├── src/                              # React 前端
 │   ├── components/
-│   │   ├── StockCard.tsx             # 股票卡片（含重試邏輯）
+│   │   ├── stock-card/               # 股票卡片模組（拆分後）
+│   │   │   ├── StockCard.tsx         # 主組件
+│   │   │   ├── StockCardHeader.tsx   # 標題與價格
+│   │   │   ├── StockCardChart.tsx    # 股價圖表
+│   │   │   ├── StockVolumeChart.tsx  # 成交量圖表
+│   │   │   ├── StockCardFooter.tsx   # 底部資訊
+│   │   │   ├── StockCardLoading.tsx  # 載入狀態
+│   │   │   ├── StockCardError.tsx    # 錯誤狀態
+│   │   │   └── hooks/useStockData.ts # 資料擷取 Hook
+│   │   ├── common/
+│   │   │   └── Toast.tsx             # Toast 通知組件
 │   │   ├── StockManager.tsx          # 股票管理（最多 18 檔）
 │   │   ├── DashboardGrid.tsx         # 儀表板網格（6x3）
+│   │   ├── ErrorBoundary.tsx         # 錯誤邊界
 │   │   └── ...
-│   ├── i18n/translations.ts          # 雙語翻譯
+│   ├── contexts/                     # React Context
+│   │   ├── AppContext.tsx            # 應用設定（語言、主題）
+│   │   ├── ChartContext.tsx          # 圖表設定（日期、類型）
+│   │   └── ToastContext.tsx          # Toast 通知狀態
+│   ├── hooks/                        # Custom Hooks
+│   │   ├── useRetry.ts               # 重試邏輯（指數退避）
+│   │   └── index.ts
+│   ├── config/
+│   │   └── chartTheme.ts             # 統一主題配置
+│   ├── i18n/translations.ts          # 雙語翻譯 (92+ keys)
 │   └── App.tsx
 │
 ├── docs/                             # 文件
 │   ├── API.md
 │   ├── ARCHITECTURE.md
-│   └── DEPLOYMENT.md
+│   ├── DEPLOYMENT.md
+│   ├── security/                     # 安全文件
+│   └── work-log-*.md                 # 工作日誌
+│
+├── scripts/
+│   └── security-check.sh             # 安全檢查腳本
 │
 ├── .claude/instructions.md           # 本檔案
 ├── .todo/                            # 內部 TODO（不進 Git）
+├── vercel.json                       # Vercel 配置
 ├── CHANGELOG.md
 ├── README.md / README_EN.md
 ├── ROADMAP.md
@@ -344,7 +381,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
    ```
 
 #### 部署配置詳情
-- 完整的部署配置和 IDs 記錄在：`.claude/deployment-config.md`
+- 完整的部署配置和 IDs 記錄在：`docs/DEPLOYMENT_CONFIG.md`
 - MCP 命令參考和故障排除檢查清單也在該文件中
 
 ---

@@ -14,7 +14,7 @@ import type { Translations } from '../../i18n/translations';
 import { CHART_CONFIG } from '../../config/constants';
 import CandlestickChart from '../CandlestickChart';
 import ChartTooltip from '../common/ChartTooltip';
-import { smartAggregateStockData, type TimeInterval } from '../../utils/dateAggregation';
+import { smartAggregateStockData } from '../../utils/dateAggregation';
 
 interface StockCardChartProps {
   data: StockDataPoint[];
@@ -60,45 +60,26 @@ const StockCardChart = memo(function StockCardChart({
   );
 
   // Date formatter for X axis (adapts to time interval)
+  // Different formats help users naturally understand the time scale
   const formatDate = useCallback((value: string) => {
     const date = new Date(value);
     if (interval === 'monthly') {
-      // Show month/year for monthly data
-      return `${date.getMonth() + 1}/${date.getFullYear().toString().slice(2)}`;
+      // Monthly: Show "Jan'24" format for clarity
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      return `${months[date.getMonth()]}'${date.getFullYear().toString().slice(2)}`;
     } else if (interval === 'weekly') {
-      // Show month/day for weekly data
+      // Weekly: Show "1/15" (month/day) format
       return `${date.getMonth() + 1}/${date.getDate()}`;
     } else {
-      // Daily data
+      // Daily: Show "1/15" (month/day) format
       return `${date.getMonth() + 1}/${date.getDate()}`;
     }
   }, [interval]);
-
-  // Get interval label for display
-  const getIntervalLabel = (interval: TimeInterval): string => {
-    switch (interval) {
-      case 'daily':
-        return t.daily || 'Daily';
-      case 'weekly':
-        return t.weekly || 'Weekly';
-      case 'monthly':
-        return t.monthly || 'Monthly';
-      default:
-        return '';
-    }
-  };
 
   if (!isVisible) return null;
 
   return (
     <div className="relative mb-1" style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}>
-      {/* Time Interval Badge - Top Right Corner */}
-      <div className="absolute top-2 right-2 z-10">
-        <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded shadow-sm">
-          {getIntervalLabel(interval)}
-        </span>
-      </div>
-
       {chartType === 'line' && (
         <ResponsiveContainer width="100%" height={CHART_CONFIG.CANDLESTICK_HEIGHT}>
           <LineChart data={aggregatedData}>

@@ -12,9 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Phase 3 後續優化 - K 線圖智慧聚合與 UI 優化** (2025-11-25)
   - Candlestick Chart Enhancements:
     - Implemented smart date aggregation (daily/weekly/monthly)
-      - ≤ 60 days (~2M): Daily view (no aggregation)
-      - 61-365 days (2M-1Y): Weekly aggregation
-      - > 365 days (>1Y): Monthly aggregation
+      - ≤ 90 days (~3M): Daily view (no aggregation)
+      - 91-180 days (3-6M): Weekly aggregation
+      - > 180 days (>6M): Monthly aggregation
+      - **Optimized thresholds to prevent YTD overlapping** (YTD ~330 days → Monthly)
       - Aligned with industry standards (TradingView, Yahoo Finance)
     - Created `src/utils/dateAggregation.ts` with aggregation utilities
     - Prevents candlesticks from being squeezed together on long date ranges
@@ -23,7 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - UI/UX Improvements:
     - Moved chart type toggle to dashboard header (right corner)
     - Global toggle affects all charts simultaneously
-    - Time interval badge (日線/週線/月線) in each card's top-right
+    - **Removed time interval badge** - cleaner, industry-standard design
+    - **Enhanced X-axis date formatting** to naturally indicate time scale:
+      - Daily/Weekly: "1/15" (month/day)
+      - Monthly: "Jan'24" (month abbreviation + year)
     - Improved layout: Stock Manager (66%) + Time Range (33%)
     - Removed redundant ChartTypeToggle component from main layout
     - Cleaner card interface with fewer controls
@@ -40,8 +44,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Traditional Chinese: "日線", "週線", "月線"
   - Benefits:
     - Better chart readability for long date ranges
+    - **YTD and longer ranges now use monthly aggregation - no overlapping**
     - More intuitive chart type switching
-    - Cleaner main layout
+    - **Cleaner, more professional UI without explicit time labels**
+    - **X-axis format naturally indicates the time scale**
     - Consistent UX across all stock cards
     - Price changes now reflect the selected time period accurately
 
