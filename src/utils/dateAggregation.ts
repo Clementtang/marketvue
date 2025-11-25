@@ -4,10 +4,17 @@
  * Intelligently aggregates stock data based on date range to prevent
  * candlesticks from being squeezed together when the date range is too long.
  *
- * Aggregation Rules:
- * - ≤ 90 days: Daily (no aggregation)
- * - 91-365 days: Weekly aggregation
- * - > 365 days: Monthly aggregation
+ * Aggregation Rules (aligned with industry standards):
+ * - ≤ 60 days (~2 months): Daily (no aggregation)
+ * - 61-365 days (2 months - 1 year): Weekly aggregation
+ * - > 365 days (> 1 year): Monthly aggregation
+ *
+ * Examples:
+ * - 1M (30 days) → Daily
+ * - 3M (90 days) → Weekly (industry standard)
+ * - 6M (180 days) → Weekly
+ * - 1Y (365 days) → Weekly
+ * - 5Y (1825 days) → Monthly
  */
 
 import type { StockDataPoint } from '../types/stock';
@@ -16,10 +23,15 @@ import { format, startOfWeek, startOfMonth, parse } from 'date-fns';
 export type TimeInterval = 'daily' | 'weekly' | 'monthly';
 
 /**
- * Determine appropriate time interval based on number of data points
+ * Determine appropriate time interval based on number of data points.
+ *
+ * Thresholds are based on industry standards (TradingView, Yahoo Finance):
+ * - Up to 2 months: Daily view for detailed short-term analysis
+ * - 2 months to 1 year: Weekly view for medium-term trends
+ * - Over 1 year: Monthly view for long-term patterns
  */
 export function determineTimeInterval(dataLength: number): TimeInterval {
-  if (dataLength <= 90) {
+  if (dataLength <= 60) {
     return 'daily';
   } else if (dataLength <= 365) {
     return 'weekly';
