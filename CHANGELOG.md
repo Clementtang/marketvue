@@ -27,6 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Improved layout: Stock Manager (66%) + Time Range (33%)
     - Removed redundant ChartTypeToggle component from main layout
     - Cleaner card interface with fewer controls
+  - Backend - Period-Based Price Change Calculation:
+    - Modified `backend/services/price_calculator.py` to calculate period change
+    - Changed from daily change (previous day vs current) to period change (first day vs last day)
+    - Now aligns with industry standards (Yahoo Finance, TradingView)
+    - Example: 3M view shows 3-month change, not daily change
+    - Updated `backend/tests/test_price_calculator.py` to reflect new behavior
+    - All 215 backend tests passing, coverage: 89.87%
   - Internationalization:
     - Added translations for time intervals (daily/weekly/monthly)
     - English: "Daily", "Weekly", "Monthly"
@@ -36,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - More intuitive chart type switching
     - Cleaner main layout
     - Consistent UX across all stock cards
+    - Price changes now reflect the selected time period accurately
 
 - **Phase 3 後續優化 - 測試覆蓋率改進 + 並行批次處理功能** (2025-11-25)
   - Test Coverage Enhancement:

@@ -30,7 +30,10 @@ class PriceCalculator:
         data_points: List[Dict]
     ) -> Tuple[Optional[float], Optional[float], Optional[float]]:
         """
-        Calculate current price, change, and change percentage.
+        Calculate current price, change, and change percentage over the period.
+
+        Calculates period change (first data point vs last data point),
+        aligned with industry standards (Yahoo Finance, TradingView).
 
         Args:
             data_points: List of data point dictionaries with 'close' values
@@ -38,9 +41,14 @@ class PriceCalculator:
         Returns:
             Tuple of (current_price, change, change_percent)
             - current_price: Most recent closing price
-            - change: Price difference from previous day
-            - change_percent: Percentage change from previous day
+            - change: Price difference from period start to end
+            - change_percent: Percentage change from period start to end
             All values are None if insufficient data
+
+        Examples:
+            >>> # 3M period: compares 3 months ago vs today
+            >>> # 1Y period: compares 1 year ago vs today
+            >>> calculator.calculate_price_info(three_month_data)
         """
         if not data_points:
             logger.warning("No data points provided for price calculation")
@@ -52,9 +60,10 @@ class PriceCalculator:
             logger.debug("Only one data point, cannot calculate change")
             return current_price, None, None
 
-        previous_price = data_points[-2]['close']
+        # Use period change (first vs last) instead of daily change (previous vs last)
+        period_start_price = data_points[0]['close']
         change, change_percent = self._calculate_change(
-            current_price, previous_price
+            current_price, period_start_price
         )
 
         return current_price, change, change_percent

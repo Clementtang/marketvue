@@ -14,7 +14,11 @@ class TestPriceCalculator:
         self.calculator = PriceCalculator()
 
     def test_calculate_price_info_with_valid_data(self):
-        """Test price calculation with valid data points."""
+        """Test price calculation with valid data points.
+
+        Tests period change calculation (first vs last data point).
+        Example: 100.00 -> 110.00 = 10.00 change, 10% change
+        """
         data_points = [
             {'close': 100.00},
             {'close': 105.00},
@@ -25,8 +29,8 @@ class TestPriceCalculator:
         )
 
         assert current_price == 110.00
-        assert change == 5.00
-        assert change_percent == pytest.approx(4.76, rel=0.01)
+        assert change == 10.00  # Period change: first (100) vs last (110)
+        assert change_percent == 10.00  # 10% increase
 
     def test_calculate_price_info_with_empty_list(self):
         """Test price calculation with empty data."""
