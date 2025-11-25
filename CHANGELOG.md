@@ -22,6 +22,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Render Health Check Path Update** (2025-11-25)
+  - Updated Render service health check endpoint from `/api/health` to `/api/v1/health`
+  - Eliminates deprecated endpoint warnings in production logs
+  - Aligns with API v1 versioning strategy
+  - Health check now uses recommended endpoint
+  - Related: Phase 2 API versioning implementation
+
 - **Time Aggregation Optimization** (2025-11-25)
   - Candlestick Chart Enhancements:
     - Implemented smart date aggregation (daily/weekly/monthly)
