@@ -10,6 +10,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **Phase 3 後續優化 - K 線圖智慧聚合與 UI 優化** (2025-11-25)
+
+### Fixed
+
+- **React Hooks Ordering Violation** (2025-11-25)
+  - Fixed "Rendered more hooks than during the previous render" error in DashboardGrid
+  - Issue: `handleToggleChartType` hook was called after early return
+  - Solution: Moved hook definition before early return to maintain consistent hook order
+  - Ensures React Hooks rules compliance across all render paths
+  - Related file: `src/components/DashboardGrid.tsx`
+
+### Changed
+
+- **Time Aggregation Optimization** (2025-11-25)
   - Candlestick Chart Enhancements:
     - Implemented smart date aggregation (daily/weekly/monthly)
       - ≤ 90 days (~3M): Daily view (no aggregation)
