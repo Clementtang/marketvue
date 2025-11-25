@@ -8,7 +8,6 @@ import {
   ResponsiveContainer,
   Legend,
 } from 'recharts';
-import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
 import type { StockDataPoint } from '../../types/stock';
 import type { ColorTheme } from '../ColorThemeSelector';
 import type { Translations } from '../../i18n/translations';
@@ -16,7 +15,6 @@ import { CHART_CONFIG } from '../../config/constants';
 import CandlestickChart from '../CandlestickChart';
 import ChartTooltip from '../common/ChartTooltip';
 import { smartAggregateStockData, type TimeInterval } from '../../utils/dateAggregation';
-import { useChart } from '../../contexts/ChartContext';
 
 interface StockCardChartProps {
   data: StockDataPoint[];
@@ -41,7 +39,6 @@ const StockCardChart = memo(function StockCardChart({
   t,
   isVisible,
 }: StockCardChartProps) {
-  const { setChartType } = useChart();
 
   // Smart aggregation based on data length
   const { data: aggregatedData, interval } = useMemo(() => {
@@ -77,12 +74,6 @@ const StockCardChart = memo(function StockCardChart({
     }
   }, [interval]);
 
-  // Toggle chart type
-  const handleToggleChartType = useCallback(() => {
-    const newType = chartType === 'line' ? 'candlestick' : 'line';
-    setChartType(newType);
-  }, [chartType, setChartType]);
-
   // Get interval label for display
   const getIntervalLabel = (interval: TimeInterval): string => {
     switch (interval) {
@@ -101,25 +92,11 @@ const StockCardChart = memo(function StockCardChart({
 
   return (
     <div className="relative mb-1" style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}>
-      {/* Chart Type Toggle Button - Top Right Corner */}
-      <div className="absolute top-2 right-2 z-10 flex items-center gap-2">
-        {/* Time Interval Badge */}
-        <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded">
+      {/* Time Interval Badge - Top Right Corner */}
+      <div className="absolute top-2 right-2 z-10">
+        <span className="px-2 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded shadow-sm">
           {getIntervalLabel(interval)}
         </span>
-
-        {/* Chart Type Toggle Button */}
-        <button
-          onClick={handleToggleChartType}
-          className="p-1.5 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 rounded shadow-sm border border-gray-200 dark:border-gray-600 transition-colors"
-          title={chartType === 'line' ? t.switchToCandlestickChart : t.switchToLineChart}
-        >
-          {chartType === 'line' ? (
-            <CandlestickIcon size={16} />
-          ) : (
-            <BarChart3 size={16} />
-          )}
-        </button>
       </div>
 
       {chartType === 'line' && (

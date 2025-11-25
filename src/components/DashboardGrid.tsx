@@ -2,9 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
+import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
 import StockCard from './stock-card';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
+import { useChart } from '../contexts/ChartContext';
 
 interface DashboardGridProps {
   stocks: string[];
@@ -15,6 +17,7 @@ interface DashboardGridProps {
 const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   // Use Context
   const { language } = useApp();
+  const { chartType, setChartType } = useChart();
   const t = useTranslation(language);
 
   const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
@@ -140,9 +143,37 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     );
   }
 
+  // Toggle chart type handler
+  const handleToggleChartType = useCallback(() => {
+    const newType = chartType === 'line' ? 'candlestick' : 'line';
+    setChartType(newType);
+  }, [chartType, setChartType]);
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors" id="grid-container">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">{t.dashboardGrid}</h2>
+      {/* Dashboard Header with Chart Type Toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.dashboardGrid}</h2>
+
+        {/* Chart Type Toggle Button */}
+        <button
+          onClick={handleToggleChartType}
+          className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg transition-colors shadow-sm"
+          title={chartType === 'line' ? t.switchToCandlestickChart : t.switchToLineChart}
+        >
+          {chartType === 'line' ? (
+            <>
+              <CandlestickIcon size={18} />
+              <span className="text-sm font-medium">{t.candlestickChart}</span>
+            </>
+          ) : (
+            <>
+              <BarChart3 size={18} />
+              <span className="text-sm font-medium">{t.lineChart}</span>
+            </>
+          )}
+        </button>
+      </div>
 
       <GridLayout
         className="layout"
