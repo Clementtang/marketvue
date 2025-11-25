@@ -9,6 +9,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Phase 3 後續優化 - K 線圖智慧聚合與 UI 優化** (2025-11-25)
+  - Candlestick Chart Enhancements:
+    - Implemented smart date aggregation (daily/weekly/monthly)
+      - ≤ 90 days: Daily view (no aggregation)
+      - 91-365 days: Weekly aggregation
+      - > 365 days: Monthly aggregation
+    - Created `src/utils/dateAggregation.ts` with aggregation utilities
+    - Prevents candlesticks from being squeezed together on long date ranges
+    - OHLC data correctly aggregated (open/high/low/close/volume)
+    - Moving averages (MA20/MA60) preserved in aggregation
+  - UI/UX Improvements:
+    - Moved chart type toggle from standalone card to stock card corner
+    - Added small icon button in top-right of each chart
+    - Added time interval badge (日線/週線/月線) next to toggle
+    - Improved layout: Stock Manager (66%) + Time Range (33%)
+    - Removed redundant ChartTypeToggle component from main layout
+    - Better use of screen space
+  - Internationalization:
+    - Added translations for time intervals (daily/weekly/monthly)
+    - English: "Daily", "Weekly", "Monthly"
+    - Traditional Chinese: "日線", "週線", "月線"
+  - Benefits:
+    - Better chart readability for long date ranges
+    - More intuitive chart type switching
+    - Cleaner main layout
+    - Consistent UX across all stock cards
+
 - **Phase 3 後續優化 - 測試覆蓋率改進 + 並行批次處理功能** (2025-11-25)
   - Test Coverage Enhancement:
     - Created comprehensive test suite for low-coverage modules

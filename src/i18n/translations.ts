@@ -59,6 +59,9 @@ export interface Translations {
   close: string;
   ma20: string;
   ma60: string;
+  daily: string;
+  weekly: string;
+  monthly: string;
 
   // Empty state
   noStocksAddedYet: string;
@@ -157,6 +160,9 @@ export const translations: Record<Language, Translations> = {
     close: 'Close',
     ma20: 'MA20',
     ma60: 'MA60',
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly',
 
     // Empty state
     noStocksAddedYet: 'No Stocks Added Yet',
@@ -253,6 +259,9 @@ export const translations: Record<Language, Translations> = {
     close: '收盤',
     ma20: 'MA20',
     ma60: 'MA60',
+    daily: '日線',
+    weekly: '週線',
+    monthly: '月線',
 
     // Empty state
     noStocksAddedYet: '尚未新增股票',

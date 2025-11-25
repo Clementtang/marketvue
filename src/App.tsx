@@ -4,7 +4,6 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
 import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
-import ChartTypeToggle from './components/ChartTypeToggle';
 import DashboardGrid from './components/DashboardGrid';
 import ThemeSettings from './components/ThemeSettings';
 import NotificationBanner from './components/NotificationBanner';
@@ -94,10 +93,10 @@ function AppContent() {
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
-        {/* Stock Manager, Chart Type Toggle, and Time Range Selector in a grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-6">
-          {/* Stock Manager - 50% width on large screens */}
-          <div className="lg:col-span-6">
+        {/* Stock Manager and Time Range Selector in a grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+          {/* Stock Manager - 66% width on large screens */}
+          <div className="lg:col-span-2">
             <StockManager
               stocks={stocks}
               onAddStock={handleAddStock}
@@ -105,13 +104,8 @@ function AppContent() {
             />
           </div>
 
-          {/* Chart Type Toggle - 20% width on large screens */}
-          <div className="lg:col-span-2">
-            <ChartTypeToggle />
-          </div>
-
-          {/* Time Range Selector - 30% width on large screens */}
-          <div className="lg:col-span-4">
+          {/* Time Range Selector - 33% width on large screens */}
+          <div className="lg:col-span-1">
             <TimeRangeSelector />
           </div>
         </div>
