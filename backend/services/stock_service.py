@@ -10,6 +10,7 @@ Single responsibility: Coordinate data flow between specialized services.
 import logging
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from constants import DEFAULT_DATE_RANGE_DAYS
 
@@ -208,6 +209,112 @@ class StockService:
 
         except Exception as e:
             logger.error(f"Error fetching batch stocks: {str(e)}")
+            raise ValueError(f"Failed to fetch batch stocks: {str(e)}")
+
+    def get_batch_stocks_parallel(
+        self,
+        symbols: List[str],
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        max_workers: int = 5
+    ) -> Dict:
+        """
+        Fetch data for multiple stocks in parallel using ThreadPoolExecutor.
+
+        This method provides better performance for batch requests by fetching
+        stock data concurrently instead of sequentially.
+
+        Args:
+            symbols: List of stock ticker symbols (max 18 per request)
+            start_date: Optional start date in YYYY-MM-DD format
+            end_date: Optional end date in YYYY-MM-DD format
+            max_workers: Maximum number of parallel workers (default: 5)
+
+        Returns:
+            Dictionary containing:
+                - stocks: List of stock data dictionaries
+                - timestamp: ISO format timestamp of the request
+                - errors: List of error dictionaries (null if no errors)
+                - processing_time_ms: Total processing time in milliseconds
+
+        Raises:
+            ValueError: If batch data cannot be fetched
+
+        Examples:
+            >>> service = StockService()
+            >>> batch = service.get_batch_stocks_parallel(
+            ...     ['AAPL', 'GOOGL', 'MSFT'],
+            ...     '2024-01-01',
+            ...     '2024-01-31'
+            ... )
+            >>> print(len(batch['stocks']))
+            3
+        """
+        try:
+            start_time = datetime.now()
+            logger.info(f"Fetching batch data for {len(symbols)} stocks (parallel mode)")
+
+            # Use default date range if not provided
+            if not end_date:
+                end_date = datetime.now().strftime('%Y-%m-%d')
+            if not start_date:
+                start_date = (
+                    datetime.now() - timedelta(days=DEFAULT_DATE_RANGE_DAYS)
+                ).strftime('%Y-%m-%d')
+
+            stocks_data = []
+            errors = []
+
+            # Use ThreadPoolExecutor for parallel fetching
+            with ThreadPoolExecutor(max_workers=max_workers) as executor:
+                # Submit all tasks
+                future_to_symbol = {
+                    executor.submit(
+                        self.get_stock_data,
+                        symbol,
+                        start_date,
+                        end_date
+                    ): symbol
+                    for symbol in symbols
+                }
+
+                # Collect results as they complete
+                for future in as_completed(future_to_symbol):
+                    symbol = future_to_symbol[future]
+                    try:
+                        stock_data = future.result()
+                        stocks_data.append(stock_data)
+                    except ValueError as e:
+                        logger.warning(f"Failed to fetch data for {symbol}: {str(e)}")
+                        errors.append({
+                            'symbol': symbol.upper(),
+                            'error': str(e)
+                        })
+                    except Exception as e:
+                        logger.error(f"Unexpected error for {symbol}: {str(e)}")
+                        errors.append({
+                            'symbol': symbol.upper(),
+                            'error': f"Unexpected error: {str(e)}"
+                        })
+
+            # Calculate processing time
+            processing_time = (datetime.now() - start_time).total_seconds() * 1000
+
+            result = {
+                'stocks': stocks_data,
+                'timestamp': datetime.now().isoformat(),
+                'errors': errors if errors else None,
+                'processing_time_ms': round(processing_time, 2)
+            }
+
+            logger.info(
+                f"Successfully fetched data for {len(stocks_data)}/{len(symbols)} stocks "
+                f"in {processing_time:.2f}ms (parallel mode)"
+            )
+            return result
+
+        except Exception as e:
+            logger.error(f"Error fetching batch stocks (parallel): {str(e)}")
             raise ValueError(f"Failed to fetch batch stocks: {str(e)}")
 
     # Backward compatibility methods (deprecated but maintained)

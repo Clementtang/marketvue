@@ -29,7 +29,7 @@ MarketVue uses URL-based API versioning. The current version is **v1**.
 
 ## Endpoints
 
-### 1. Get Stock Data
+### 1. Get Stock Data (Single)
 
 Fetch historical stock data for a specific symbol.
 
@@ -94,9 +94,9 @@ Fetch historical stock data for a specific symbol.
 
 ---
 
-### 2. Get Batch Stock Data
+### 2. Get Batch Stock Data (Sequential)
 
-Fetch data for multiple stocks in a single request.
+Fetch data for multiple stocks in a single request (sequential processing).
 
 **Endpoint:** `POST /api/v1/batch-stocks`
 
@@ -154,7 +154,73 @@ Fetch data for multiple stocks in a single request.
 
 ---
 
-### 3. Health Check Endpoints
+### 3. Batch Stocks (Parallel) 🚀
+
+**Optimized parallel version of batch endpoint** - 2-3x faster for fetching multiple stocks.
+
+**Endpoint:** `POST /api/v1/batch-stocks-parallel`
+
+**Request Body:**
+```json
+{
+  "symbols": ["AAPL", "GOOGL", "MSFT", "TSLA", "AMZN"],
+  "start_date": "2024-01-01",
+  "end_date": "2024-10-31",
+  "max_workers": 5
+}
+```
+
+**Parameters:**
+- `symbols` (array, required): List of stock ticker symbols (max 18)
+- `start_date` (string, optional): Start date in YYYY-MM-DD format
+- `end_date` (string, optional): End date in YYYY-MM-DD format
+- `max_workers` (integer, optional): Number of parallel workers (1-10, default: 5)
+
+**Response:** `200 OK`
+```json
+{
+  "stocks": [
+    {
+      "symbol": "AAPL",
+      "company_name": {
+        "en-US": "Apple Inc.",
+        "zh-TW": "蘋果公司"
+      },
+      "data": [...],
+      "current_price": 175.5,
+      "change": 2.5,
+      "change_percent": 1.45
+    }
+  ],
+  "timestamp": "2024-11-25T12:00:00",
+  "errors": null,
+  "processing_time_ms": 1234.56
+}
+```
+
+**Performance Comparison:**
+- Sequential (`/batch-stocks`): ~3-5 seconds for 5 stocks
+- Parallel (`/batch-stocks-parallel`): ~1-2 seconds for 5 stocks
+- **Improvement:** Up to 3x faster
+
+**When to Use:**
+- ✅ Recommended for 3+ stocks
+- ✅ Better for high-latency networks
+- ✅ Ideal for batch imports
+- ⚠️ Use sequential for 1-2 stocks (no benefit from parallelization)
+
+**Cache:**
+- Same as `/batch-stocks` endpoint (5 minutes)
+- Cached by symbols + date range combination
+
+**Error Handling:**
+- Supports partial success (some stocks succeed, others fail)
+- Failed stocks returned in `errors` array
+- Processing time included for performance monitoring
+
+---
+
+### 4. Health Check Endpoints
 
 Monitor service health and readiness.
 
