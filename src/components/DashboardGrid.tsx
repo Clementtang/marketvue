@@ -115,6 +115,12 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     localStorage.setItem('dashboard-layout', JSON.stringify(newLayout));
   }, []);
 
+  // Toggle chart type handler - must be before early return to follow Hooks rules
+  const handleToggleChartType = useCallback(() => {
+    const newType = chartType === 'line' ? 'candlestick' : 'line';
+    setChartType(newType);
+  }, [chartType, setChartType]);
+
   if (stocks.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center transition-colors">
@@ -142,12 +148,6 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
       </div>
     );
   }
-
-  // Toggle chart type handler
-  const handleToggleChartType = useCallback(() => {
-    const newType = chartType === 'line' ? 'candlestick' : 'line';
-    setChartType(newType);
-  }, [chartType, setChartType]);
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors" id="grid-container">
