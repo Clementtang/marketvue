@@ -44,7 +44,7 @@
   - **[frontend-optimization-plan.md](development/frontend-optimization-plan.md)** - 前端優化計劃
   - **[implementation-roadmap.md](development/implementation-roadmap.md)** - 實作路線圖
   - **[meeting-notes/](development/meeting-notes/)** - 會議記錄
-    - [2025-11-14.md](development/meeting-notes/2025-11-14.md) - Phase 2 技術會議
+    - [2025-11-14.md](development/meeting-notes/meeting-notes-2025-11-14.md) - Phase 2 技術會議
 
 ### 📚 專案歷史
 
