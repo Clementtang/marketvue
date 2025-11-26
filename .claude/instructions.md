@@ -24,7 +24,7 @@
 
 - **專案名稱**：MarketVue
 - **描述**：即時多市場股票追蹤儀表板 / Real-time Multi-Market Stock Dashboard
-- **當前版本**：v1.3.4
+- **當前版本**：v1.4.0
 - **授權**：MIT License
 - **儲存庫**：https://github.com/Clementtang/marketvue.git
 - **本地路徑**：`/Users/clementtang/stock-dashboard`
