@@ -234,12 +234,22 @@ marketvue/
 │   │   └── translations.ts      # 多語言翻譯
 │   ├── App.tsx                   # 根組件
 │   └── main.tsx                  # 入口點
-├── docs/                         # 文件
+├── docs/                         # 📚 文件中心
+│   ├── README.md                # 文件導航索引
+│   ├── DOCUMENTATION_GUIDE.md   # 文件組織指南
 │   ├── API.md                   # API 文件
 │   ├── ARCHITECTURE.md          # 架構文件
 │   ├── DEPLOYMENT.md            # 部署指南
+│   ├── DEPLOYMENT_CONFIG.md     # 部署配置
+│   ├── guides/                  # 使用指南（規劃中）
+│   ├── development/             # 開發文件與規劃
+│   ├── project-history/         # 專案歷史（按 Phase 組織）
+│   │   ├── phases/              # Phase 1-3 工作日誌
+│   │   ├── optimizations/       # 優化記錄
+│   │   ├── deployments/         # 部署驗證
+│   │   └── archive/             # 歸檔文件
 │   ├── security/                # 安全文件
-│   └── work-log-*.md            # 工作日誌
+│   └── workflows/               # 工作流程 SOP
 ├── scripts/
 │   └── security-check.sh        # 安全檢查腳本
 ├── package.json
@@ -263,12 +273,38 @@ marketvue/
 
 ## 📚 文件
 
-- [API 文件](./docs/API.md) - 完整的 API 端點說明
-- [架構文件](./docs/ARCHITECTURE.md) - 系統架構與技術選型
-- [部署指南](./docs/DEPLOYMENT.md) - Vercel + Render 部署設定
-- [安全指南](./docs/security/README.md) - 安全審計與實作
-- [貢獻指南](./CONTRIBUTING.md) - 如何參與專案開發
-- [變更日誌](./CHANGELOG.md) - 版本變更記錄
+### 快速導航
+
+- **[📖 文件中心](./docs/README.md)** - 所有文件的中央導航與索引
+- **[📋 文件組織指南](./docs/DOCUMENTATION_GUIDE.md)** - 如何組織和維護專案文件
+
+### 技術文件
+
+- **[API 文件](./docs/API.md)** - 完整的 API 端點說明
+- **[架構文件](./docs/ARCHITECTURE.md)** - 系統架構與技術選型
+- **[部署指南](./docs/DEPLOYMENT.md)** - Vercel + Render 部署設定
+- **[部署配置](./docs/DEPLOYMENT_CONFIG.md)** - 環境變數與配置詳情
+
+### 專案管理
+
+- **[專案進度總結](./docs/project-history/PROJECT_PROGRESS_SUMMARY.md)** - Phase 1-3 完整記錄
+- **[近期變更時間線](./docs/project-history/recent-changes-timeline.md)** - 最新功能與優化
+- **[變更日誌](./CHANGELOG.md)** - 版本變更記錄
+- **[開發路線圖](./ROADMAP.md)** - 未來規劃
+
+### 開發資源
+
+- **[開發文件](./docs/development/)** - 技術規劃與會議記錄
+- **[專案歷史](./docs/project-history/)** - 按階段組織的工作日誌
+  - [Phase 1: CI/CD + 測試基礎](./docs/project-history/phases/phase1/)
+  - [Phase 2: 前端重構](./docs/project-history/phases/phase2/)
+  - [Phase 3: 後端重構](./docs/project-history/phases/phase3/)
+- **[安全文件](./docs/security/README.md)** - 安全審計與實作指南
+- **[工作流程](./docs/workflows/)** - 分支管理與快速參考
+
+### 貢獻指南
+
+- **[貢獻指南](./CONTRIBUTING.md)** - 如何參與專案開發（規劃中）
 
 ## 🧪 測試
 
