@@ -9,6 +9,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Documentation Reorganization** (2025-11-26)
+  - Created comprehensive documentation organization system
+  - Added [DOCUMENTATION_GUIDE.md](docs/DOCUMENTATION_GUIDE.md) - Complete guide for organizing project documentation
+  - Added [docs/README.md](docs/README.md) - Central navigation for all documentation
+  - Reorganized documentation structure following industry best practices (Google, GitLab, Microsoft)
+  - New structure:
+    - `docs/guides/` - User-facing guides and tutorials (planned)
+    - `docs/development/` - Developer documentation and planning
+    - `docs/project-history/` - Historical records organized by phases
+      - `phases/phase1/` - Phase 1: CI/CD + Testing (11 work logs)
+      - `phases/phase2/` - Phase 2: Frontend Refactoring (3 work logs)
+      - `phases/phase3/` - Phase 3: Backend Refactoring (9 work logs)
+      - `optimizations/` - Optimization records
+      - `deployments/` - Deployment verification records
+      - `archive/` - Deprecated planning and analysis documents (26+ files)
+    - `docs/security/` - Security documentation (unchanged)
+    - `docs/workflows/` - Workflow SOPs (unchanged)
+  - Cleaned up `.todo/` directory structure:
+    - New structure: `current-tasks.md`, `planning/`, `scratch/`
+    - Moved 11 work logs from `.todo/work-logs/` to `docs/project-history/phases/phase1/work-logs/`
+    - Clear separation between current work and historical records
+  - Benefits:
+    - Clear time-based organization by development phases
+    - Easy navigation with README indexes at every level
+    - Proper separation of audience-specific documentation
+    - Archival strategy for completed planning documents
+    - Sustainable documentation maintenance process
+
 - **Phase 3 後續優化 - K 線圖智慧聚合與 UI 優化** (2025-11-25)
 
 ### Fixed
