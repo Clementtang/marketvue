@@ -241,6 +241,7 @@ const CandlestickChart = ({ data, showMA = true }: CandlestickChartProps) => {
         <Tooltip
           content={<CustomTooltip colorTheme={colorTheme} language={language} />}
           cursor={{ stroke: 'currentColor', strokeWidth: 1, strokeDasharray: '3 3' }}
+          wrapperStyle={{ zIndex: 50 }}
         />
 
         {/* Candlesticks - using Bar with custom shape */}

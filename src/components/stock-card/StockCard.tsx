@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { useChart } from '../../contexts/ChartContext';
 import { useTranslation } from '../../i18n/translations';
@@ -45,6 +45,14 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
     t,
   });
 
+  // Calculate price color based on last data point
+  const priceColor = useMemo(() => {
+    if (!stockData || stockData.data.length < 2) return colorTheme.up;
+    const lastClose = stockData.data[stockData.data.length - 1].close;
+    const prevClose = stockData.data[stockData.data.length - 2].close;
+    return lastClose >= prevClose ? colorTheme.up : colorTheme.down;
+  }, [stockData, colorTheme]);
+
   // Loading state
   if (loading && !stockData) {
     return <StockCardLoading language={language} retryCount={retryCount} />;
@@ -78,7 +86,7 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
 
   // Success state - render stock card with all sub-components
   return (
-    <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-sm p-3 md:p-4 flex flex-col transition-colors">
+    <div className="h-full max-h-[220px] overflow-hidden bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-2 flex flex-col transition-colors">
       {/* Header with company name and price */}
       <StockCardHeader
         stockData={stockData}
@@ -103,10 +111,13 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
         isVisible={true}
       />
 
-      {/* Footer with average volume */}
+      {/* Footer with average volume and legend */}
       <StockCardFooter
         data={stockData.data}
         language={language}
+        colorTheme={colorTheme}
+        t={t}
+        priceColor={priceColor}
       />
     </div>
   );

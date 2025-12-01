@@ -4,6 +4,7 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
 import StockCard from './stock-card';
+import ScreenshotButton from './ScreenshotButton';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
@@ -44,14 +45,22 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
   // Generate layout for 3x3 grid
   useEffect(() => {
-    // Check layout version and clear if outdated
-    const layoutVersion = localStorage.getItem('dashboard-layout-version');
-    const CURRENT_VERSION = '5';
+    // Check URL parameter for reset
+    const urlParams = new URLSearchParams(window.location.search);
+    const shouldReset = urlParams.get('reset') === 'true';
 
-    if (layoutVersion !== CURRENT_VERSION) {
+    if (shouldReset) {
       localStorage.removeItem('dashboard-layout');
-      localStorage.setItem('dashboard-layout-version', CURRENT_VERSION);
+      localStorage.removeItem('dashboard-layout-version');
+      // Remove reset parameter from URL
+      urlParams.delete('reset');
+      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+      window.history.replaceState({}, '', newUrl);
     }
+
+    // FORCE CLEAR: Always clear layout for snapshot mode testing
+    localStorage.removeItem('dashboard-layout');
+    localStorage.setItem('dashboard-layout-version', 'snapshot-v20');
 
     // Load saved layout from localStorage
     const savedLayout = localStorage.getItem('dashboard-layout');
@@ -71,23 +80,28 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     }
 
     const newLayout = stocks.map((symbol, index) => {
-      // Use saved layout if exists AND it has valid dimensions
-      if (existingLayout[symbol] && existingLayout[symbol].w && existingLayout[symbol].h) {
+      // Use saved layout if exists BUT force update h to current value
+      if (existingLayout[symbol] && existingLayout[symbol].w) {
         return {
           ...existingLayout[symbol],
           i: symbol,
+          h: 1.0, // Force update height to current setting (220px)
+          minH: 1.0,
+          static: false,
         };
       }
       // Generate default 6x3 grid layout (support up to 18 stocks)
+      // SNAPSHOT MODE: Using h: 1.0 for compact card height (220px)
+      const row = Math.floor(index / 3);
       return {
         i: symbol,
         x: index % 3, // Column (0-2)
-        y: Math.floor(index / 3), // Row (0-5 for 18 stocks)
+        y: row * 1.0, // Row position for auto-compaction
         w: 1, // Width (1 unit = 1/3 of container)
-        h: 1, // Height (1 unit = rowHeight)
+        h: 1.0, // Height (1.0 units = 220px * 1.0 = 220px)
         minW: 1,
-        minH: 1,
-        static: false,
+        minH: 1.0,
+        static: false, // Allow auto-repositioning for compaction
       };
     });
     setLayout(newLayout);
@@ -95,15 +109,23 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
   // Memoized layout change handler
   const handleLayoutChange = useCallback((newLayout: GridLayout.Layout[]) => {
+    // Force update all items to have correct h value
+    const correctedLayout = newLayout.map((item, index) => ({
+      ...item,
+      h: 1.0, // Always enforce correct height (220px)
+      minH: 1.0,
+      static: false,
+    }));
+
     // Check if all items are stacked vertically (all x=0)
-    if (newLayout.length >= 3) {
-      const allAtXZero = newLayout.filter(item => item.x === 0).length === newLayout.length;
+    if (correctedLayout.length >= 3) {
+      const allAtXZero = correctedLayout.filter(item => item.x === 0).length === correctedLayout.length;
 
       if (allAtXZero) {
-        const fixedLayout = newLayout.map((item, index) => ({
+        const fixedLayout = correctedLayout.map((item, index) => ({
           ...item,
           x: index % 3,
-          y: Math.floor(index / 3),
+          y: Math.floor(index / 3) * 1.0,
         }));
         setLayout(fixedLayout);
         localStorage.setItem('dashboard-layout', JSON.stringify(fixedLayout));
@@ -111,8 +133,8 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
       }
     }
 
-    setLayout(newLayout);
-    localStorage.setItem('dashboard-layout', JSON.stringify(newLayout));
+    setLayout(correctedLayout);
+    localStorage.setItem('dashboard-layout', JSON.stringify(correctedLayout));
   }, []);
 
   // Toggle chart type handler - must be before early return to follow Hooks rules
@@ -151,47 +173,53 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors" id="grid-container">
-      {/* Dashboard Header with Chart Type Toggle */}
+      {/* Dashboard Header */}
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.dashboardGrid}</h2>
 
-        {/* Chart Type Toggle Button */}
-        <button
-          onClick={handleToggleChartType}
-          className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg transition-colors shadow-sm"
-          title={chartType === 'line' ? t.switchToCandlestickChart : t.switchToLineChart}
-        >
-          {chartType === 'line' ? (
-            <>
-              <CandlestickIcon size={18} />
-              <span className="text-sm font-medium">{t.candlestickChart}</span>
-            </>
-          ) : (
-            <>
-              <BarChart3 size={18} />
-              <span className="text-sm font-medium">{t.lineChart}</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center gap-3">
+          {/* Chart Type Toggle Button */}
+          <button
+            onClick={handleToggleChartType}
+            className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg transition-colors shadow-sm"
+            title={chartType === 'line' ? t.switchToCandlestickChart : t.switchToLineChart}
+          >
+            {chartType === 'line' ? (
+              <>
+                <CandlestickIcon size={18} />
+                <span className="text-sm font-medium">{t.candlestickChart}</span>
+              </>
+            ) : (
+              <>
+                <BarChart3 size={18} />
+                <span className="text-sm font-medium">{t.lineChart}</span>
+              </>
+            )}
+          </button>
+
+          {/* Screenshot Button */}
+          <ScreenshotButton targetElementId="dashboard-grid-layout" language={language} />
+        </div>
       </div>
 
-      <GridLayout
-        className="layout"
-        layout={layout}
-        cols={3}
-        rowHeight={350}
-        width={Math.max(containerWidth - 48, 300)}
-        onLayoutChange={handleLayoutChange}
-        draggableHandle=".drag-handle"
-        compactType="horizontal"
-        preventCollision={false}
-        isResizable={true}
-        resizeHandles={['se']}
-      >
+      <div id="dashboard-grid-layout">
+        <GridLayout
+          className="layout"
+          layout={layout}
+          cols={3}
+          rowHeight={220}
+          width={Math.max(containerWidth - 48, 300)}
+          onLayoutChange={handleLayoutChange}
+          draggableHandle=".drag-handle"
+          compactType="vertical"
+          preventCollision={false}
+          isResizable={true}
+          resizeHandles={['se']}
+        >
         {stocks.map((symbol) => (
           <div key={symbol} className="relative">
-            {/* Drag Handle */}
-            <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10 bg-gradient-to-b from-gray-900/10 to-transparent rounded-t-lg" />
+            {/* Drag Handle - transparent for minimal design */}
+            <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10" />
 
             {/* Stock Card */}
             <StockCard
@@ -202,6 +230,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           </div>
         ))}
       </GridLayout>
+      </div>
     </div>
   );
 };

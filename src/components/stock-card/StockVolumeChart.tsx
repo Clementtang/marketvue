@@ -16,9 +16,21 @@ interface StockVolumeChartProps {
  * Displays trading volume as a bar chart
  */
 const StockVolumeChart = memo(function StockVolumeChart({ data, t, isVisible }: StockVolumeChartProps) {
-  // Custom tooltip component
+  // Custom tooltip component with forced upward positioning
   const CustomTooltip = useCallback(
-    (props: any) => <ChartTooltip {...props} t={t} showMovingAverages={false} />,
+    (props: any) => {
+      // Force tooltip to appear above the cursor
+      const wrapperStyle: React.CSSProperties = {
+        transform: 'translateY(-100%)',
+        marginTop: '-10px'
+      };
+
+      return (
+        <div style={wrapperStyle}>
+          <ChartTooltip {...props} t={t} showMovingAverages={false} />
+        </div>
+      );
+    },
     [t]
   );
 
@@ -38,12 +50,17 @@ const StockVolumeChart = memo(function StockVolumeChart({ data, t, isVisible }: 
   if (!isVisible) return null;
 
   return (
-    <div className="mb-1" style={{ height: `${CHART_CONFIG.VOLUME_HEIGHT}px` }}>
+    <div style={{ height: `${CHART_CONFIG.VOLUME_HEIGHT}px` }}>
       <ResponsiveContainer width="100%" height={CHART_CONFIG.VOLUME_HEIGHT}>
-        <BarChart data={data}>
+        <BarChart data={data} margin={CHART_CONFIG.MARGINS}>
           <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={formatDate} />
           <YAxis tick={{ fontSize: 10 }} tickFormatter={formatVolume} />
-          <Tooltip content={<CustomTooltip />} wrapperStyle={{ zIndex: 50 }} />
+          <Tooltip
+            content={<CustomTooltip />}
+            wrapperStyle={{ zIndex: 50 }}
+            cursor={{ fill: 'rgba(148, 163, 184, 0.2)' }}
+            isAnimationActive={false}
+          />
           <Bar dataKey="volume" fill="#94a3b8" name={t.volume} />
         </BarChart>
       </ResponsiveContainer>

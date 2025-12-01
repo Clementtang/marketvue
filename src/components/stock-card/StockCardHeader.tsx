@@ -21,7 +21,12 @@ const StockCardHeader = memo(function StockCardHeader({
   language,
   colorTheme,
 }: StockCardHeaderProps) {
-  // Memoized display name
+  // Determine if this is a Taiwan stock (ends with .TW or .TWO)
+  const isTaiwanStock = useMemo(() => {
+    return stockData.symbol.endsWith('.TW') || stockData.symbol.endsWith('.TWO');
+  }, [stockData.symbol]);
+
+  // Memoized display name (company name only, without symbol)
   const displayName = useMemo(() => {
     if (!stockData.company_name) {
       return stockData.symbol || symbol;
@@ -31,11 +36,7 @@ const StockCardHeader = memo(function StockCardHeader({
       ? stockData.company_name['zh-TW']
       : stockData.company_name['en-US'];
 
-    if (companyName) {
-      return `${companyName} (${stockData.symbol})`;
-    }
-
-    return stockData.symbol;
+    return companyName || stockData.symbol;
   }, [stockData, language, symbol]);
 
   // Memoized price info
@@ -46,35 +47,59 @@ const StockCardHeader = memo(function StockCardHeader({
   }, [stockData, colorTheme]);
 
   return (
-    <div className="flex items-start justify-between mb-2 md:mb-3">
-      <div className="min-w-0 flex-1">
-        <h3
-          className="text-base md:text-lg font-bold text-gray-800 dark:text-white truncate"
-          title={displayName}
-        >
-          {displayName}
-        </h3>
-        <div className="flex items-baseline gap-1 md:gap-2 flex-wrap">
-          <span className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-            ${stockData.current_price?.toFixed(2) || 'N/A'}
-          </span>
-          {stockData.change !== null && stockData.change_percent !== null && (
-            <div
-              className="flex items-center gap-1 text-xs md:text-sm font-medium"
-              style={{ color: priceInfo.upColor }}
+    <div className="flex items-start justify-between mb-1.5 gap-2">
+      {/* Left: Symbol/Company Name (different order based on stock type) */}
+      <div className="flex flex-col min-w-0 overflow-hidden">
+        {isTaiwanStock ? (
+          // Taiwan stock: Company name (top), Symbol (bottom, no parentheses)
+          <>
+            <h3
+              className="text-base font-bold text-gray-800 dark:text-white truncate leading-tight"
+              title={displayName}
             >
-              {priceInfo.isPositive ? (
-                <TrendingUp size={14} className="md:w-4 md:h-4" />
-              ) : (
-                <TrendingDown size={14} className="md:w-4 md:h-4" />
-              )}
-              <span className="whitespace-nowrap">
-                {priceInfo.isPositive ? '+' : ''}
-                {stockData.change.toFixed(2)} ({stockData.change_percent.toFixed(2)}%)
-              </span>
-            </div>
-          )}
-        </div>
+              {displayName}
+            </h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+              {stockData.symbol}
+            </span>
+          </>
+        ) : (
+          // US/Other stock: Symbol (top), Company name (bottom)
+          <>
+            <h3
+              className="text-base font-bold text-gray-800 dark:text-white whitespace-nowrap leading-tight"
+              title={stockData.symbol}
+            >
+              {stockData.symbol}
+            </h3>
+            <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={displayName}>
+              {displayName}
+            </span>
+          </>
+        )}
+      </div>
+
+      {/* Right: Price (top), Change (bottom) */}
+      <div className="flex flex-col items-end flex-shrink-0">
+        <span className="text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap leading-tight">
+          ${stockData.current_price?.toFixed(2) || 'N/A'}
+        </span>
+        {stockData.change !== null && stockData.change_percent !== null && (
+          <div
+            className="flex items-center gap-0.5 text-xs font-medium whitespace-nowrap"
+            style={{ color: priceInfo.upColor }}
+          >
+            {priceInfo.isPositive ? (
+              <TrendingUp size={12} />
+            ) : (
+              <TrendingDown size={12} />
+            )}
+            <span>
+              {priceInfo.isPositive ? '+' : ''}
+              {stockData.change.toFixed(2)} ({stockData.change_percent.toFixed(2)}%)
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

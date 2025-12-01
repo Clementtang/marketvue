@@ -79,14 +79,17 @@ const StockCardChart = memo(function StockCardChart({
   if (!isVisible) return null;
 
   return (
-    <div className="relative mb-1" style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}>
+    <div className="relative" style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}>
       {chartType === 'line' && (
         <ResponsiveContainer width="100%" height={CHART_CONFIG.CANDLESTICK_HEIGHT}>
-          <LineChart data={aggregatedData}>
+          <LineChart data={aggregatedData} margin={CHART_CONFIG.MARGINS}>
             <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={formatDate} />
             <YAxis tick={{ fontSize: 10 }} domain={['auto', 'auto']} />
-            <Tooltip content={<CustomTooltip />} wrapperStyle={{ zIndex: 50 }} />
-            <Legend wrapperStyle={{ fontSize: '10px' }} iconSize={10} />
+            <Tooltip
+              content={<CustomTooltip />}
+              wrapperStyle={{ zIndex: 50 }}
+            />
+            {/* Legend removed - now shown in footer */}
             <Line
               type="monotone"
               dataKey="close"

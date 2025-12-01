@@ -60,11 +60,11 @@ function AppContent() {
   return (
     <ErrorBoundary language={language}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
-        {/* Notification Banner */}
-        <NotificationBanner t={t} />
+        {/* SNAPSHOT PREVIEW MODE - Temporarily hidden elements */}
+      {/* <NotificationBanner t={t} /> */}
 
-      {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
+      {/* Header - Temporarily hidden */}
+      {/* <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -77,7 +77,6 @@ function AppContent() {
               </div>
             </div>
 
-            {/* Settings Button */}
             <ThemeSettings
               colorTheme={colorTheme}
               onColorThemeChange={setColorTheme}
@@ -89,13 +88,25 @@ function AppContent() {
             />
           </div>
         </div>
-      </header>
+      </header> */}
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
-        {/* Stock Manager and Time Range Selector in a grid */}
+        {/* Temporary Theme Toggle for Testing */}
+        <div className="mb-4 flex justify-end">
+          <ThemeSettings
+            colorTheme={colorTheme}
+            onColorThemeChange={setColorTheme}
+            themeMode={themeMode}
+            onThemeModeChange={setThemeMode}
+            language={language}
+            onLanguageChange={setLanguage}
+            t={t}
+          />
+        </div>
+
+        {/* Stock Manager and Time Range Selector */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          {/* Stock Manager - 66% width on large screens */}
           <div className="lg:col-span-2">
             <StockManager
               stocks={stocks}
@@ -104,7 +115,6 @@ function AppContent() {
             />
           </div>
 
-          {/* Time Range Selector - 33% width on large screens */}
           <div className="lg:col-span-1">
             <TimeRangeSelector />
           </div>
@@ -118,8 +128,8 @@ function AppContent() {
         />
       </main>
 
-      {/* Footer */}
-      <Footer />
+      {/* Footer - Temporarily hidden */}
+      {/* <Footer /> */}
 
       {/* Vercel Analytics */}
       <Analytics />

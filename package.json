@@ -38,6 +38,7 @@
     "axios": "^1.12.2",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.546.0",
+    "modern-screenshot": "^4.6.7",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-grid-layout": "^1.5.2",

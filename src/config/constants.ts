@@ -15,19 +15,20 @@ export const API_CONFIG = {
 
 /**
  * Chart Configuration
+ * SNAPSHOT MODE: Optimized heights for 16:9 aspect ratio
  */
 export const CHART_CONFIG = {
-  // Heights (in pixels)
-  STOCK_CARD_HEIGHT: 235,
-  CANDLESTICK_HEIGHT: 145,
-  VOLUME_HEIGHT: 80,
+  // Heights (in pixels) - SNAPSHOT MODE
+  STOCK_CARD_HEIGHT: 220, // Optimized for snapshot
+  CANDLESTICK_HEIGHT: 85, // Reduced to save vertical space
+  VOLUME_HEIGHT: 45, // Reduced to save vertical space
 
   // Margins (for Recharts)
   MARGINS: {
-    top: 5,
+    top: 0,  // Reduced from 5 to 0 to maximize chart area
     right: 5,
-    left: -20,
-    bottom: 5,
+    left: 0,  // Changed from -20 to 0 to prevent Y-axis labels from extending beyond card left edge
+    bottom: 0,  // Reduced from 5 to 0 to eliminate whitespace below X-axis
   },
 
   // Chart display settings
