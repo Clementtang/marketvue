@@ -25,6 +25,12 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
   - MA60（60 日移動平均線）
   - 即時價格變化追蹤
   - 成交量分析
+  - K 線圖 / 折線圖切換
+
+- 📸 **截圖功能**
+  - 一鍵複製儀表板截圖到剪貼簿
+  - 16:9 寬高比優化（適用於簡報）
+  - 支援淺色/深色主題
 
 - 🎨 **客製化選項**
   - 漲跌顏色主題（西式紅漲綠跌 / 東式綠漲紅跌）
@@ -55,6 +61,7 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
 - **Axios** - HTTP 請求客戶端
 - **date-fns** - 日期處理工具
 - **Lucide Icons** - 美觀的圖示庫
+- **modern-screenshot** - 高品質螢幕截圖（支援現代 CSS）
 - **Context API** - 全局狀態管理 (AppContext, ChartContext, ToastContext)
 - **Custom Hooks** - 可重用邏輯 (useRetry, useStockData, useToast)
 
@@ -140,8 +147,15 @@ PORT=5001 python app.py
    - 查看即時價格和漲跌幅
    - 分析移動平均線趨勢（MA20、MA60）
    - 查看成交量走勢
+   - 切換 K 線圖 / 折線圖
 
-4. **自訂設定**
+4. **截圖功能**
+   - 點擊右上角綠色「截圖」按鈕
+   - 儀表板截圖將自動複製到剪貼簿
+   - 可直接貼上到簡報、文件或聊天軟體
+   - 自動匹配當前主題（淺色/深色）
+
+5. **自訂設定**
    - 點擊右上角設定圖示
    - 調整顏色主題（Western/Eastern）
    - 切換深色/淺色模式
@@ -219,6 +233,7 @@ marketvue/
 │   │   ├── StockManager.tsx
 │   │   ├── TimeRangeSelector.tsx
 │   │   ├── DashboardGrid.tsx
+│   │   ├── ScreenshotButton.tsx # 截圖按鈕組件
 │   │   ├── ThemeSettings.tsx
 │   │   └── ErrorBoundary.tsx    # 錯誤邊界
 │   ├── contexts/                 # React Context
@@ -228,6 +243,8 @@ marketvue/
 │   ├── hooks/                    # Custom Hooks
 │   │   ├── useRetry.ts          # 重試邏輯
 │   │   └── index.ts
+│   ├── utils/
+│   │   └── screenshot.ts        # 截圖工具函式
 │   ├── config/
 │   │   └── chartTheme.ts        # 統一主題配置
 │   ├── i18n/

@@ -7,6 +7,75 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.1] - 2025-12-01
+
+### Added
+
+- **Screenshot Functionality** (2025-12-01)
+  - Created screenshot capture system for dashboard grid
+  - New `ScreenshotButton` component with green camera icon
+  - Placed next to chart type toggle in dashboard header
+  - Features:
+    - Captures 3x3 grid area only (dashboard-grid-layout div)
+    - Copies screenshot directly to clipboard (no download)
+    - Target dimensions: 1920x1080 (16:9 aspect ratio) with proportional scaling
+    - Automatic theme detection (light/dark mode background)
+    - Visual feedback: Loading state, success message (2s auto-dismiss)
+    - Bilingual UI: "截圖" / "Screenshot", "截圖中..." / "Capturing..."
+  - Technical implementation:
+    - New utility: `src/utils/screenshot.ts` with `captureAndCopyToClipboard()` and `isClipboardAvailable()`
+    - Uses `modern-screenshot` library (supports Tailwind CSS 4.x oklch colors)
+    - Scale calculation to maintain 16:9 aspect ratio
+    - Background color detection: `#1f2937` (dark) or `#ffffff` (light)
+    - Clipboard API with PNG blob conversion
+  - Testing: Verified in both Light and Dark modes
+  - Dependencies: Added `modern-screenshot@5.0.2` to package.json
+
+### Changed
+
+- **Card Layout Optimization for 16:9 Snapshot Mode** (2025-12-01)
+  - Reduced card height from 270px to 220px for more compact PowerPoint slides
+  - Chart height optimizations:
+    - Candlestick/Line chart: 145px → 85px
+    - Volume chart: 80px → 45px
+    - Stock card: 235px → 220px
+  - Chart margin adjustments (CHART_CONFIG in constants.ts):
+    - Top margin: 5px → 0px (maximize chart area)
+    - Left margin: -20px → 0px (prevent Y-axis labels from extending beyond card edge)
+    - Bottom margin: 5px → 0px (eliminate whitespace below X-axis)
+  - Card styling refinements:
+    - Removed drag handle gradient background (transparent for minimal design)
+    - Changed card shadow to border (border-gray-200/700)
+    - Reduced card padding: p-3 md:p-4 → p-2
+  - Grid layout updates (DashboardGrid.tsx):
+    - Row height: 350px → 220px
+    - Layout height units: 1.23 → 1.0
+    - Compact type: horizontal → vertical
+    - Added `dashboard-grid-layout` div wrapper for screenshot targeting
+  - Removed margins from chart sub-components:
+    - StockCardChart: removed mb-1
+    - StockVolumeChart: removed mb-1, improved tooltip positioning
+  - Benefits:
+    - Perfect 16:9 aspect ratio for presentation slides
+    - Cleaner, more professional card design
+    - Better use of vertical space
+    - Improved readability despite smaller size
+
+### Technical
+
+- Screenshot library evaluation:
+  - Tested `html2canvas` → Failed (oklch color parsing errors with Tailwind CSS 4.x)
+  - Tested `dom-to-image-more` → Failed (black borders in output)
+  - Selected `modern-screenshot` → Success (perfect rendering with modern CSS)
+- Component files:
+  - New: `src/components/ScreenshotButton.tsx` (77 lines)
+  - New: `src/utils/screenshot.ts` (65 lines)
+  - Modified: `src/components/DashboardGrid.tsx` (integrated screenshot button)
+  - Modified: `src/config/constants.ts` (updated CHART_CONFIG)
+  - Modified: 6+ stock card sub-components (height and margin adjustments)
+- Build verification: ✅ TypeScript compilation successful, production build ok
+- Feature status: ✅ Fully functional and tested in production
+
 ## [1.4.0] - 2025-11-26
 
 ### Added

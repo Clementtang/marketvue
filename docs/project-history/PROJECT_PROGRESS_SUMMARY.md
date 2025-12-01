@@ -1,9 +1,9 @@
 # MarketVue 專案進度總結
 
 **專案名稱**: MarketVue (Real-time Multi-Market Stock Dashboard)
-**最後更新**: 2025-11-26
-**專案版本**: v1.4.0
-**總體狀態**: ✅ **Phase 1-3 完成，前端優化完成，文件重組完成**
+**最後更新**: 2025-12-01
+**專案版本**: v1.4.1
+**總體狀態**: ✅ **Phase 1-3 完成，前端優化完成，截圖功能完成，文件重組完成**
 
 ---
 
@@ -14,8 +14,9 @@
 3. [Phase 2: 前端重構](#phase-2-前端重構)
 4. [Phase 3: 後端重構](#phase-3-後端重構)
 5. [前端優化階段](#前端優化階段)
-6. [整體成果統計](#整體成果統計)
-7. [下一步規劃](#下一步規劃)
+6. [截圖功能與卡片優化](#截圖功能與卡片優化)
+7. [整體成果統計](#整體成果統計)
+8. [下一步規劃](#下一步規劃)
 
 ---
 
@@ -467,6 +468,118 @@ CACHE_KEY_PREFIX=marketvue
 
 ---
 
+## 截圖功能與卡片優化
+
+**執行日期**: 2025-12-01
+**狀態**: ✅ **完成**
+
+### 主要成果
+
+#### 1. 截圖功能 ✅
+
+**功能特點**:
+- 一鍵複製儀表板截圖到剪貼簿
+- 僅捕捉 3x3 Grid 區域（dashboard-grid-layout div）
+- 16:9 寬高比優化（1920x1080 或按比例縮放）
+- 自動偵測淺色/深色主題背景
+- 綠色按鈕設計，放置於圖表類型切換按鈕旁
+- 視覺回饋：Loading 狀態 + 成功訊息（2 秒自動消失）
+- 雙語支援：繁中/英文
+
+**技術實作**:
+```typescript
+// Screenshot utility (src/utils/screenshot.ts)
+- captureAndCopyToClipboard(): 核心截圖函式
+- isClipboardAvailable(): 檢查瀏覽器支援度
+- 使用 modern-screenshot 庫（支援 Tailwind CSS 4.x oklch 顏色）
+- Scale 計算維持 16:9 比例
+- Clipboard API (navigator.clipboard.write + ClipboardItem)
+
+// ScreenshotButton component (src/components/ScreenshotButton.tsx)
+- useState: isCapturing, showSuccess
+- useCallback: handleCapture (防止重複觸發)
+- Camera icon with animate-pulse
+- Success notification with auto-dismiss
+```
+
+**Library 選擇過程**:
+1. ❌ `html2canvas` - 無法解析 oklch 顏色函數
+2. ❌ `dom-to-image-more` - 產生黑色框線問題
+3. ✅ `modern-screenshot` - 完美支援現代 CSS
+
+**測試結果**:
+- ✅ 淺色模式：白色背景 (#ffffff)
+- ✅ 深色模式：灰色背景 (#1f2937)
+- ✅ 圖表渲染：無變形
+- ✅ 文字清晰度：完美
+- ✅ 寬高比例：16:9
+- ✅ 複製到剪貼簿：成功
+
+#### 2. 卡片佈局優化（Snapshot Mode） ✅
+
+**高度縮減**:
+| 元素 | 原始高度 | 優化後高度 | 變化 |
+|------|---------|-----------|------|
+| 線圖/K線圖 | 145px | 85px | -60px |
+| 交易量圖 | 80px | 45px | -35px |
+| 卡片總高度 | 270px | 220px | -50px |
+
+**Chart Margin 優化** (src/config/constants.ts):
+```typescript
+MARGINS: {
+  top: 0,     // was 5 - 最大化圖表區域
+  right: 5,
+  left: 0,    // was -20 - 防止 Y 軸標籤超出卡片
+  bottom: 0,  // was 5 - 消除 X 軸下方空白
+}
+```
+
+**卡片樣式優化**:
+- 移除拖曳手把漸層背景（改為透明）
+- 將卡片陰影改為邊框樣式
+- 減少卡片 padding (p-3 md:p-4 → p-2)
+
+**Grid 佈局調整**:
+- Row height: 350px → 220px
+- Layout height units: 1.23 → 1.0
+- Compact type: horizontal → vertical
+- 新增 `dashboard-grid-layout` div wrapper
+
+**Benefits**:
+- 完美 16:9 寬高比（適用於 PowerPoint 簡報）
+- 更簡潔專業的卡片設計
+- 更好的垂直空間利用
+- 保持可讀性的同時縮減尺寸
+
+### 程式碼變更
+
+**新建檔案**:
+- `src/utils/screenshot.ts` (65 lines)
+- `src/components/ScreenshotButton.tsx` (77 lines)
+
+**修改檔案**:
+- `package.json` - 新增 `modern-screenshot@5.0.2`
+- `src/config/constants.ts` - 更新 CHART_CONFIG
+- `src/components/DashboardGrid.tsx` - 整合截圖按鈕、Grid 佈局
+- `src/components/stock-card/*.tsx` - 高度與 margin 調整（6 個檔案）
+
+**文件更新**:
+- `CHANGELOG.md` - 新增 v1.4.1 版本記錄
+- `README.md` - 新增截圖功能說明
+- `docs/project-history/phases/phase3/work-logs/2025-12-01-screenshot-feature.md`
+- `docs/project-history/PROJECT_PROGRESS_SUMMARY.md` (本檔案)
+
+### Commit 資訊
+```
+Commit: f5f03f3
+Message: feat: Add screenshot functionality and optimize card layout for 16:9 snapshot mode
+Files Changed: 13
+Insertions: +396
+Deletions: -121
+```
+
+---
+
 ## 整體成果統計
 
 ### 測試總覽
@@ -509,6 +622,7 @@ CACHE_KEY_PREFIX=marketvue
 - 互動式圖表 (折線圖/K線圖)
 - 響應式儀表板布局
 - 拖拽排序功能
+- 📸 截圖功能 (16:9 寬高比，複製到剪貼簿)
 
 ✅ **進階功能** (100%):
 - 雙語介面 (繁中/英文)
