@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { captureAndCopyToClipboard, isClipboardAvailable } from '../utils/screenshot';
-import { useTranslation } from '../i18n/translations';
 import type { Language } from '../i18n/translations';
 
 interface ScreenshotButtonProps {

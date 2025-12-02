@@ -115,7 +115,6 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
       <StockCardFooter
         data={stockData.data}
         language={language}
-        colorTheme={colorTheme}
         t={t}
         priceColor={priceColor}
       />
