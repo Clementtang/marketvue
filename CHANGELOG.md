@@ -45,6 +45,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Root cause: `useEffect` dependency on `stocks.length` triggered on every render
   - Solution: Track actual stock list changes using `useRef` instead of array length
 
+- **TypeScript Build Errors for Vercel Deployment** (2025-12-02)
+  - Fixed 9 TypeScript TS6133 and TS2322 errors that blocked Vercel production builds
+  - Removed unused imports: `NotificationBanner`, `Footer`, `TrendingUp`, `useTranslation`, `Legend`
+  - Removed unused variables: `index`, `t`, `colorTheme`
+  - Fixed prop type mismatch in `StockCardFooter` component
+  - Files affected:
+    - `src/App.tsx`: Removed unused component imports
+    - `src/components/DashboardGrid.tsx`: Removed unused index parameter
+    - `src/components/ScreenshotButton.tsx`: Removed unused useTranslation
+    - `src/components/stock-card/StockCardChart.tsx`: Removed unused Legend import
+    - `src/components/stock-card/StockCard.tsx`: Removed colorTheme prop
+    - `src/components/stock-card/StockCardFooter.tsx`: Updated interface
+
+- **UI Components Restoration** (2025-12-02)
+  - Restored all UI components that were temporarily hidden during screenshot feature testing
+  - Components restored:
+    - `NotificationBanner`: Now visible at the top of the page
+    - `Header`: Restored with app title, subtitle, TrendingUp icon, and theme settings
+    - `Footer`: Restored at the bottom of the page
+  - Removed temporary standalone ThemeSettings button in main content area
+  - All components now fully functional in production
+
 ## [1.4.1] - 2025-12-01
 
 ### Added
