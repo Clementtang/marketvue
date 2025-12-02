@@ -6,7 +6,10 @@ import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
 import DashboardGrid from './components/DashboardGrid';
 import ThemeSettings from './components/ThemeSettings';
+import NotificationBanner from './components/NotificationBanner';
+import Footer from './components/Footer';
 import { useTranslation } from './i18n/translations';
+import { TrendingUp } from 'lucide-react';
 import ErrorBoundary from './components/ErrorBoundary';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { ChartProvider, useChart } from './contexts/ChartContext';
@@ -57,82 +60,66 @@ function AppContent() {
   return (
     <ErrorBoundary language={language}>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
-        {/* SNAPSHOT PREVIEW MODE - Temporarily hidden elements */}
-      {/* <NotificationBanner t={t} /> */}
+        <NotificationBanner t={t} />
 
-      {/* Header - Temporarily hidden */}
-      {/* <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
-        <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <TrendingUp size={32} />
-              <div>
-                <h1 className="text-3xl font-bold">{t.appTitle}</h1>
-                <p className="text-blue-100 text-sm">
-                  {t.appSubtitle}
-                </p>
+        <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
+          <div className="container mx-auto px-4 py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <TrendingUp size={32} />
+                <div>
+                  <h1 className="text-3xl font-bold">{t.appTitle}</h1>
+                  <p className="text-blue-100 text-sm">
+                    {t.appSubtitle}
+                  </p>
+                </div>
               </div>
+
+              <ThemeSettings
+                colorTheme={colorTheme}
+                onColorThemeChange={setColorTheme}
+                themeMode={themeMode}
+                onThemeModeChange={setThemeMode}
+                language={language}
+                onLanguageChange={setLanguage}
+                t={t}
+              />
+            </div>
+          </div>
+        </header>
+
+        {/* Main Content */}
+        <main className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
+          {/* Stock Manager and Time Range Selector */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+            <div className="lg:col-span-2">
+              <StockManager
+                stocks={stocks}
+                onAddStock={handleAddStock}
+                onRemoveStock={handleRemoveStock}
+              />
             </div>
 
-            <ThemeSettings
-              colorTheme={colorTheme}
-              onColorThemeChange={setColorTheme}
-              themeMode={themeMode}
-              onThemeModeChange={setThemeMode}
-              language={language}
-              onLanguageChange={setLanguage}
-              t={t}
-            />
+            <div className="lg:col-span-1">
+              <TimeRangeSelector />
+            </div>
           </div>
-        </div>
-      </header> */}
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
-        {/* Temporary Theme Toggle for Testing */}
-        <div className="mb-4 flex justify-end">
-          <ThemeSettings
-            colorTheme={colorTheme}
-            onColorThemeChange={setColorTheme}
-            themeMode={themeMode}
-            onThemeModeChange={setThemeMode}
-            language={language}
-            onLanguageChange={setLanguage}
-            t={t}
+          {/* Dashboard Grid */}
+          <DashboardGrid
+            stocks={stocks}
+            startDate={dateRange.startDate}
+            endDate={dateRange.endDate}
           />
-        </div>
+        </main>
 
-        {/* Stock Manager and Time Range Selector */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-          <div className="lg:col-span-2">
-            <StockManager
-              stocks={stocks}
-              onAddStock={handleAddStock}
-              onRemoveStock={handleRemoveStock}
-            />
-          </div>
+        <Footer />
 
-          <div className="lg:col-span-1">
-            <TimeRangeSelector />
-          </div>
-        </div>
+        {/* Vercel Analytics */}
+        <Analytics />
 
-        {/* Dashboard Grid */}
-        <DashboardGrid
-          stocks={stocks}
-          startDate={dateRange.startDate}
-          endDate={dateRange.endDate}
-        />
-      </main>
-
-      {/* Footer - Temporarily hidden */}
-      {/* <Footer /> */}
-
-      {/* Vercel Analytics */}
-      <Analytics />
-
-      {/* Vercel Speed Insights */}
-      <SpeedInsights />
+        {/* Vercel Speed Insights */}
+        <SpeedInsights />
       </div>
     </ErrorBoundary>
   );
