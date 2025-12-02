@@ -7,6 +7,9 @@ interface ChartContextType {
   setChartType: (type: 'line' | 'candlestick') => void;
   dateRange: DateRange;
   setDateRange: (range: DateRange) => void;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  itemsPerPage: number;
 }
 
 const ChartContext = createContext<ChartContextType | undefined>(undefined);
@@ -30,7 +33,9 @@ export function ChartProvider({ children }: ChartProviderProps) {
     endDate: format(new Date(), 'yyyy-MM-dd'),
     preset: '1m',
   });
+  const [currentPage, setCurrentPageState] = useState(1);
   const [isInitialized, setIsInitialized] = useState(false);
+  const itemsPerPage = 9; // 3x3 grid
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -66,11 +71,20 @@ export function ChartProvider({ children }: ChartProviderProps) {
     }
   };
 
+  const setCurrentPage = (page: number) => {
+    setCurrentPageState(page);
+    // No need to persist page number to localStorage
+    // Always start from page 1 on refresh
+  };
+
   const value: ChartContextType = {
     chartType,
     setChartType,
     dateRange,
     setDateRange,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
   };
 
   return <ChartContext.Provider value={value}>{children}</ChartContext.Provider>;

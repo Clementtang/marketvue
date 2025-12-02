@@ -25,6 +25,20 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - MA60 (60-day Moving Average)
   - Real-time price change tracking
   - Volume analysis
+  - Candlestick / Line chart toggle
+
+- 📄 **Pagination**
+  - Support unlimited stock tracking
+  - 9 stocks per page (3x3 grid)
+  - Smart page navigation (auto-jump to last page when adding stock)
+  - Previous/Next page buttons
+  - Page indicator
+
+- 📸 **Screenshot**
+  - One-click copy dashboard screenshot to clipboard
+  - 16:9 aspect ratio optimized (for presentations)
+  - Support light/dark themes
+  - Each page can be screenshot independently
 
 - 🎨 **Customization Options**
   - Color themes for price changes (Western red-up/green-down, Eastern green-up/red-down)

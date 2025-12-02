@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.0] - 2025-12-02
+
+### Added
+
+- **Grid Pagination Feature** (2025-12-02)
+  - Implemented pagination for dashboard grid to support unlimited stocks (9 stocks per page)
+  - New `PageNavigator` component with previous/next buttons and page indicator
+  - Features:
+    - Displays 9 stocks per page in 3x3 grid layout
+    - Navigation controls: "上一頁" / "Previous" and "下一頁" / "Next" buttons
+    - Page indicator: "頁 X / Y" / "Page X / Y"
+    - Auto-hide when there's only one page (≤9 stocks)
+    - Smooth page transitions with React state management
+  - Smart page navigation behavior:
+    - **Add stock**: Automatically jumps to last page to show newly added stock
+    - **Remove stock**: Stays on current page if valid, otherwise jumps to last valid page
+    - **Drag/resize**: Layout changes preserved across all pages independently
+  - State management:
+    - Added pagination state to `ChartContext`: `currentPage`, `setCurrentPage`, `itemsPerPage`
+    - Page state NOT persisted to localStorage (always starts from page 1 on refresh)
+    - Layout positions saved to localStorage for ALL stocks (cross-page persistence)
+  - Screenshot compatibility:
+    - Screenshot button captures only current page's stocks (9 or fewer)
+    - Each page can be screenshot independently
+  - Technical implementation:
+    - `useMemo` hook for efficient `paginatedStocks` calculation
+    - `useRef` for tracking stock list changes without unnecessary re-renders
+    - Layout version upgraded: `snapshot-v20` → `snapshot-v20-pagination`
+  - UI styling: Gray buttons with chevron icons, matches existing design system
+  - Bilingual support: Traditional Chinese and English
+
+### Fixed
+
+- **Page Reset Issue** (2025-12-02)
+  - Fixed infinite loop where page would reset to 1 after clicking next/previous
+  - Root cause: `useEffect` dependency on `stocks.length` triggered on every render
+  - Solution: Track actual stock list changes using `useRef` instead of array length
+
 ## [1.4.1] - 2025-12-01
 
 ### Added

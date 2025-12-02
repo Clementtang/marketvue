@@ -1,10 +1,11 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
 import StockCard from './stock-card';
 import ScreenshotButton from './ScreenshotButton';
+import PageNavigator from './PageNavigator';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
@@ -18,11 +19,50 @@ interface DashboardGridProps {
 const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   // Use Context
   const { language } = useApp();
-  const { chartType, setChartType } = useChart();
+  const { chartType, setChartType, currentPage, setCurrentPage, itemsPerPage } = useChart();
   const t = useTranslation(language);
 
   const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
   const [containerWidth, setContainerWidth] = useState(1200);
+
+  // Calculate paginated stocks
+  const paginatedStocks = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return stocks.slice(startIndex, endIndex);
+  }, [stocks, currentPage, itemsPerPage]);
+
+  // Smart page navigation when stocks change
+  const previousStocksRef = useRef<string[]>([]);
+  useEffect(() => {
+    const previousStocks = previousStocksRef.current;
+
+    // Check if stocks actually changed (not just re-rendered)
+    const stocksString = stocks.join(',');
+    const previousStocksString = previousStocks.join(',');
+
+    if (stocksString !== previousStocksString && previousStocks.length > 0) {
+      const totalPages = Math.ceil(stocks.length / itemsPerPage);
+
+      // Stock was added (array grew) - jump to last page to show the new stock
+      if (stocks.length > previousStocks.length) {
+        setCurrentPage(totalPages);
+      }
+      // Stock was removed (array shrunk) - stay on current page if valid
+      else if (stocks.length < previousStocks.length) {
+        // If current page is now out of range, go to last valid page
+        if (currentPage > totalPages) {
+          setCurrentPage(totalPages);
+        }
+        // Otherwise stay on current page
+      }
+
+      previousStocksRef.current = stocks;
+    } else if (previousStocks.length === 0) {
+      // First load, initialize the ref
+      previousStocksRef.current = stocks;
+    }
+  }, [stocks, currentPage, itemsPerPage, setCurrentPage]);
 
   // Memoized width update handler
   const updateWidth = useCallback(() => {
@@ -58,11 +98,15 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
       window.history.replaceState({}, '', newUrl);
     }
 
-    // FORCE CLEAR: Always clear layout for snapshot mode testing
-    localStorage.removeItem('dashboard-layout');
-    localStorage.setItem('dashboard-layout-version', 'snapshot-v20');
+    // Check layout version
+    const layoutVersion = localStorage.getItem('dashboard-layout-version');
+    if (layoutVersion !== 'snapshot-v20-pagination') {
+      // Clear old layout when upgrading to pagination version
+      localStorage.removeItem('dashboard-layout');
+      localStorage.setItem('dashboard-layout-version', 'snapshot-v20-pagination');
+    }
 
-    // Load saved layout from localStorage
+    // Load saved layout from localStorage (contains ALL stocks, not just current page)
     const savedLayout = localStorage.getItem('dashboard-layout');
     let existingLayout: Record<string, GridLayout.Layout> = {};
 
@@ -79,9 +123,10 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
       }
     }
 
-    const newLayout = stocks.map((symbol, index) => {
-      // Use saved layout if exists BUT force update h to current value
-      if (existingLayout[symbol] && existingLayout[symbol].w) {
+    // Generate layout for current page's stocks only
+    const newLayout = paginatedStocks.map((symbol, index) => {
+      // Use saved layout if exists for this stock
+      if (existingLayout[symbol]) {
         return {
           ...existingLayout[symbol],
           i: symbol,
@@ -90,7 +135,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           static: false,
         };
       }
-      // Generate default 6x3 grid layout (support up to 18 stocks)
+      // Generate default 3x3 grid layout for new stocks
       // SNAPSHOT MODE: Using h: 1.0 for compact card height (220px)
       const row = Math.floor(index / 3);
       return {
@@ -105,7 +150,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
       };
     });
     setLayout(newLayout);
-  }, [stocks]);
+  }, [paginatedStocks]);
 
   // Memoized layout change handler
   const handleLayoutChange = useCallback((newLayout: GridLayout.Layout[]) => {
@@ -128,13 +173,55 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           y: Math.floor(index / 3) * 1.0,
         }));
         setLayout(fixedLayout);
-        localStorage.setItem('dashboard-layout', JSON.stringify(fixedLayout));
+
+        // Merge with existing layout from other pages
+        const savedLayout = localStorage.getItem('dashboard-layout');
+        let allLayouts: Record<string, GridLayout.Layout> = {};
+        if (savedLayout) {
+          try {
+            const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
+            allLayouts = parsed.reduce((acc, item) => {
+              acc[item.i] = item;
+              return acc;
+            }, {} as Record<string, GridLayout.Layout>);
+          } catch (e) {
+            console.error('Failed to parse saved layout:', e);
+          }
+        }
+
+        // Update with current page's layout
+        fixedLayout.forEach(item => {
+          allLayouts[item.i] = item;
+        });
+
+        localStorage.setItem('dashboard-layout', JSON.stringify(Object.values(allLayouts)));
         return;
       }
     }
 
     setLayout(correctedLayout);
-    localStorage.setItem('dashboard-layout', JSON.stringify(correctedLayout));
+
+    // Merge current page layout with existing layouts from other pages
+    const savedLayout = localStorage.getItem('dashboard-layout');
+    let allLayouts: Record<string, GridLayout.Layout> = {};
+    if (savedLayout) {
+      try {
+        const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
+        allLayouts = parsed.reduce((acc, item) => {
+          acc[item.i] = item;
+          return acc;
+        }, {} as Record<string, GridLayout.Layout>);
+      } catch (e) {
+        console.error('Failed to parse saved layout:', e);
+      }
+    }
+
+    // Update with current page's layout
+    correctedLayout.forEach(item => {
+      allLayouts[item.i] = item;
+    });
+
+    localStorage.setItem('dashboard-layout', JSON.stringify(Object.values(allLayouts)));
   }, []);
 
   // Toggle chart type handler - must be before early return to follow Hooks rules
@@ -178,6 +265,9 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.dashboardGrid}</h2>
 
         <div className="flex items-center gap-3">
+          {/* Page Navigator (only show if multiple pages) */}
+          <PageNavigator totalItems={stocks.length} language={language} />
+
           {/* Chart Type Toggle Button */}
           <button
             onClick={handleToggleChartType}
@@ -216,7 +306,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           isResizable={true}
           resizeHandles={['se']}
         >
-        {stocks.map((symbol) => (
+        {paginatedStocks.map((symbol) => (
           <div key={symbol} className="relative">
             {/* Drag Handle - transparent for minimal design */}
             <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10" />
