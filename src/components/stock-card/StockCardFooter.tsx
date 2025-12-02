@@ -1,13 +1,11 @@
 import { memo, useMemo } from 'react';
 import type { StockDataPoint } from '../../types/stock';
 import type { Language } from '../../i18n/translations';
-import type { ColorTheme } from '../ColorThemeSelector';
 import type { Translations } from '../../i18n/translations';
 
 interface StockCardFooterProps {
   data: StockDataPoint[];
   language: Language;
-  colorTheme: ColorTheme;
   t: Translations;
   priceColor: string;
 }
@@ -19,7 +17,6 @@ interface StockCardFooterProps {
 const StockCardFooter = memo(function StockCardFooter({
   data,
   language,
-  colorTheme,
   t,
   priceColor
 }: StockCardFooterProps) {

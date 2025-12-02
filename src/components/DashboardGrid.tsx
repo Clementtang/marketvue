@@ -155,7 +155,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   // Memoized layout change handler
   const handleLayoutChange = useCallback((newLayout: GridLayout.Layout[]) => {
     // Force update all items to have correct h value
-    const correctedLayout = newLayout.map((item, index) => ({
+    const correctedLayout = newLayout.map((item) => ({
       ...item,
       h: 1.0, // Always enforce correct height (220px)
       minH: 1.0,

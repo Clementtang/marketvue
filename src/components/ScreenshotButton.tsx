@@ -14,7 +14,6 @@ interface ScreenshotButtonProps {
  * Copies the screenshot to clipboard in 16:9 aspect ratio
  */
 const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) => {
-  const t = useTranslation(language);
   const [isCapturing, setIsCapturing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 

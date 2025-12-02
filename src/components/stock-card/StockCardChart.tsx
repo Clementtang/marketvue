@@ -6,7 +6,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from 'recharts';
 import type { StockDataPoint } from '../../types/stock';
 import type { ColorTheme } from '../ColorThemeSelector';
