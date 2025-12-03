@@ -260,8 +260,11 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors" id="grid-container">
-      {/* Dashboard Header */}
-      <div className="flex items-center justify-between mb-4">
+      {/* Dashboard Header - constrained to grid width */}
+      <div
+        className="flex items-center justify-between mb-4 mx-auto"
+        style={{ maxWidth: Math.max(containerWidth - 48, 300) }}
+      >
         <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.dashboardGrid}</h2>
 
         <div className="flex items-center gap-3">

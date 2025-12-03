@@ -38,6 +38,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Documentation aligned: All docs now show `.JP` format to users
   - API docs clarified: Added note about automatic `.JP` → `.T` conversion
 
+- **Dashboard Header Width Alignment**
+  - Fixed width discrepancy where dashboard header (containing "儀表板", page navigator, chart toggle, and screenshot buttons) extended beyond the 3x3 stock card grid
+  - Issue: Header spanned full container width while grid was constrained to `containerWidth - 48px`
+  - Solution: Applied same `maxWidth` constraint to header as grid layout
+  - Now ensures proper alignment in both existing windows (with localStorage) and fresh incognito windows
+
 ### Improved
 
 - **Company Name Display**

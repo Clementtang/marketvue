@@ -21,9 +21,11 @@ const StockCardHeader = memo(function StockCardHeader({
   language,
   colorTheme,
 }: StockCardHeaderProps) {
-  // Determine if this is a Taiwan stock (ends with .TW or .TWO)
-  const isTaiwanStock = useMemo(() => {
-    return stockData.symbol.endsWith('.TW') || stockData.symbol.endsWith('.TWO');
+  // Determine if this is a Taiwan or Japan stock (ends with .TW, .TWO, or .T)
+  const isAsianStock = useMemo(() => {
+    return stockData.symbol.endsWith('.TW') ||
+           stockData.symbol.endsWith('.TWO') ||
+           stockData.symbol.endsWith('.T');
   }, [stockData.symbol]);
 
   // Memoized display name (company name only, without symbol)
@@ -46,12 +48,35 @@ const StockCardHeader = memo(function StockCardHeader({
     return { isPositive, upColor };
   }, [stockData, colorTheme]);
 
+  // Get currency code based on symbol
+  const getCurrency = (symbol: string): string => {
+    if (symbol.endsWith('.TW') || symbol.endsWith('.TWO')) return 'TWD';
+    if (symbol.endsWith('.T')) return 'JPY';
+    if (symbol.endsWith('.HK')) return 'HKD';
+    return 'USD'; // Default for US stocks and others
+  };
+
+  // Format price with thousand separators
+  const formatPrice = (price: number, currency: string): string => {
+    if (currency === 'JPY') {
+      // Japanese Yen: no decimals, with thousand separators
+      return price.toLocaleString('en-US', { maximumFractionDigits: 0 });
+    }
+    // Others: 2 decimals, with thousand separators
+    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  };
+
+  const currency = getCurrency(stockData.symbol);
+  const formattedPrice = stockData.current_price
+    ? formatPrice(stockData.current_price, currency)
+    : 'N/A';
+
   return (
     <div className="flex items-start justify-between mb-1.5 gap-2">
       {/* Left: Symbol/Company Name (different order based on stock type) */}
-      <div className="flex flex-col min-w-0 overflow-hidden">
-        {isTaiwanStock ? (
-          // Taiwan stock: Company name (top), Symbol (bottom, no parentheses)
+      <div className="flex flex-col justify-start min-w-0 overflow-hidden">
+        {isAsianStock ? (
+          // Taiwan/Japan stock: Company name (top), Symbol (bottom, no parentheses)
           <>
             <h3
               className="text-base font-bold text-gray-800 dark:text-white truncate leading-tight"
@@ -80,10 +105,15 @@ const StockCardHeader = memo(function StockCardHeader({
       </div>
 
       {/* Right: Price (top), Change (bottom) */}
-      <div className="flex flex-col items-end flex-shrink-0">
-        <span className="text-xl font-bold text-gray-900 dark:text-white whitespace-nowrap leading-tight">
-          ${stockData.current_price?.toFixed(2) || 'N/A'}
-        </span>
+      <div className="flex flex-col items-end justify-start flex-shrink-0">
+        <div className="flex items-baseline gap-1">
+          <span className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap leading-tight">
+            {formattedPrice}
+          </span>
+          <span className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+            {currency}
+          </span>
+        </div>
         {stockData.change !== null && stockData.change_percent !== null && (
           <div
             className="flex items-center gap-0.5 text-xs font-medium whitespace-nowrap"
@@ -96,7 +126,7 @@ const StockCardHeader = memo(function StockCardHeader({
             )}
             <span>
               {priceInfo.isPositive ? '+' : ''}
-              {stockData.change.toFixed(2)} ({stockData.change_percent.toFixed(2)}%)
+              {formatPrice(Math.abs(stockData.change), currency)} ({stockData.change_percent.toFixed(2)}%)
             </span>
           </div>
         )}
