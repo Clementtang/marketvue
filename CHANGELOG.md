@@ -52,6 +52,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fallback mechanism: Uses yfinance `shortName` if no predefined mapping exists
   - All 9 Japanese stocks in `company_names.json` now use `.T` keys for correct lookup
 
+- **Stock Card Layout for Japanese Stocks**
+  - Changed display format to match Taiwan stocks layout
+  - Company name displayed on top (large bold text)
+  - Stock symbol displayed below (small gray text)
+  - Custom names displayed first (e.g., "UNIQLO｜FAST RETAILING" instead of "FAST RETAILING｜UNIQLO")
+
+- **Currency Display Enhancement**
+  - Implemented TradingView-style price formatting
+  - Added thousand separators for all currencies (e.g., "56,950" instead of "56950")
+  - Currency codes displayed in small font next to price (e.g., "56,950 JPY")
+  - Special handling for JPY: No decimal places (e.g., "56,950" not "56,950.00")
+  - Other currencies: 2 decimal places with thousand separators (e.g., "1,234.56")
+
+- **Visual Alignment Improvements**
+  - Unified font sizes: Company name and price both use 16px (text-base)
+  - Proper baseline alignment between price and currency label
+  - Header and grid width alignment: Both constrained to same width for consistent layout
+
 ### Changed
 
 - **Documentation Updates**
