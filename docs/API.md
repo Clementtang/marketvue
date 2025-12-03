@@ -302,9 +302,9 @@ MarketVue supports various stock exchanges with specific ticker formats:
 | Taiwan OTC | `XXXX.TWO` | `5904.TWO` | Taipei Exchange (TPEx) |
 | US Stocks | `SYMBOL` | `AAPL` | NYSE, NASDAQ |
 | Hong Kong | `XXXX.HK` | `0700.HK` | Hong Kong Stock Exchange |
-| Japan | `XXXX.JP` | `9983.JP` | Tokyo Stock Exchange (use .T for yfinance) |
+| Japan | `XXXX.JP` | `9983.JP` | Tokyo Stock Exchange |
 
-**Note:** While the frontend displays `.JP` for Japanese stocks, yfinance internally uses `.T` format.
+**Note:** Japanese stocks use `.JP` format in the frontend. The system automatically converts `.JP` to `.T` for yfinance API compatibility.
 
 ---
 

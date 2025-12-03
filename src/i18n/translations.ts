@@ -28,6 +28,19 @@ export interface Translations {
   maxStocksReached: string;
   stockAlreadyAdded: string;
   pleaseEnterSymbol: string;
+  export: string;
+  import: string;
+  exportToClipboard: string;
+  importFromClipboard: string;
+  exportedToClipboard: string;
+  importedStocks: string;
+  noStocksToExport: string;
+  clipboardEmpty: string;
+  noValidSymbols: string;
+  skipped: string;
+  noNewStocks: string;
+  exportFailed: string;
+  importFailed: string;
 
   // Stock examples
   stockExampleTaiwan: string;
@@ -129,13 +142,26 @@ export const translations: Record<Language, Translations> = {
     maxStocksReached: 'Maximum 18 stocks allowed',
     stockAlreadyAdded: 'Stock already added',
     pleaseEnterSymbol: 'Please enter a stock symbol',
+    export: 'Export',
+    import: 'Import',
+    exportToClipboard: 'Export to clipboard',
+    importFromClipboard: 'Import from clipboard',
+    exportedToClipboard: 'Exported to clipboard',
+    importedStocks: 'Imported',
+    noStocksToExport: 'No stocks to export',
+    clipboardEmpty: 'Clipboard is empty',
+    noValidSymbols: 'No valid symbols found',
+    skipped: 'Skipped',
+    noNewStocks: 'No new stocks to import',
+    exportFailed: 'Failed to export to clipboard',
+    importFailed: 'Failed to import from clipboard',
 
     // Stock examples
     stockExampleTaiwan: 'Taiwan: 2330.TW (TSMC)',
     stockExampleUS: 'US: AAPL (Apple)',
     stockExampleTaiwan2: 'Taiwan: 6741.TWO (91APP)',
     stockExampleHK: 'HK: 0700.HK (Tencent)',
-    stockExampleJP: 'Japan: 9983.T (UNIQLO)',
+    stockExampleJP: 'Japan: 9983.JP (UNIQLO)',
     stockExampleEU: 'Europe: Add exchange suffix',
 
     // Time Range
@@ -228,13 +254,26 @@ export const translations: Record<Language, Translations> = {
     maxStocksReached: '最多只能新增 18 支股票',
     stockAlreadyAdded: '股票已新增',
     pleaseEnterSymbol: '請輸入股票代號',
+    export: '匯出',
+    import: '匯入',
+    exportToClipboard: '匯出至剪貼簿',
+    importFromClipboard: '從剪貼簿匯入',
+    exportedToClipboard: '已匯出至剪貼簿',
+    importedStocks: '已匯入',
+    noStocksToExport: '沒有可匯出的股票',
+    clipboardEmpty: '剪貼簿是空的',
+    noValidSymbols: '找不到有效的股票代號',
+    skipped: '已略過',
+    noNewStocks: '沒有新的股票可匯入',
+    exportFailed: '匯出至剪貼簿失敗',
+    importFailed: '從剪貼簿匯入失敗',
 
     // Stock examples
     stockExampleTaiwan: '台股：2330.TW（台積電）',
     stockExampleUS: '美股：AAPL（Apple）',
     stockExampleTaiwan2: '台股：6741.TWO（91APP）',
     stockExampleHK: '港股：0700.HK（騰訊）',
-    stockExampleJP: '日股：9983.T（UNIQLO）',
+    stockExampleJP: '日股：9983.JP（UNIQLO）',
     stockExampleEU: '歐股：需加上交易所後綴',
 
     // Time Range

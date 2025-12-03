@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Copy, ClipboardPaste } from 'lucide-react';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
+import { useToast } from '../contexts/ToastContext';
 
 interface StockManagerProps {
   stocks: string[];
@@ -13,17 +14,23 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   // Use Context
   const { language } = useApp();
   const t = useTranslation(language);
+  const { showToast } = useToast();
 
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const symbol = inputValue.trim().toUpperCase();
+    let symbol = inputValue.trim().toUpperCase();
 
     if (!symbol) {
       setError(t.pleaseEnterSymbol);
       return;
+    }
+
+    // Convert .JP to .T for Japanese stocks (yfinance requirement)
+    if (symbol.endsWith('.JP')) {
+      symbol = symbol.replace(/\.JP$/, '.T');
     }
 
     if (stocks.length >= 18) {
@@ -41,9 +48,118 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
     setError('');
   };
 
+  // Export stocks to clipboard
+  const handleExportToClipboard = async () => {
+    if (stocks.length === 0) {
+      showToast('error', t.noStocksToExport || 'No stocks to export');
+      return;
+    }
+
+    try {
+      // Convert .T back to .JP for user-friendly format
+      const exportedStocks = stocks.map(symbol =>
+        symbol.endsWith('.T') ? symbol.replace(/\.T$/, '.JP') : symbol
+      );
+      const stockText = exportedStocks.join(', ');
+      await navigator.clipboard.writeText(stockText);
+      showToast(
+        'success',
+        `${t.exportedToClipboard || 'Exported to clipboard'}: ${stocks.length} ${t.stocksAdded || 'stocks'}`
+      );
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err);
+      showToast('error', t.exportFailed || 'Failed to export to clipboard');
+    }
+  };
+
+  // Import stocks from clipboard
+  const handleImportFromClipboard = async () => {
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) {
+        showToast('error', t.clipboardEmpty || 'Clipboard is empty');
+        return;
+      }
+
+      // Parse comma-separated symbols
+      const symbols = text
+        .split(',')
+        .map(s => s.trim().toUpperCase())
+        .filter(s => s.length > 0);
+
+      if (symbols.length === 0) {
+        showToast('error', t.noValidSymbols || 'No valid symbols found');
+        return;
+      }
+
+      let addedCount = 0;
+      let skippedCount = 0;
+
+      for (let symbol of symbols) {
+        // Convert .JP to .T
+        if (symbol.endsWith('.JP')) {
+          symbol = symbol.replace(/\.JP$/, '.T');
+        }
+
+        // Skip if already added or reached max limit
+        if (stocks.includes(symbol)) {
+          skippedCount++;
+          continue;
+        }
+
+        if (stocks.length + addedCount >= 18) {
+          break;
+        }
+
+        onAddStock(symbol);
+        addedCount++;
+      }
+
+      if (addedCount > 0) {
+        showToast(
+          'success',
+          `${t.importedStocks || 'Imported'}: ${addedCount} ${t.stocksAdded || 'stocks'}` +
+          (skippedCount > 0 ? ` (${t.skipped || 'Skipped'}: ${skippedCount})` : '')
+        );
+      } else {
+        showToast(
+          'info',
+          t.noNewStocks || 'No new stocks to import'
+        );
+      }
+    } catch (err) {
+      console.error('Failed to read clipboard:', err);
+      showToast('error', t.importFailed || 'Failed to import from clipboard');
+    }
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors h-full">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">{t.stockManager}</h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.stockManager}</h2>
+
+        {/* Import/Export Buttons */}
+        <div className="flex gap-2">
+          <button
+            onClick={handleExportToClipboard}
+            disabled={stocks.length === 0}
+            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
+            title={t.exportToClipboard || 'Export to clipboard'}
+          >
+            <Copy size={16} />
+            <span className="hidden sm:inline">{t.export || 'Export'}</span>
+          </button>
+          <button
+            onClick={handleImportFromClipboard}
+            disabled={stocks.length >= 18}
+            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
+            title={t.importFromClipboard || 'Import from clipboard'}
+          >
+            <ClipboardPaste size={16} />
+            <span className="hidden sm:inline">{t.import || 'Import'}</span>
+          </button>
+        </div>
+      </div>
 
       {/* Add Stock Form */}
       <form onSubmit={handleSubmit} className="mb-4">

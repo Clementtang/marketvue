@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.1] - 2025-12-03
+
+### Added
+
+- **Clipboard Import/Export Feature**
+  - **Export to Clipboard**: Copy all tracked stocks to clipboard as comma-separated list
+  - **Import from Clipboard**: Paste comma-separated stock symbols to batch add stocks
+  - Features:
+    - Smart handling: Automatically converts `.JP` ↔ `.T` for user-friendly format
+    - Export format: User-friendly `.JP` format (e.g., `2330.TW, AAPL, 9983.JP`)
+    - Internal format: yfinance-compatible `.T` format maintained internally
+    - Duplicate detection: Skips already-added stocks during import
+    - Max limit enforcement: Respects 18-stock limit
+    - Toast notifications: Clear feedback for success/error/info states
+  - UI: Export and Import buttons in `StockManager` header (gray buttons with icons)
+  - Use cases:
+    - Share your dashboard: Export → send to friend → friend imports
+    - Switch devices: Export on laptop → import on desktop
+    - Backup watchlist: Export periodically to notes app
+  - Bilingual support: Traditional Chinese and English
+
+### Fixed
+
+- **Japanese Stock Symbol Handling**
+  - **User-facing format**: `.JP` suffix (e.g., `9983.JP`)
+  - **Internal format**: `.T` suffix (e.g., `9983.T`) for yfinance API compatibility
+  - Automatic conversion in `StockManager`: `.JP` input → `.T` storage
+  - Updated `company_names.json`: Keys changed from `.JP` to `.T`
+  - Documentation aligned: All docs now show `.JP` format to users
+  - API docs clarified: Added note about automatic `.JP` → `.T` conversion
+
+### Improved
+
+- **Company Name Display**
+  - US stocks: Now display full company names from yfinance API (e.g., "SHOP" → "Shopify Inc.")
+  - Japan stocks: Display bilingual names (e.g., "FAST RETAILING｜UNIQLO")
+  - Fallback mechanism: Uses yfinance `shortName` if no predefined mapping exists
+  - All 9 Japanese stocks in `company_names.json` now use `.T` keys for correct lookup
+
+### Changed
+
+- **Documentation Updates**
+  - `README.md`: Japanese stock examples show `.JP` format
+  - `README_EN.md`: Japanese stock examples show `.JP` format
+  - `docs/API.md`: Added conversion note, removed confusing statement
+  - `src/i18n/translations.ts`: Examples updated to `.JP` format
+  - Input placeholder: Shows `JP: 9983.JP` instead of `9983.T`
+
 ## [1.5.0] - 2025-12-02
 
 ### Added
