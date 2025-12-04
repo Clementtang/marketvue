@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Settings, Sun, Moon, Monitor, TrendingUp, X, Languages } from 'lucide-react';
 import type { ColorTheme } from './ColorThemeSelector';
 import type { Language, Translations } from '../i18n/translations';
+import KeepAliveToggle from './KeepAliveToggle';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -192,6 +193,11 @@ const ThemeSettings = ({
                   </button>
                 ))}
               </div>
+            </div>
+
+            {/* Keep-Alive Section */}
+            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <KeepAliveToggle />
             </div>
           </div>
         </div>

@@ -111,6 +111,14 @@ export interface Translations {
 
   // Notification Banner
   freeHostingNotice: string;
+
+  // Keep-Alive Settings
+  keepAlive: string;
+  keepAliveDescription: string;
+  keepAliveEnabled: string;
+  keepAliveDisabled: string;
+  lastPing: string;
+  never: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -225,6 +233,14 @@ export const translations: Record<Language, Translations> = {
 
     // Notification Banner
     freeHostingNotice: 'Using free hosting: Backend sleeps after 15min idle. First load may take 30-60s.',
+
+    // Keep-Alive Settings
+    keepAlive: 'Keep Backend Awake',
+    keepAliveDescription: 'Ping backend every 10 minutes to prevent sleep. Keep this page open for best results.',
+    keepAliveEnabled: 'Enabled',
+    keepAliveDisabled: 'Disabled',
+    lastPing: 'Last ping',
+    never: 'Never',
   },
   'zh-TW': {
     // Header
@@ -337,6 +353,14 @@ export const translations: Record<Language, Translations> = {
 
     // Notification Banner
     freeHostingNotice: '採用免費託管服務：後端閒置 15 分鐘後休眠，首次載入可能需要 30-60 秒',
+
+    // Keep-Alive Settings
+    keepAlive: '保持後端運作',
+    keepAliveDescription: '每 10 分鐘 ping 後端以防止休眠。請保持頁面開啟以獲得最佳效果。',
+    keepAliveEnabled: '已啟用',
+    keepAliveDisabled: '已停用',
+    lastPing: '上次 ping',
+    never: '從未',
   },
 };
 

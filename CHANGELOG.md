@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.2] - 2025-12-04
+
+### Added
+
+- **Frontend Keep-Alive Feature** (2025-12-04)
+  - Prevents Render Free Tier backend from sleeping after 15 minutes of inactivity
+  - New `useKeepAlive` hook with automatic ping mechanism (every 10 minutes)
+  - Features:
+    - **User-controlled toggle**: Enable/disable in Settings panel
+    - **Status indicator**: Shows last ping time and current status
+    - **Bilingual support**: Traditional Chinese and English
+    - **Non-intrusive**: Failures don't affect main functionality
+    - **localStorage persistence**: Remembers user preference
+  - Technical implementation:
+    - Pings `/api/v1/health` endpoint every 10 minutes
+    - Automatic cleanup on component unmount
+    - Visual feedback with animated pulse indicator during ping
+    - Error handling with console warnings (no user interruption)
+  - UI components:
+    - New `KeepAliveToggle` component in ThemeSettings panel
+    - Toggle switch with status display
+    - Descriptive help text explaining functionality
+    - Last ping time indicator (formatted by locale)
+  - Benefits:
+    - ✅ Eliminates cold start delays (30-60 seconds)
+    - ✅ Improves first-load experience
+    - ✅ Completely free (within Render Free Tier 750 hours/month)
+    - ✅ Complies with Render Terms of Service
+    - ✅ Optional - users choose to enable it
+  - Files added:
+    - `src/hooks/useKeepAlive.ts` (95 lines)
+    - `src/components/KeepAliveToggle.tsx` (96 lines)
+  - Files modified:
+    - `src/components/ThemeSettings.tsx` (integrated KeepAliveToggle)
+    - `src/i18n/translations.ts` (added 6 new translation keys)
+
 ## [1.5.1] - 2025-12-03
 
 ### Added
