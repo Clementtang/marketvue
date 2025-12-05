@@ -86,7 +86,7 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
 
   // Success state - render stock card with all sub-components
   return (
-    <div className="h-full max-h-[220px] overflow-hidden bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-2 flex flex-col transition-colors">
+    <div className="h-full max-h-[220px] overflow-hidden bg-warm-100 dark:bg-warm-800 rounded-card border-0 shadow-warm p-3 flex flex-col transition-colors">
       {/* Header with company name and price */}
       <StockCardHeader
         stockData={stockData}

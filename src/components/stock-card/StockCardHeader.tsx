@@ -79,12 +79,12 @@ const StockCardHeader = memo(function StockCardHeader({
           // Taiwan/Japan stock: Company name (top), Symbol (bottom, no parentheses)
           <>
             <h3
-              className="text-base font-bold text-gray-800 dark:text-white truncate leading-tight"
+              className="text-base font-semibold text-warm-800 dark:text-warm-50 truncate leading-tight"
               title={displayName}
             >
               {displayName}
             </h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+            <span className="text-xs text-warm-500 dark:text-warm-400 whitespace-nowrap">
               {stockData.symbol}
             </span>
           </>
@@ -92,12 +92,12 @@ const StockCardHeader = memo(function StockCardHeader({
           // US/Other stock: Symbol (top), Company name (bottom)
           <>
             <h3
-              className="text-base font-bold text-gray-800 dark:text-white whitespace-nowrap leading-tight"
+              className="text-base font-semibold text-warm-800 dark:text-warm-50 whitespace-nowrap leading-tight"
               title={stockData.symbol}
             >
               {stockData.symbol}
             </h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={displayName}>
+            <span className="text-xs text-warm-500 dark:text-warm-400 truncate" title={displayName}>
               {displayName}
             </span>
           </>
@@ -107,10 +107,10 @@ const StockCardHeader = memo(function StockCardHeader({
       {/* Right: Price (top), Change (bottom) */}
       <div className="flex flex-col items-end justify-start flex-shrink-0">
         <div className="flex items-baseline gap-1">
-          <span className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap leading-tight">
+          <span className="text-base font-semibold text-warm-800 dark:text-warm-50 whitespace-nowrap leading-tight">
             {formattedPrice}
           </span>
-          <span className="text-xs text-gray-500 dark:text-gray-400 leading-tight">
+          <span className="text-xs text-warm-500 dark:text-warm-400 leading-tight">
             {currency}
           </span>
         </div>

@@ -134,16 +134,16 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors h-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.stockManager}</h2>
+    <div className="bg-warm-100 dark:bg-warm-800 rounded-card shadow-warm p-8 transition-colors h-full">
+      <div className="flex items-center justify-between mb-5">
+        <h2 className="text-xl font-semibold text-warm-800 dark:text-warm-50">{t.stockManager}</h2>
 
         {/* Import/Export Buttons */}
         <div className="flex gap-2">
           <button
             onClick={handleExportToClipboard}
             disabled={stocks.length === 0}
-            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
+            className="px-3 py-1.5 bg-warm-200 hover:bg-warm-300 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
             title={t.exportToClipboard || 'Export to clipboard'}
           >
             <Copy size={16} />
@@ -152,7 +152,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           <button
             onClick={handleImportFromClipboard}
             disabled={stocks.length >= 18}
-            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
+            className="px-3 py-1.5 bg-warm-200 hover:bg-warm-300 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-200 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
             title={t.importFromClipboard || 'Import from clipboard'}
           >
             <ClipboardPaste size={16} />
@@ -172,13 +172,13 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
               setError('');
             }}
             placeholder="TW Listed: 2330.TW | TW OTC: 5904.TWO | US: AAPL | JP: 9983.JP"
-            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+            className="flex-1 px-4 py-2 border border-warm-300 dark:border-warm-600 bg-warm-50 dark:bg-warm-700 text-warm-800 dark:text-warm-100 rounded-lg focus:ring-2 focus:ring-accent-primary focus:border-transparent outline-none transition-colors"
             maxLength={10}
           />
           <button
             type="submit"
             disabled={stocks.length >= 18}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            className="px-4 py-2 bg-accent-primary hover:bg-accent-hover dark:bg-accent-secondary dark:hover:bg-accent-hover text-white rounded-lg disabled:bg-warm-400 dark:disabled:bg-warm-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
           >
             <Plus size={20} />
             {t.add}
@@ -187,7 +187,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
         {error && (
           <p className="text-red-500 dark:text-red-400 text-sm mt-2">{error}</p>
         )}
-        <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
+        <p className="text-warm-500 dark:text-warm-400 text-sm mt-2">
           {stocks.length}/18 {t.stocksAdded}
         </p>
       </form>
@@ -195,17 +195,17 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
       {/* Stock List */}
       {stocks.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t.trackedStocks}</h3>
+          <h3 className="text-sm font-medium text-warm-700 dark:text-warm-300 mb-2">{t.trackedStocks}</h3>
           <div className="flex flex-wrap gap-2">
             {stocks.map((symbol) => (
               <div
                 key={symbol}
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full border border-blue-200 dark:border-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-3 py-1.5 bg-accent-primary/10 dark:bg-accent-primary/20 text-accent-primary dark:text-accent-secondary rounded-full border border-accent-primary/30 dark:border-accent-primary/40 transition-colors"
               >
                 <span className="font-medium">{symbol}</span>
                 <button
                   onClick={() => onRemoveStock(symbol)}
-                  className="hover:bg-blue-100 dark:hover:bg-blue-800/50 rounded-full p-0.5 transition-colors"
+                  className="hover:bg-accent-primary/20 dark:hover:bg-accent-primary/30 rounded-full p-0.5 transition-colors"
                   title={`Remove ${symbol}`}
                 >
                   <X size={16} />
@@ -217,7 +217,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
       )}
 
       {stocks.length === 0 && (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-500">
+        <div className="text-center py-8 text-warm-400 dark:text-warm-500">
           <p>{t.noStocksYet}</p>
         </div>
       )}

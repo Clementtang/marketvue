@@ -59,17 +59,17 @@ function AppContent() {
 
   return (
     <ErrorBoundary language={language}>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
+      <div className="min-h-screen bg-warm-50 dark:bg-warm-900 text-warm-900 dark:text-warm-100 transition-colors flex flex-col">
         <NotificationBanner t={t} />
 
-        <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
+        <header className="bg-warm-100 dark:bg-warm-800 border-b border-warm-200 dark:border-warm-700 shadow-warm">
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <TrendingUp size={32} />
+                <TrendingUp size={32} className="text-accent-primary" />
                 <div>
-                  <h1 className="text-3xl font-bold">{t.appTitle}</h1>
-                  <p className="text-blue-100 text-sm">
+                  <h1 className="text-3xl font-semibold text-warm-800 dark:text-warm-50">{t.appTitle}</h1>
+                  <p className="text-warm-600 dark:text-warm-300 text-sm">
                     {t.appSubtitle}
                   </p>
                 </div>

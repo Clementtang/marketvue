@@ -21,7 +21,7 @@ const StockCardError = memo(function StockCardError({
   onRetry,
 }: StockCardErrorProps) {
   return (
-    <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex flex-col items-center justify-center transition-colors">
+    <div className="h-full bg-warm-100 dark:bg-warm-800 rounded-card shadow-warm p-6 flex flex-col items-center justify-center transition-colors">
       <div className="text-red-500 dark:text-red-400 mb-2">
         <svg
           className="w-12 h-12 mx-auto mb-2"
@@ -40,10 +40,10 @@ const StockCardError = memo(function StockCardError({
       <p className="text-red-500 dark:text-red-400 text-center mb-2 font-medium">
         {error || t.noDataAvailable}
       </p>
-      <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{symbol}</p>
+      <p className="text-warm-500 dark:text-warm-400 text-sm mb-4">{symbol}</p>
       <button
         onClick={onRetry}
-        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm rounded-lg transition-colors"
+        className="px-4 py-2 bg-accent-primary hover:bg-accent-hover dark:bg-accent-secondary dark:hover:bg-accent-hover text-white text-sm rounded-lg transition-colors"
       >
         {language === 'zh-TW' ? '重新載入' : 'Retry'}
       </button>

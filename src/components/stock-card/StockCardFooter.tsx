@@ -30,7 +30,7 @@ const StockCardFooter = memo(function StockCardFooter({
   }, [data]);
 
   return (
-    <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mt-1 pt-1 pb-2 border-t border-gray-200 dark:border-gray-700">
+    <div className="flex items-center justify-between text-xs text-warm-500 dark:text-warm-400 mt-1 pt-1 pb-2 border-t border-warm-200 dark:border-warm-700">
       {/* Average Volume */}
       <div>
         {language === 'zh-TW' ? '平均成交量' : 'Avg Volume'}: {averageVolume}

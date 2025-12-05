@@ -82,8 +82,8 @@ const TimeRangeSelector = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors h-full">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">{t.timeRange}</h2>
+    <div className="bg-warm-100 dark:bg-warm-800 rounded-card shadow-warm p-8 transition-colors h-full">
+      <h2 className="text-xl font-semibold text-warm-800 dark:text-warm-50 mb-5">{t.timeRange}</h2>
 
       {/* Preset Buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -93,8 +93,8 @@ const TimeRangeSelector = () => {
             onClick={() => handlePresetClick(preset)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               dateRange.preset === preset.value
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? 'bg-accent-primary text-white'
+                : 'bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-200 hover:bg-warm-300 dark:hover:bg-warm-600'
             }`}
           >
             {preset.label}
@@ -104,8 +104,8 @@ const TimeRangeSelector = () => {
           onClick={() => setCustomMode(!customMode)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
             dateRange.preset === 'custom'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              ? 'bg-accent-primary text-white'
+              : 'bg-warm-200 dark:bg-warm-700 text-warm-700 dark:text-warm-200 hover:bg-warm-300 dark:hover:bg-warm-600'
           }`}
         >
           <Calendar size={18} />
@@ -115,10 +115,10 @@ const TimeRangeSelector = () => {
 
       {/* Custom Date Picker */}
       {customMode && (
-        <form onSubmit={handleCustomSubmit} className="border-t dark:border-gray-700 pt-4">
+        <form onSubmit={handleCustomSubmit} className="border-t border-warm-200 dark:border-warm-700 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-warm-700 dark:text-warm-300 mb-2">
                 {t.startDate}
               </label>
               <input
@@ -126,11 +126,11 @@ const TimeRangeSelector = () => {
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 max={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+                className="w-full px-4 py-2 border border-warm-300 dark:border-warm-600 bg-warm-50 dark:bg-warm-700 text-warm-800 dark:text-warm-100 rounded-lg focus:ring-2 focus:ring-accent-primary focus:border-transparent outline-none transition-colors"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className="block text-sm font-medium text-warm-700 dark:text-warm-300 mb-2">
                 {t.endDate}
               </label>
               <input
@@ -138,13 +138,13 @@ const TimeRangeSelector = () => {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 max={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+                className="w-full px-4 py-2 border border-warm-300 dark:border-warm-600 bg-warm-50 dark:bg-warm-700 text-warm-800 dark:text-warm-100 rounded-lg focus:ring-2 focus:ring-accent-primary focus:border-transparent outline-none transition-colors"
               />
             </div>
           </div>
           <button
             type="submit"
-            className="mt-4 w-full md:w-auto px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
+            className="mt-4 w-full md:w-auto px-6 py-2 bg-accent-primary dark:bg-accent-secondary text-white rounded-lg hover:bg-accent-hover dark:hover:bg-accent-hover transition-colors"
           >
             {t.applyCustomRange}
           </button>
@@ -152,7 +152,7 @@ const TimeRangeSelector = () => {
       )}
 
       {/* Current Range Display */}
-      <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
+      <div className="mt-4 text-sm text-warm-600 dark:text-warm-400">
         <span className="font-medium">{t.currentRange}</span>{' '}
         {dateRange.startDate} {t.to} {dateRange.endDate}
       </div>

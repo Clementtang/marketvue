@@ -7,6 +7,68 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.3] - 2025-12-05
+
+### Changed
+
+- **Warm Minimal Design - Phase 1** (2025-12-05)
+  - Complete visual transformation of core UI components with warm, inviting color palette
+  - Design philosophy:
+    - **Color warmth**: Transitioned from cool grays to warm beige/taupe tones
+    - **Soft sophistication**: Replaced sharp shadows with subtle, diffused effects
+    - **Generous spacing**: Increased padding by 25% for better breathing room
+    - **Gentle corners**: Border radius increased from 8px to 12px for softer feel
+    - **Professional warmth**: Maintained credibility while adding approachability
+  - Color palette:
+    - **Warm backgrounds**: #F9F8F6 (light), #F5F3F0 (cards), #2A2520 (dark)
+    - **Accent bronze**: #B8906A (primary), #A67D56 (secondary), #9A7149 (hover)
+    - **Warm text**: Replaced gray-800 with warm-800, gray-500 with warm-500
+  - Typography refinements:
+    - Font weight reduced: `font-bold` → `font-semibold` for softer hierarchy
+    - Maintained readability with warm color contrasts
+  - Components transformed:
+    - **StockCard**: Warm background, soft shadows, increased internal spacing
+    - **StockCardHeader**: Warm text colors, refined font weights
+    - **StockCardFooter**: Warm border and text colors
+    - **StockManager**: Bronze input focus states, warm card background, refined badges
+    - **TimeRangeSelector**: Bronze accent buttons, warm input fields
+    - **StockCardLoading**: Bronze spinner, warm text colors
+    - **StockCardError**: Bronze retry button, warm backgrounds
+  - Header transformation:
+    - **Removed gradient**: Replaced blue gradient with clean warm-100 background
+    - **Subtle border**: Added warm-200 bottom border for definition
+    - **Bronze icon**: TrendingUp icon now uses accent-primary color
+  - Global changes:
+    - Body background: `bg-gray-50` → `bg-warm-50`
+    - Dark mode: Full warm palette support (warm-900, warm-800, etc.)
+    - Shadows: Custom warm shadow system with subtle brownish tint
+  - Technical implementation:
+    - Extended Tailwind config with warm color scale (50-900)
+    - Added accent bronze colors with hover states
+    - Custom shadow utilities: `shadow-warm`, `shadow-warm-md`, `shadow-warm-lg`
+    - Custom border radius: `rounded-card` (12px)
+  - Files modified:
+    - `tailwind.config.js` (extended theme with warm palette)
+    - `src/App.tsx` (global background and header)
+    - `src/components/StockManager.tsx`
+    - `src/components/TimeRangeSelector.tsx`
+    - `src/components/stock-card/StockCard.tsx`
+    - `src/components/stock-card/StockCardHeader.tsx`
+    - `src/components/stock-card/StockCardFooter.tsx`
+    - `src/components/stock-card/StockCardLoading.tsx`
+    - `src/components/stock-card/StockCardError.tsx`
+  - Design impact:
+    - ✨ More inviting and approachable visual feel
+    - ✨ Maintained professional credibility
+    - ✨ Improved visual hierarchy with softer contrasts
+    - ✨ Better readability with warm, natural color tones
+    - ✨ Consistent warm aesthetic across light and dark modes
+  - User experience:
+    - More comfortable for extended viewing sessions
+    - Reduced visual fatigue with warmer tones
+    - More distinctive brand identity vs. typical financial dashboards
+    - Seamless transition between light/dark modes
+
 ## [1.5.2] - 2025-12-04
 
 ### Added
