@@ -7,6 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.5.4] - 2025-12-05
+
+### Changed
+
+- **Warm Minimal Design - Phase 2** (2025-12-05)
+  - Extended warm design transformation to remaining UI components
+  - Components transformed:
+    - **ThemeSettings**: Bronze accent selection states, warm dropdown panel
+    - **Footer**: Warm text colors, bronze links with hover states
+    - **Toast**: Softer rounded corners (rounded-card), warm shadows
+    - **NotificationBanner**: Warm background with amber accents
+  - Design refinements:
+    - Settings button hover states with warm overlay
+    - Language/theme mode buttons use bronze active states
+    - All borders and dividers transitioned to warm color palette
+    - Maintained consistent warm aesthetic across all states
+  - Files modified:
+    - `src/components/ThemeSettings.tsx`
+    - `src/components/Footer.tsx`
+    - `src/components/common/Toast.tsx`
+    - `src/components/NotificationBanner.tsx`
+  - Impact:
+    - Complete warm design consistency across entire application
+    - All interactive elements now use bronze accent colors
+    - Seamless visual harmony between all UI components
+
 ## [1.5.3] - 2025-12-05
 
 ### Changed

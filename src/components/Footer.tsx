@@ -7,12 +7,12 @@ const Footer = () => {
   const { language } = useApp();
   const t = useTranslation(language);
   return (
-    <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 transition-colors mt-auto">
+    <footer className="bg-warm-100 dark:bg-warm-800 border-t border-warm-200 dark:border-warm-700 transition-colors mt-auto">
       <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-warm-600 dark:text-warm-400">
           {/* Left: App Name & Copyright */}
           <div className="flex items-center gap-2">
-            <span className="font-semibold text-gray-700 dark:text-gray-300">MarketVue</span>
+            <span className="font-semibold text-warm-700 dark:text-warm-300">MarketVue</span>
             <span>© 2025</span>
           </div>
 
@@ -23,7 +23,7 @@ const Footer = () => {
               href="https://github.com/clementtang"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-medium"
+              className="text-accent-primary dark:text-accent-secondary hover:text-accent-hover dark:hover:text-accent-hover font-medium"
             >
               @clementtang
             </a>
@@ -34,7 +34,7 @@ const Footer = () => {
             href="https://github.com/clementtang/marketvue"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            className="flex items-center gap-2 text-warm-700 dark:text-warm-300 hover:text-accent-primary dark:hover:text-accent-secondary transition-colors"
           >
             <Github size={18} />
             <span>{t.viewOnGitHub}</span>

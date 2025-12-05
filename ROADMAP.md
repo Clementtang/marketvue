@@ -62,17 +62,21 @@
   - 間距增加 25%
   - 完整 Dark Mode 支援
 
+- ✅ **Warm Minimal Design - Phase 2** - 完成於 v1.5.4 (2025-12-05)
+  - 擴展至其他組件（ThemeSettings、Footer、Toast、NotificationBanner）
+  - 青銅色重點色應用至所有互動元素
+  - 全局暖色調一致性
+  - 完整的視覺和諧
+
 ---
 
 ## 📊 Q2 2025 - 中期目標
 
-### 🎨 UI/UX 設計優化 (中優先級)
-- **Warm Minimal Design - Phase 2** - 規劃中
-  - 擴展至其他組件（ThemeSettings、Footer、Toast、NotificationBanner）
-  - 動畫與過渡效果優化
-  - 微互動設計（hover、focus 狀態）
-  - 進一步間距與排版調整
-  - 確保所有狀態下的一致性
+### 🎨 UI/UX 設計優化 (低優先級)
+- **動畫與微互動優化** - 規劃中
+  - 提升過渡效果流暢度
+  - 添加微妙的 hover/focus 動畫
+  - 優化載入狀態動畫
 
 ### 新聞功能重新設計 (高優先級)
 - **多語言新聞整合** - 重新實作新聞功能，支援中英文雙語

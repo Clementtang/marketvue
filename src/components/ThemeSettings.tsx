@@ -71,7 +71,7 @@ const ThemeSettings = ({
       {/* Settings Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="p-2 rounded-lg hover:bg-white/10 transition-colors text-white"
+        className="p-2 rounded-lg hover:bg-warm-100/20 dark:hover:bg-warm-800/30 transition-colors text-warm-800 dark:text-warm-100"
         title="Settings"
       >
         <Settings size={24} />
@@ -79,15 +79,15 @@ const ThemeSettings = ({
 
       {/* Dropdown Panel */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 z-50">
+        <div className="absolute right-0 mt-2 w-80 bg-warm-100 dark:bg-warm-800 rounded-card shadow-warm-lg border border-warm-200 dark:border-warm-700 z-50">
           {/* Header */}
-          <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white">{t.settings}</h3>
+          <div className="flex items-center justify-between p-4 border-b border-warm-200 dark:border-warm-700">
+            <h3 className="text-lg font-semibold text-warm-800 dark:text-warm-50">{t.settings}</h3>
             <button
               onClick={() => setIsOpen(false)}
-              className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-1 rounded hover:bg-warm-200 dark:hover:bg-warm-700 transition-colors"
             >
-              <X size={20} className="text-gray-500 dark:text-gray-400" />
+              <X size={20} className="text-warm-500 dark:text-warm-400" />
             </button>
           </div>
 
@@ -95,7 +95,7 @@ const ThemeSettings = ({
           <div className="p-4 space-y-6">
             {/* Language Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3 flex items-center gap-2">
+              <label className="block text-sm font-medium text-warm-700 dark:text-warm-300 mb-3 flex items-center gap-2">
                 <Languages size={16} />
                 {t.language}
               </label>
@@ -106,8 +106,8 @@ const ThemeSettings = ({
                     onClick={() => onLanguageChange(lang.code)}
                     className={`p-3 rounded-lg border-2 transition-all text-sm font-medium ${
                       language === lang.code
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500 text-gray-700 dark:text-gray-300'
+                        ? 'border-accent-primary bg-accent-primary/10 dark:bg-accent-primary/20 text-accent-primary dark:text-accent-secondary'
+                        : 'border-warm-200 dark:border-warm-600 hover:border-warm-300 dark:hover:border-warm-500 text-warm-700 dark:text-warm-300'
                     }`}
                   >
                     {lang.name}
@@ -118,7 +118,7 @@ const ThemeSettings = ({
 
             {/* Theme Mode Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-warm-700 dark:text-warm-300 mb-3">
                 {t.appearance}
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -128,17 +128,17 @@ const ThemeSettings = ({
                     onClick={() => onThemeModeChange(mode)}
                     className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all ${
                       themeMode === mode
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                        ? 'border-accent-primary bg-accent-primary/10 dark:bg-accent-primary/20'
+                        : 'border-warm-200 dark:border-warm-600 hover:border-warm-300 dark:hover:border-warm-500'
                     }`}
                   >
-                    <div className={themeMode === mode ? 'text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400'}>
+                    <div className={themeMode === mode ? 'text-accent-primary dark:text-accent-secondary' : 'text-warm-600 dark:text-warm-400'}>
                       {getThemeIcon(mode)}
                     </div>
                     <span className={`text-xs font-medium ${
                       themeMode === mode
-                        ? 'text-blue-600 dark:text-blue-400'
-                        : 'text-gray-700 dark:text-gray-300'
+                        ? 'text-accent-primary dark:text-accent-secondary'
+                        : 'text-warm-700 dark:text-warm-300'
                     }`}>
                       {mode === 'light' ? t.light : mode === 'dark' ? t.dark : t.system}
                     </span>
@@ -149,7 +149,7 @@ const ThemeSettings = ({
 
             {/* Color Theme Section */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+              <label className="block text-sm font-medium text-warm-700 dark:text-warm-300 mb-3">
                 {t.priceColorScheme}
               </label>
               <div className="space-y-2">
@@ -159,33 +159,33 @@ const ThemeSettings = ({
                     onClick={() => onColorThemeChange(theme)}
                     className={`w-full flex items-center justify-between p-3 rounded-lg border-2 transition-all ${
                       colorTheme.name === theme.name
-                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                        : 'border-gray-200 dark:border-gray-600 hover:border-gray-300 dark:hover:border-gray-500'
+                        ? 'border-accent-primary bg-accent-primary/10 dark:bg-accent-primary/20'
+                        : 'border-warm-200 dark:border-warm-600 hover:border-warm-300 dark:hover:border-warm-500'
                     }`}
                   >
                     <div className="flex items-center gap-2">
-                      <TrendingUp size={16} className="text-gray-600 dark:text-gray-400" />
+                      <TrendingUp size={16} className="text-warm-600 dark:text-warm-400" />
                       <div className="text-left">
                         <div className={`text-sm font-medium ${
                           colorTheme.name === theme.name
-                            ? 'text-blue-600 dark:text-blue-400'
-                            : 'text-gray-700 dark:text-gray-300'
+                            ? 'text-accent-primary dark:text-accent-secondary'
+                            : 'text-warm-700 dark:text-warm-300'
                         }`}>
                           {theme.name === 'Asian' ? t.asian : t.western}
                         </div>
-                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                        <div className="text-xs text-warm-500 dark:text-warm-400">
                           {theme.name === 'Asian' ? t.redUpGreenDown : t.greenUpRedDown}
                         </div>
                       </div>
                     </div>
                     <div className="flex gap-2">
                       <div
-                        className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600"
+                        className="w-6 h-6 rounded border border-warm-300 dark:border-warm-600"
                         style={{ backgroundColor: theme.up }}
                         title="Up"
                       />
                       <div
-                        className="w-6 h-6 rounded border border-gray-300 dark:border-gray-600"
+                        className="w-6 h-6 rounded border border-warm-300 dark:border-warm-600"
                         style={{ backgroundColor: theme.down }}
                         title="Down"
                       />
@@ -196,7 +196,7 @@ const ThemeSettings = ({
             </div>
 
             {/* Keep-Alive Section */}
-            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="pt-4 border-t border-warm-200 dark:border-warm-700">
               <KeepAliveToggle />
             </div>
           </div>

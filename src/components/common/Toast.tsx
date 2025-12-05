@@ -53,7 +53,7 @@ function ToastItem({ toast, onClose }: { toast: ToastMessage; onClose: () => voi
       role="alert"
       aria-live="polite"
       className={`
-        flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg
+        flex items-center gap-3 px-4 py-3 rounded-card shadow-warm-lg border border-white/20
         transform transition-all duration-200 ease-out
         ${isVisible && !isLeaving ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'}
       `}
