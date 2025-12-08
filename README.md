@@ -41,9 +41,13 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
   - 每頁可獨立截圖
 
 - 🎨 **客製化選項**
+  - 視覺主題系統（Classic / Warm Minimal）
+    - **Warm Minimal 設計**：溫暖色調、襯線字體、優雅圓角
+    - **Classic 設計**：現代藍色、無襯線字體、專業感
   - 漲跌顏色主題（西式紅漲綠跌 / 東式綠漲紅跌）
   - 深色模式 / 淺色模式
   - 系統自動偵測或手動切換
+  - 設計指南（Warm Minimal 主題專屬）
 
 - 🌐 **多語言支援**
   - 繁體中文
@@ -64,14 +68,15 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
 - **React 19** - 現代化前端框架
 - **TypeScript** - 型別安全
 - **Vite** - 快速建構工具
-- **Tailwind CSS** - 實用優先的 CSS 框架
+- **Tailwind CSS v4** - 實用優先的 CSS 框架（@theme 配置、CSS 自訂屬性）
 - **Recharts** - 強大的圖表庫
 - **Axios** - HTTP 請求客戶端
 - **date-fns** - 日期處理工具
 - **Lucide Icons** - 美觀的圖示庫
 - **modern-screenshot** - 高品質螢幕截圖（支援現代 CSS）
-- **Context API** - 全局狀態管理 (AppContext, ChartContext, ToastContext)
+- **Context API** - 全局狀態管理 (AppContext, ChartContext, ToastContext, VisualThemeContext)
 - **Custom Hooks** - 可重用邏輯 (useRetry, useStockData, useToast)
+- **Google Fonts** - Playfair Display (襯線)、Inter (無襯線)、Noto Sans TC (中文)
 
 ### 後端
 - **Flask** - 輕量級 Python Web 框架
@@ -243,11 +248,13 @@ marketvue/
 │   │   ├── DashboardGrid.tsx
 │   │   ├── ScreenshotButton.tsx # 截圖按鈕組件
 │   │   ├── ThemeSettings.tsx
+│   │   ├── ThemeGuide.tsx       # 主題設計指南
 │   │   └── ErrorBoundary.tsx    # 錯誤邊界
 │   ├── contexts/                 # React Context
 │   │   ├── AppContext.tsx       # 應用設定
 │   │   ├── ChartContext.tsx     # 圖表設定
-│   │   └── ToastContext.tsx     # Toast 通知
+│   │   ├── ToastContext.tsx     # Toast 通知
+│   │   └── VisualThemeContext.tsx # 視覺主題
 │   ├── hooks/                    # Custom Hooks
 │   │   ├── useRetry.ts          # 重試邏輯
 │   │   └── index.ts

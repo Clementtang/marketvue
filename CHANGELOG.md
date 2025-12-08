@@ -7,6 +7,99 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2025-12-08
+
+### Added
+
+- **Warm Minimal Design Visual Theme System** (2025-12-08)
+  - New visual theme system with "Classic" and "Warm Minimal" options in Settings
+  - Warm color palette:
+    - Neutral beige shades (warm-50 to warm-950): Soft backgrounds and text colors
+    - Terracotta accent colors (warm-accent-50 to warm-accent-900): Buttons, highlights, and interactive elements
+  - Typography system:
+    - Display fonts: Playfair Display (serif) for titles and headings
+    - Functional fonts: Inter + Noto Sans TC (sans-serif) for buttons, data, and numbers
+    - Hybrid font strategy for optimal readability:
+      - English headings: Playfair Display serif for elegant aesthetic
+      - Buttons and UI controls: Sans-serif for better alignment with icons
+      - Numbers and dates: Sans-serif for improved legibility
+      - Chinese text: Noto Sans TC for proper CJK rendering
+  - Design features:
+    - Large rounded corners (rounded-3xl) for softer, more organic appearance
+    - Subtle borders and shadows for refined depth
+    - Smooth transitions for theme switching
+    - Carefully calibrated dark mode support
+  - **Theme Guide Page**:
+    - Comprehensive design documentation showcasing Warm Minimal Design system
+    - Three sections: Colors, Typography, and Components
+    - Accessible via Settings panel → Visual Theme section
+    - Interactive examples of buttons, cards, and badges
+    - Design principles and color usage guidelines
+  - Implementation:
+    - Migrated from Tailwind v3 to Tailwind v4 with @theme directive
+    - Created `VisualThemeContext` for global theme state management
+    - Added `ThemeGuide` component (400+ lines) with bilingual support
+    - Theme preferences persisted to localStorage
+  - Files added:
+    - `src/contexts/VisualThemeContext.tsx` - Visual theme context provider
+    - `src/components/ThemeGuide.tsx` - Comprehensive theme documentation page
+  - Files modified:
+    - `src/index.css` - Added Tailwind v4 @theme configuration with custom colors and fonts
+    - `index.html` - Added Google Fonts: Playfair Display, Inter, Noto Sans TC
+    - All UI components updated with conditional Warm theme styling
+
+### Fixed
+
+- **Resize Handle Visibility** (2025-12-08)
+  - Hidden stock card resize handle icon (bottom-right corner) to prevent visual clutter
+  - Element remains functional with `opacity: 0`, maintaining drag-to-resize capability
+  - Cursor still changes to `se-resize` on hover for discoverability
+
+### Improved
+
+- **Font Readability Optimization** (2025-12-08)
+  - Identified and fixed readability issues with serif fonts on numbers and dates
+  - Resolved CJK text alignment problems in buttons with icon fonts
+  - Applied hybrid font strategy:
+    - Serif fonts reserved for display text only (h1, h2, h3 titles)
+    - Sans-serif fonts for all functional text (buttons, numbers, data)
+    - Added Noto Sans TC for proper Chinese character rendering
+  - Result: Better legibility across all UI elements while maintaining elegant aesthetic
+
+- **Cursor Interaction Feedback** (2025-12-08)
+  - Added global CSS rule ensuring all buttons display pointer cursor
+  - All clickable elements in Warm theme now properly indicate interactivity
+  - Disabled buttons show `cursor: not-allowed` for clear visual feedback
+
+- **Settings Panel Organization** (2025-12-08)
+  - Moved Theme Guide access button from header to Settings panel
+  - Positioned next to "Visual Theme" label for logical grouping
+  - Only visible when Warm Minimal theme is selected
+  - Cleaner header design with reduced visual clutter
+
+### Changed
+
+- **Tailwind CSS Version** (2025-12-08)
+  - Upgraded from Tailwind CSS v3 to v4
+  - Configuration method changed from `tailwind.config.js` to `@theme` directive in CSS
+  - Custom properties now defined as CSS variables (e.g., `--color-warm-50`, `--font-serif`)
+  - No breaking changes to existing components
+
+### Technical
+
+- Typography configuration:
+  - Primary fonts: Playfair Display (serif), Inter (sans-serif), Noto Sans TC (CJK)
+  - Font loading: Google Fonts with `display=swap` for optimal performance
+  - Global button cursor rules for consistent UX
+- Color system:
+  - 20 new color variables (warm + warm-accent scales)
+  - oklch color space support via Tailwind v4
+  - Dark mode color variants with proper contrast ratios
+- Component updates:
+  - 15+ components updated with conditional Warm theme styling
+  - All cursor interactions verified and optimized
+  - Font classes systematically applied based on content type
+
 ## [1.5.2] - 2025-12-04
 
 ### Added

@@ -11,6 +11,11 @@ export interface Translations {
   light: string;
   dark: string;
   system: string;
+  visualTheme: string;
+  classic: string;
+  warmMinimal: string;
+  classicDescription: string;
+  warmMinimalDescription: string;
   priceColorScheme: string;
   asian: string;
   western: string;
@@ -133,6 +138,11 @@ export const translations: Record<Language, Translations> = {
     light: 'Light',
     dark: 'Dark',
     system: 'System',
+    visualTheme: 'Visual Theme',
+    classic: 'Classic',
+    warmMinimal: 'Warm Minimal',
+    classicDescription: 'Professional cool-toned appearance',
+    warmMinimalDescription: 'Friendly warm-toned appearance',
     priceColorScheme: 'Price Color Scheme',
     asian: 'Asian',
     western: 'Western',
@@ -253,6 +263,11 @@ export const translations: Record<Language, Translations> = {
     light: '淺色',
     dark: '深色',
     system: '系統',
+    visualTheme: '視覺主題',
+    classic: '經典',
+    warmMinimal: '溫暖極簡',
+    classicDescription: '冷色調專業外觀',
+    warmMinimalDescription: '暖色調親和外觀',
     priceColorScheme: '價格配色',
     asian: '亞洲',
     western: '歐美',

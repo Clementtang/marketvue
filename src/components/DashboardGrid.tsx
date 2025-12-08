@@ -9,6 +9,7 @@ import PageNavigator from './PageNavigator';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
+import { useVisualTheme } from '../contexts/VisualThemeContext';
 
 interface DashboardGridProps {
   stocks: string[];
@@ -20,6 +21,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   // Use Context
   const { language } = useApp();
   const { chartType, setChartType, currentPage, setCurrentPage, itemsPerPage } = useChart();
+  const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
 
   const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
@@ -232,7 +234,11 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
   if (stocks.length === 0) {
     return (
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-12 text-center transition-colors">
+      <div className={`rounded-lg shadow-sm p-12 text-center transition-colors ${
+        visualTheme === 'warm'
+          ? 'bg-warm-100 dark:bg-warm-800'
+          : 'bg-white dark:bg-gray-800'
+      }`}>
         <div className="text-gray-400 dark:text-gray-500 mb-4">
           <svg
             className="w-24 h-24 mx-auto"
@@ -259,13 +265,21 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors" id="grid-container">
+    <div className={`shadow-sm p-6 transition-colors ${
+      visualTheme === 'warm'
+        ? 'bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50'
+        : 'bg-white dark:bg-gray-800 rounded-lg'
+    }`} id="grid-container">
       {/* Dashboard Header - constrained to grid width */}
       <div
         className="flex items-center justify-between mb-4 mx-auto"
         style={{ maxWidth: Math.max(containerWidth - 48, 300) }}
       >
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.dashboardGrid}</h2>
+        <h2 className={`text-xl font-semibold ${
+          visualTheme === 'warm'
+            ? 'text-warm-800 dark:text-warm-100 font-serif'
+            : 'text-gray-800 dark:text-white'
+        }`}>{t.dashboardGrid}</h2>
 
         <div className="flex items-center gap-3">
           {/* Page Navigator (only show if multiple pages) */}
@@ -274,7 +288,11 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           {/* Chart Type Toggle Button */}
           <button
             onClick={handleToggleChartType}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg transition-colors shadow-sm"
+            className={`flex items-center gap-2 px-3 py-2 text-white rounded-lg transition-colors shadow-sm ${
+              visualTheme === 'warm'
+                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700'
+                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
+            }`}
             title={chartType === 'line' ? t.switchToCandlestickChart : t.switchToLineChart}
           >
             {chartType === 'line' ? (

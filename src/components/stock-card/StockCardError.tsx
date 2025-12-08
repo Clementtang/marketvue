@@ -1,5 +1,6 @@
 import { memo } from 'react';
 import type { Language, Translations } from '../../i18n/translations';
+import { useVisualTheme } from '../../contexts/VisualThemeContext';
 
 interface StockCardErrorProps {
   error: string | null;
@@ -20,8 +21,13 @@ const StockCardError = memo(function StockCardError({
   t,
   onRetry,
 }: StockCardErrorProps) {
+  const { visualTheme } = useVisualTheme();
   return (
-    <div className="h-full bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 flex flex-col items-center justify-center transition-colors">
+    <div className={`h-full shadow-sm p-6 flex flex-col items-center justify-center transition-all duration-300 ${
+      visualTheme === 'warm'
+        ? 'bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50'
+        : 'bg-white dark:bg-gray-800 rounded-lg'
+    }`}>
       <div className="text-red-500 dark:text-red-400 mb-2">
         <svg
           className="w-12 h-12 mx-auto mb-2"

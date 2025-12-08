@@ -1,5 +1,6 @@
 import { useKeepAlive } from '../hooks/useKeepAlive';
 import { useApp } from '../contexts/AppContext';
+import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { useTranslation } from '../i18n/translations';
 
 /**
@@ -17,6 +18,7 @@ import { useTranslation } from '../i18n/translations';
  */
 export default function KeepAliveToggle() {
   const { language } = useApp();
+  const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
   const { keepAliveEnabled, setKeepAliveEnabled, lastPingTime, isPinging } = useKeepAlive();
 
@@ -43,8 +45,11 @@ export default function KeepAliveToggle() {
           aria-checked={keepAliveEnabled}
           onClick={() => setKeepAliveEnabled(!keepAliveEnabled)}
           className={`
-            relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2
-            ${keepAliveEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}
+            relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2
+            ${visualTheme === 'warm'
+              ? `focus:ring-warm-accent-500 ${keepAliveEnabled ? 'bg-warm-accent-500' : 'bg-gray-300 dark:bg-gray-600'}`
+              : `focus:ring-blue-500 ${keepAliveEnabled ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'}`
+            }
           `}
         >
           <span
@@ -68,14 +73,18 @@ export default function KeepAliveToggle() {
           <span
             className={`font-medium ${
               keepAliveEnabled
-                ? 'text-green-600 dark:text-green-400'
+                ? visualTheme === 'warm'
+                  ? 'text-warm-accent-600 dark:text-warm-accent-400'
+                  : 'text-green-600 dark:text-green-400'
                 : 'text-gray-500 dark:text-gray-400'
             }`}
           >
             {keepAliveEnabled ? t.keepAliveEnabled : t.keepAliveDisabled}
           </span>
           {isPinging && (
-            <span className="inline-flex h-2 w-2 animate-pulse rounded-full bg-blue-500"></span>
+            <span className={`inline-flex h-2 w-2 animate-pulse rounded-full ${
+              visualTheme === 'warm' ? 'bg-warm-accent-500' : 'bg-blue-500'
+            }`}></span>
           )}
         </div>
 

@@ -4,6 +4,7 @@ import { format, subMonths, subYears, subDays, startOfYear } from 'date-fns';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
+import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { useToast } from '../contexts/ToastContext';
 
 export interface DateRange {
@@ -16,6 +17,7 @@ const TimeRangeSelector = () => {
   // Use Context
   const { language } = useApp();
   const { dateRange, setDateRange } = useChart();
+  const { visualTheme } = useVisualTheme();
   const { showToast } = useToast();
   const t = useTranslation(language);
 
@@ -82,8 +84,16 @@ const TimeRangeSelector = () => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors h-full">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-white mb-4">{t.timeRange}</h2>
+    <div className={`shadow-sm p-6 transition-all duration-300 h-full ${
+      visualTheme === 'warm'
+        ? 'bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50'
+        : 'bg-white dark:bg-gray-800 rounded-lg'
+    }`}>
+      <h2 className={`text-xl font-semibold mb-4 ${
+        visualTheme === 'warm'
+          ? 'text-warm-800 dark:text-warm-100 font-serif'
+          : 'text-gray-800 dark:text-white'
+      }`}>{t.timeRange}</h2>
 
       {/* Preset Buttons */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -93,8 +103,12 @@ const TimeRangeSelector = () => {
             onClick={() => handlePresetClick(preset)}
             className={`px-4 py-2 rounded-lg font-medium transition-colors ${
               dateRange.preset === preset.value
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                ? visualTheme === 'warm'
+                  ? 'bg-warm-accent-500 dark:bg-warm-accent-600 text-white'
+                  : 'bg-blue-600 text-white'
+                : visualTheme === 'warm'
+                  ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
             }`}
           >
             {preset.label}
@@ -104,8 +118,12 @@ const TimeRangeSelector = () => {
           onClick={() => setCustomMode(!customMode)}
           className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
             dateRange.preset === 'custom'
-              ? 'bg-blue-600 text-white'
-              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+              ? visualTheme === 'warm'
+                ? 'bg-warm-accent-500 dark:bg-warm-accent-600 text-white'
+                : 'bg-blue-600 text-white'
+              : visualTheme === 'warm'
+                ? 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
           }`}
         >
           <Calendar size={18} />
@@ -118,7 +136,11 @@ const TimeRangeSelector = () => {
         <form onSubmit={handleCustomSubmit} className="border-t dark:border-gray-700 pt-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${
+                visualTheme === 'warm'
+                  ? 'text-warm-700 dark:text-warm-300 font-serif'
+                  : 'text-gray-700 dark:text-gray-300'
+              }`}>
                 {t.startDate}
               </label>
               <input
@@ -126,11 +148,19 @@ const TimeRangeSelector = () => {
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
                 max={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+                className={`w-full px-4 py-2 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none transition-colors ${
+                  visualTheme === 'warm'
+                    ? 'border-warm-300 dark:border-warm-600 rounded-lg focus:ring-2 focus:ring-warm-accent-500 focus:border-transparent'
+                    : 'border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                }`}
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label className={`block text-sm font-medium mb-2 ${
+                visualTheme === 'warm'
+                  ? 'text-warm-700 dark:text-warm-300 font-serif'
+                  : 'text-gray-700 dark:text-gray-300'
+              }`}>
                 {t.endDate}
               </label>
               <input
@@ -138,13 +168,21 @@ const TimeRangeSelector = () => {
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
                 max={format(new Date(), 'yyyy-MM-dd')}
-                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+                className={`w-full px-4 py-2 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none transition-colors ${
+                  visualTheme === 'warm'
+                    ? 'border-warm-300 dark:border-warm-600 rounded-lg focus:ring-2 focus:ring-warm-accent-500 focus:border-transparent'
+                    : 'border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+                }`}
               />
             </div>
           </div>
           <button
             type="submit"
-            className="mt-4 w-full md:w-auto px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-800 transition-colors"
+            className={`mt-4 w-full md:w-auto px-6 py-2 text-white rounded-lg transition-colors ${
+              visualTheme === 'warm'
+                ? 'bg-warm-accent-500 dark:bg-warm-accent-600 hover:bg-warm-accent-600 dark:hover:bg-warm-accent-700'
+                : 'bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800'
+            }`}
           >
             {t.applyCustomRange}
           </button>

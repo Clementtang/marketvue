@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Plus, X, Copy, ClipboardPaste } from 'lucide-react';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
+import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { useToast } from '../contexts/ToastContext';
 
 interface StockManagerProps {
@@ -13,6 +14,7 @@ interface StockManagerProps {
 const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) => {
   // Use Context
   const { language } = useApp();
+  const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
   const { showToast } = useToast();
 
@@ -134,9 +136,17 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 transition-colors h-full">
+    <div className={`shadow-sm p-6 transition-all duration-300 h-full ${
+      visualTheme === 'warm'
+        ? 'bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50'
+        : 'bg-white dark:bg-gray-800 rounded-lg'
+    }`}>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{t.stockManager}</h2>
+        <h2 className={`text-xl font-semibold ${
+          visualTheme === 'warm'
+            ? 'text-warm-800 dark:text-warm-100 font-serif'
+            : 'text-gray-800 dark:text-white'
+        }`}>{t.stockManager}</h2>
 
         {/* Import/Export Buttons */}
         <div className="flex gap-2">
@@ -178,7 +188,11 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           <button
             type="submit"
             disabled={stocks.length >= 18}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white rounded-lg disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors"
+            className={`px-4 py-2 text-white rounded-lg disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors ${
+              visualTheme === 'warm'
+                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700'
+                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
+            }`}
           >
             <Plus size={20} />
             {t.add}
@@ -195,17 +209,29 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
       {/* Stock List */}
       {stocks.length > 0 && (
         <div>
-          <h3 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t.trackedStocks}</h3>
+          <h3 className={`text-sm font-medium mb-2 ${
+            visualTheme === 'warm'
+              ? 'text-warm-700 dark:text-warm-300 font-serif'
+              : 'text-gray-700 dark:text-gray-300'
+          }`}>{t.trackedStocks}</h3>
           <div className="flex flex-wrap gap-2">
             {stocks.map((symbol) => (
               <div
                 key={symbol}
-                className="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full border border-blue-200 dark:border-blue-700 transition-colors"
+                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${
+                  visualTheme === 'warm'
+                    ? 'bg-warm-accent-50 dark:bg-warm-accent-900/30 text-warm-accent-700 dark:text-warm-accent-300 border-warm-accent-200 dark:border-warm-accent-700'
+                    : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700'
+                }`}
               >
                 <span className="font-medium">{symbol}</span>
                 <button
                   onClick={() => onRemoveStock(symbol)}
-                  className="hover:bg-blue-100 dark:hover:bg-blue-800/50 rounded-full p-0.5 transition-colors"
+                  className={`rounded-full p-0.5 transition-colors ${
+                    visualTheme === 'warm'
+                      ? 'hover:bg-warm-accent-100 dark:hover:bg-warm-accent-800/50'
+                      : 'hover:bg-blue-100 dark:hover:bg-blue-800/50'
+                  }`}
                   title={`Remove ${symbol}`}
                 >
                   <X size={16} />

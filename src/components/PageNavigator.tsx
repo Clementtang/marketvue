@@ -1,5 +1,6 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useChart } from '../contexts/ChartContext';
+import { useVisualTheme } from '../contexts/VisualThemeContext';
 import type { Language } from '../i18n/translations';
 
 interface PageNavigatorProps {
@@ -14,6 +15,7 @@ interface PageNavigatorProps {
  */
 const PageNavigator = ({ totalItems, language }: PageNavigatorProps) => {
   const { currentPage, setCurrentPage, itemsPerPage } = useChart();
+  const { visualTheme } = useVisualTheme();
 
   // Calculate total pages
   const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -43,15 +45,27 @@ const PageNavigator = ({ totalItems, language }: PageNavigatorProps) => {
       <button
         onClick={handlePrevious}
         disabled={currentPage === 1}
-        className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-100 dark:disabled:hover:bg-gray-700"
+        className={`flex items-center justify-center w-8 h-8 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+          visualTheme === 'warm'
+            ? 'rounded-lg bg-warm-100 hover:bg-warm-200 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-300 disabled:hover:bg-warm-100 dark:disabled:hover:bg-warm-700'
+            : 'rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:hover:bg-gray-100 dark:disabled:hover:bg-gray-700'
+        }`}
         title={language === 'zh-TW' ? '上一頁' : 'Previous page'}
       >
         <ChevronLeft size={18} />
       </button>
 
       {/* Page Indicator */}
-      <div className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 dark:bg-gray-700 rounded-lg">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+      <div className={`flex items-center gap-1 px-3 py-1.5 ${
+        visualTheme === 'warm'
+          ? 'rounded-lg bg-warm-100 dark:bg-warm-700'
+          : 'rounded-lg bg-gray-100 dark:bg-gray-700'
+      }`}>
+        <span className={`text-sm font-medium ${
+          visualTheme === 'warm'
+            ? 'text-warm-700 dark:text-warm-300'
+            : 'text-gray-700 dark:text-gray-300'
+        }`}>
           {pageText} {currentPage} / {totalPages}
         </span>
       </div>
@@ -60,7 +74,11 @@ const PageNavigator = ({ totalItems, language }: PageNavigatorProps) => {
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className="flex items-center justify-center w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-gray-100 dark:disabled:hover:bg-gray-700"
+        className={`flex items-center justify-center w-8 h-8 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+          visualTheme === 'warm'
+            ? 'rounded-lg bg-warm-100 hover:bg-warm-200 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-300 disabled:hover:bg-warm-100 dark:disabled:hover:bg-warm-700'
+            : 'rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:hover:bg-gray-100 dark:disabled:hover:bg-gray-700'
+        }`}
         title={language === 'zh-TW' ? '下一頁' : 'Next page'}
       >
         <ChevronRight size={18} />

@@ -6,6 +6,7 @@ import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
 import DashboardGrid from './components/DashboardGrid';
 import ThemeSettings from './components/ThemeSettings';
+import ThemeGuide from './components/ThemeGuide';
 import NotificationBanner from './components/NotificationBanner';
 import Footer from './components/Footer';
 import { useTranslation } from './i18n/translations';
@@ -14,6 +15,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { AppProvider, useApp } from './contexts/AppContext';
 import { ChartProvider, useChart } from './contexts/ChartContext';
 import { ToastProvider } from './contexts/ToastContext';
+import { VisualThemeProvider, useVisualTheme } from './contexts/VisualThemeContext';
 import { ToastContainer } from './components/common/Toast';
 import { queryClient } from './config/queryClient';
 
@@ -21,10 +23,12 @@ function AppContent() {
   // Use Context hooks
   const { language, colorTheme, setColorTheme, themeMode, setThemeMode, setLanguage } = useApp();
   const { dateRange } = useChart();
+  const { visualTheme } = useVisualTheme();
 
   // Local state (stocks management)
   const [stocks, setStocks] = useState<string[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [showThemeGuide, setShowThemeGuide] = useState(false);
 
   // Get translations
   const t = useTranslation(language);
@@ -57,33 +61,65 @@ function AppContent() {
     setStocks((prev) => prev.filter((s) => s !== symbol));
   }, []);
 
+  // Show Theme Guide if requested
+  if (showThemeGuide) {
+    return (
+      <ErrorBoundary language={language}>
+        <ThemeGuide onClose={() => setShowThemeGuide(false)} />
+      </ErrorBoundary>
+    );
+  }
+
   return (
     <ErrorBoundary language={language}>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors flex flex-col">
+      <div className={`min-h-screen transition-colors flex flex-col ${
+        visualTheme === 'warm'
+          ? 'bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-200'
+          : 'bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
+      }`}>
         <NotificationBanner t={t} />
 
-        <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white shadow-lg">
-          <div className="container mx-auto px-4 py-6">
+        <header className={`shadow-sm ${
+          visualTheme === 'warm'
+            ? 'bg-warm-100 dark:bg-warm-800 border-b border-warm-200 dark:border-warm-700'
+            : 'bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900'
+        }`}>
+          <div className="container mx-auto px-4 py-8">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <TrendingUp size={32} />
+              <div className={`flex items-center gap-4 ${
+                visualTheme === 'warm'
+                  ? 'text-warm-800 dark:text-warm-100'
+                  : 'text-white'
+              }`}>
+                <TrendingUp size={36} className={visualTheme === 'warm' ? 'text-warm-accent-400' : ''} />
                 <div>
-                  <h1 className="text-3xl font-bold">{t.appTitle}</h1>
-                  <p className="text-blue-100 text-sm">
+                  <h1 className={`text-4xl font-bold ${visualTheme === 'warm' ? 'font-serif' : ''}`}>
+                    {t.appTitle}
+                  </h1>
+                  <p className={`text-sm mt-1 ${
+                    visualTheme === 'warm'
+                      ? 'text-warm-600 dark:text-warm-400 font-serif'
+                      : 'text-blue-100'
+                  }`}>
                     {t.appSubtitle}
                   </p>
                 </div>
               </div>
 
-              <ThemeSettings
-                colorTheme={colorTheme}
-                onColorThemeChange={setColorTheme}
-                themeMode={themeMode}
-                onThemeModeChange={setThemeMode}
-                language={language}
-                onLanguageChange={setLanguage}
-                t={t}
-              />
+              <div className="flex items-center gap-3">
+                <div className={visualTheme === 'warm' ? 'text-warm-800 dark:text-warm-100' : ''}>
+                  <ThemeSettings
+                    colorTheme={colorTheme}
+                    onColorThemeChange={setColorTheme}
+                    themeMode={themeMode}
+                    onThemeModeChange={setThemeMode}
+                    language={language}
+                    onLanguageChange={setLanguage}
+                    t={t}
+                    onOpenThemeGuide={() => setShowThemeGuide(true)}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </header>
@@ -129,12 +165,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AppProvider>
-        <ChartProvider>
-          <ToastProvider>
-            <AppContent />
-            <ToastContainer />
-          </ToastProvider>
-        </ChartProvider>
+        <VisualThemeProvider>
+          <ChartProvider>
+            <ToastProvider>
+              <AppContent />
+              <ToastContainer />
+            </ToastProvider>
+          </ChartProvider>
+        </VisualThemeProvider>
       </AppProvider>
     </QueryClientProvider>
   );

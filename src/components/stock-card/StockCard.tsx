@@ -1,6 +1,7 @@
 import { memo, useMemo } from 'react';
 import { useApp } from '../../contexts/AppContext';
 import { useChart } from '../../contexts/ChartContext';
+import { useVisualTheme } from '../../contexts/VisualThemeContext';
 import { useTranslation } from '../../i18n/translations';
 import { useStockData } from './hooks/useStockData';
 import StockCardHeader from './StockCardHeader';
@@ -34,6 +35,7 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
   // Get context values
   const { language, colorTheme } = useApp();
   const { chartType } = useChart();
+  const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
 
   // Fetch stock data using custom hook
@@ -86,7 +88,11 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
 
   // Success state - render stock card with all sub-components
   return (
-    <div className="h-full max-h-[220px] overflow-hidden bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-2 flex flex-col transition-colors">
+    <div className={`h-full max-h-[220px] overflow-hidden p-3 flex flex-col transition-all duration-300 ${
+      visualTheme === 'warm'
+        ? 'bg-white dark:bg-warm-800 rounded-3xl shadow-md hover:shadow-xl border border-warm-200/50 dark:border-warm-700/50'
+        : 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700'
+    }`}>
       {/* Header with company name and price */}
       <StockCardHeader
         stockData={stockData}

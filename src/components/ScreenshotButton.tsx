@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Camera } from 'lucide-react';
 import { captureAndCopyToClipboard, isClipboardAvailable } from '../utils/screenshot';
+import { useVisualTheme } from '../contexts/VisualThemeContext';
 import type { Language } from '../i18n/translations';
 
 interface ScreenshotButtonProps {
@@ -13,6 +14,7 @@ interface ScreenshotButtonProps {
  * Copies the screenshot to clipboard in 16:9 aspect ratio
  */
 const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) => {
+  const { visualTheme } = useVisualTheme();
   const [isCapturing, setIsCapturing] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
@@ -46,7 +48,11 @@ const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) 
       <button
         onClick={handleCapture}
         disabled={isCapturing}
-        className="flex items-center gap-2 px-3 py-2 bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 text-white rounded-lg transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+        className={`flex items-center gap-2 px-3 py-2 text-white transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
+          visualTheme === 'warm'
+            ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-lg'
+            : 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 rounded-lg'
+        }`}
         title={language === 'zh-TW' ? '複製截圖到剪貼簿' : 'Copy screenshot to clipboard'}
       >
         <Camera size={18} className={isCapturing ? 'animate-pulse' : ''} />
@@ -63,7 +69,11 @@ const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) 
 
       {/* Success message */}
       {showSuccess && (
-        <div className="absolute top-full left-0 mt-2 px-3 py-2 bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200 rounded-lg shadow-md text-sm whitespace-nowrap z-50">
+        <div className={`absolute top-full left-0 mt-2 px-3 py-2 rounded-lg shadow-md text-sm whitespace-nowrap z-50 ${
+          visualTheme === 'warm'
+            ? 'bg-warm-accent-50 dark:bg-warm-accent-900/50 text-warm-accent-800 dark:text-warm-accent-200'
+            : 'bg-green-100 dark:bg-green-900/50 text-green-800 dark:text-green-200'
+        }`}>
           {language === 'zh-TW' ? '✓ 已複製到剪貼簿' : '✓ Copied to clipboard'}
         </div>
       )}
