@@ -55,6 +55,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Element remains functional with `opacity: 0`, maintaining drag-to-resize capability
   - Cursor still changes to `se-resize` on hover for discoverability
 
+- **TypeScript Build Errors for Vercel Deployment** (2025-12-09)
+  - Fixed TS6133: Removed unused `useTranslation` import and `t` variable from `ThemeGuide.tsx`
+  - Fixed TS6133: Removed unused `React` import from `VisualThemeContext.tsx`
+  - Fixed TS1484: Changed `ReactNode` to type-only import in `VisualThemeContext.tsx` to comply with `verbatimModuleSyntax`
+  - Resolved 3 TypeScript errors blocking Vercel production deployment
+
 ### Improved
 
 - **Font Readability Optimization** (2025-12-08)

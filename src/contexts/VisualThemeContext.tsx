@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 // Visual theme types (Classic vs Warm Minimal)
 // Note: This is different from ColorTheme in ColorThemeSelector (Eastern/Western price colors)

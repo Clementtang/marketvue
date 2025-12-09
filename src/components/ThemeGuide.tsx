@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Palette, Type, Square, Sparkles, ArrowLeft } from 'lucide-react';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { useApp } from '../contexts/AppContext';
-import { useTranslation } from '../i18n/translations';
 
 interface ThemeGuideProps {
   onClose: () => void;
@@ -11,7 +10,6 @@ interface ThemeGuideProps {
 const ThemeGuide = ({ onClose }: ThemeGuideProps) => {
   const { visualTheme } = useVisualTheme();
   const { language } = useApp();
-  const t = useTranslation(language);
   const [selectedSection, setSelectedSection] = useState<'colors' | 'typography' | 'components'>('colors');
 
   const warmColors = [
