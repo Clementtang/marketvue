@@ -153,7 +153,9 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           <button
             onClick={handleExportToClipboard}
             disabled={stocks.length === 0}
-            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
+            className={`px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors ${
+              visualTheme === 'warm' ? 'rounded-xl' : 'rounded-lg'
+            }`}
             title={t.exportToClipboard || 'Export to clipboard'}
           >
             <Copy size={16} />
@@ -162,7 +164,9 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           <button
             onClick={handleImportFromClipboard}
             disabled={stocks.length >= 18}
-            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors"
+            className={`px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors ${
+              visualTheme === 'warm' ? 'rounded-xl' : 'rounded-lg'
+            }`}
             title={t.importFromClipboard || 'Import from clipboard'}
           >
             <ClipboardPaste size={16} />
@@ -182,16 +186,20 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
               setError('');
             }}
             placeholder="TW Listed: 2330.TW | TW OTC: 5904.TWO | US: AAPL | JP: 9983.JP"
-            className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-colors"
+            className={`flex-1 px-4 py-2 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none transition-colors ${
+              visualTheme === 'warm'
+                ? 'border-warm-300 dark:border-warm-600 rounded-2xl focus:ring-2 focus:ring-warm-accent-500 focus:border-transparent'
+                : 'border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+            }`}
             maxLength={10}
           />
           <button
             type="submit"
             disabled={stocks.length >= 18}
-            className={`px-4 py-2 text-white rounded-lg disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors ${
+            className={`px-4 py-2 text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors ${
               visualTheme === 'warm'
-                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700'
-                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
+                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
+                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg'
             }`}
           >
             <Plus size={20} />

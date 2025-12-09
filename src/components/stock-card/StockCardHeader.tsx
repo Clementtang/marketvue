@@ -1,5 +1,6 @@
 import { memo, useMemo } from 'react';
 import { TrendingUp, TrendingDown } from 'lucide-react';
+import { AnimatedNumber } from '../common/AnimatedNumber';
 import type { StockData } from '../../types/stock';
 import type { Language } from '../../i18n/translations';
 import type { ColorTheme } from '../ColorThemeSelector';
@@ -74,17 +75,17 @@ const StockCardHeader = memo(function StockCardHeader({
   return (
     <div className="flex items-start justify-between mb-1.5 gap-2">
       {/* Left: Symbol/Company Name (different order based on stock type) */}
-      <div className="flex flex-col justify-start min-w-0 overflow-hidden">
+      <div className="flex flex-col justify-start min-w-0 overflow-hidden group cursor-default py-0.5 -my-0.5">
         {isAsianStock ? (
           // Taiwan/Japan stock: Company name (top), Symbol (bottom, no parentheses)
           <>
             <h3
-              className="text-base font-bold text-gray-800 dark:text-white truncate leading-tight"
+              className="text-base font-bold text-gray-800 dark:text-white truncate leading-tight transition-all duration-200 group-hover:opacity-80"
               title={displayName}
             >
               {displayName}
             </h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap">
+            <span className="text-xs text-gray-500 dark:text-gray-400 whitespace-nowrap transition-all duration-200 group-hover:opacity-70">
               {stockData.symbol}
             </span>
           </>
@@ -92,12 +93,12 @@ const StockCardHeader = memo(function StockCardHeader({
           // US/Other stock: Symbol (top), Company name (bottom)
           <>
             <h3
-              className="text-base font-bold text-gray-800 dark:text-white whitespace-nowrap leading-tight"
+              className="text-base font-bold text-gray-800 dark:text-white whitespace-nowrap leading-tight transition-all duration-200 group-hover:opacity-80"
               title={stockData.symbol}
             >
               {stockData.symbol}
             </h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate" title={displayName}>
+            <span className="text-xs text-gray-500 dark:text-gray-400 truncate transition-all duration-200 group-hover:opacity-70" title={displayName}>
               {displayName}
             </span>
           </>
@@ -106,7 +107,7 @@ const StockCardHeader = memo(function StockCardHeader({
 
       {/* Right: Price (top), Change (bottom) */}
       <div className="flex flex-col items-end justify-start flex-shrink-0">
-        <div className="flex items-baseline gap-1">
+        <div className="flex items-baseline gap-1 transition-transform duration-200 hover:scale-105">
           <span className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap leading-tight">
             {formattedPrice}
           </span>
@@ -126,7 +127,13 @@ const StockCardHeader = memo(function StockCardHeader({
             )}
             <span>
               {priceInfo.isPositive ? '+' : ''}
-              {formatPrice(Math.abs(stockData.change), currency)} ({stockData.change_percent.toFixed(2)}%)
+              {formatPrice(Math.abs(stockData.change), currency)} (
+              <AnimatedNumber
+                value={Math.abs(stockData.change_percent)}
+                decimals={2}
+                suffix="%"
+                duration={600}
+              />)
             </span>
           </div>
         )}

@@ -101,7 +101,9 @@ const TimeRangeSelector = () => {
           <button
             key={preset.value}
             onClick={() => handlePresetClick(preset)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+            className={`px-4 py-2 font-medium transition-colors ${
+              visualTheme === 'warm' ? 'rounded-2xl' : 'rounded-lg'
+            } ${
               dateRange.preset === preset.value
                 ? visualTheme === 'warm'
                   ? 'bg-warm-accent-500 dark:bg-warm-accent-600 text-white'
@@ -116,7 +118,9 @@ const TimeRangeSelector = () => {
         ))}
         <button
           onClick={() => setCustomMode(!customMode)}
-          className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
+          className={`px-4 py-2 font-medium transition-colors flex items-center gap-2 ${
+            visualTheme === 'warm' ? 'rounded-2xl' : 'rounded-lg'
+          } ${
             dateRange.preset === 'custom'
               ? visualTheme === 'warm'
                 ? 'bg-warm-accent-500 dark:bg-warm-accent-600 text-white'
@@ -178,10 +182,10 @@ const TimeRangeSelector = () => {
           </div>
           <button
             type="submit"
-            className={`mt-4 w-full md:w-auto px-6 py-2 text-white rounded-lg transition-colors ${
+            className={`mt-4 w-full md:w-auto px-6 py-2 text-white transition-colors ${
               visualTheme === 'warm'
-                ? 'bg-warm-accent-500 dark:bg-warm-accent-600 hover:bg-warm-accent-600 dark:hover:bg-warm-accent-700'
-                : 'bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800'
+                ? 'bg-warm-accent-500 dark:bg-warm-accent-600 hover:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
+                : 'bg-blue-600 dark:bg-blue-700 hover:bg-blue-700 dark:hover:bg-blue-800 rounded-lg'
             }`}
           >
             {t.applyCustomRange}

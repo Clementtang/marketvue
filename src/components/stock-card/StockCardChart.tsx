@@ -81,7 +81,12 @@ const StockCardChart = memo(function StockCardChart({
     <div className="relative" style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}>
       {chartType === 'line' && (
         <ResponsiveContainer width="100%" height={CHART_CONFIG.CANDLESTICK_HEIGHT}>
-          <LineChart data={aggregatedData} margin={CHART_CONFIG.MARGINS}>
+          <LineChart
+            data={aggregatedData}
+            margin={CHART_CONFIG.MARGINS}
+            animationDuration={800}
+            animationEasing="ease-in-out"
+          >
             <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={formatDate} />
             <YAxis tick={{ fontSize: 10 }} domain={['auto', 'auto']} />
             <Tooltip
@@ -96,6 +101,11 @@ const StockCardChart = memo(function StockCardChart({
               strokeWidth={2}
               dot={false}
               name={t.close}
+              isAnimationActive={true}
+              animationBegin={0}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
+              activeDot={{ r: 5, strokeWidth: 2, stroke: priceColor }}
             />
             <Line
               type="monotone"
@@ -105,6 +115,11 @@ const StockCardChart = memo(function StockCardChart({
               dot={false}
               name={t.ma20}
               strokeDasharray="5 5"
+              isAnimationActive={true}
+              animationBegin={200}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
+              activeDot={{ r: 4, strokeWidth: 2, stroke: '#3b82f6' }}
             />
             <Line
               type="monotone"
@@ -114,6 +129,11 @@ const StockCardChart = memo(function StockCardChart({
               dot={false}
               name={t.ma60}
               strokeDasharray="3 3"
+              isAnimationActive={true}
+              animationBegin={400}
+              animationDuration={1000}
+              animationEasing="ease-in-out"
+              activeDot={{ r: 4, strokeWidth: 2, stroke: '#a855f7' }}
             />
           </LineChart>
         </ResponsiveContainer>

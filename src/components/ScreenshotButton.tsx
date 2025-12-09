@@ -50,7 +50,7 @@ const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) 
         disabled={isCapturing}
         className={`flex items-center gap-2 px-3 py-2 text-white transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${
           visualTheme === 'warm'
-            ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-lg'
+            ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
             : 'bg-green-600 hover:bg-green-700 dark:bg-green-700 dark:hover:bg-green-800 rounded-lg'
         }`}
         title={language === 'zh-TW' ? '複製截圖到剪貼簿' : 'Copy screenshot to clipboard'}

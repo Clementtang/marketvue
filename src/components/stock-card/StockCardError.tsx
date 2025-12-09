@@ -49,7 +49,11 @@ const StockCardError = memo(function StockCardError({
       <p className="text-gray-500 dark:text-gray-400 text-sm mb-4">{symbol}</p>
       <button
         onClick={onRetry}
-        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 text-white text-sm rounded-lg transition-colors"
+        className={`px-4 py-2 text-white text-sm transition-colors ${
+          visualTheme === 'warm'
+            ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
+            : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg'
+        }`}
       >
         {language === 'zh-TW' ? '重新載入' : 'Retry'}
       </button>

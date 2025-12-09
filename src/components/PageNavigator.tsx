@@ -47,7 +47,7 @@ const PageNavigator = ({ totalItems, language }: PageNavigatorProps) => {
         disabled={currentPage === 1}
         className={`flex items-center justify-center w-8 h-8 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
           visualTheme === 'warm'
-            ? 'rounded-lg bg-warm-100 hover:bg-warm-200 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-300 disabled:hover:bg-warm-100 dark:disabled:hover:bg-warm-700'
+            ? 'rounded-xl bg-warm-100 hover:bg-warm-200 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-300 disabled:hover:bg-warm-100 dark:disabled:hover:bg-warm-700'
             : 'rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:hover:bg-gray-100 dark:disabled:hover:bg-gray-700'
         }`}
         title={language === 'zh-TW' ? '上一頁' : 'Previous page'}
@@ -58,7 +58,7 @@ const PageNavigator = ({ totalItems, language }: PageNavigatorProps) => {
       {/* Page Indicator */}
       <div className={`flex items-center gap-1 px-3 py-1.5 ${
         visualTheme === 'warm'
-          ? 'rounded-lg bg-warm-100 dark:bg-warm-700'
+          ? 'rounded-xl bg-warm-100 dark:bg-warm-700'
           : 'rounded-lg bg-gray-100 dark:bg-gray-700'
       }`}>
         <span className={`text-sm font-medium ${
@@ -76,7 +76,7 @@ const PageNavigator = ({ totalItems, language }: PageNavigatorProps) => {
         disabled={currentPage === totalPages}
         className={`flex items-center justify-center w-8 h-8 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
           visualTheme === 'warm'
-            ? 'rounded-lg bg-warm-100 hover:bg-warm-200 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-300 disabled:hover:bg-warm-100 dark:disabled:hover:bg-warm-700'
+            ? 'rounded-xl bg-warm-100 hover:bg-warm-200 dark:bg-warm-700 dark:hover:bg-warm-600 text-warm-700 dark:text-warm-300 disabled:hover:bg-warm-100 dark:disabled:hover:bg-warm-700'
             : 'rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:hover:bg-gray-100 dark:disabled:hover:bg-gray-700'
         }`}
         title={language === 'zh-TW' ? '下一頁' : 'Next page'}

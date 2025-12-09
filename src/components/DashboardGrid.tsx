@@ -3,6 +3,7 @@ import GridLayout from 'react-grid-layout';
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
+import { useTrail, animated } from '@react-spring/web';
 import StockCard from './stock-card';
 import ScreenshotButton from './ScreenshotButton';
 import PageNavigator from './PageNavigator';
@@ -10,6 +11,7 @@ import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
+import { animations, getStaggerDelay } from '../utils/animations';
 
 interface DashboardGridProps {
   stocks: string[];
@@ -33,6 +35,14 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     const endIndex = startIndex + itemsPerPage;
     return stocks.slice(startIndex, endIndex);
   }, [stocks, currentPage, itemsPerPage]);
+
+  // Stagger animation for stock cards
+  const trails = useTrail(paginatedStocks.length, {
+    from: { opacity: 0, transform: 'translateY(20px)' },
+    to: { opacity: 1, transform: 'translateY(0px)' },
+    config: animations.gentle,
+    reset: true, // Reset animation when page changes
+  });
 
   // Smart page navigation when stocks change
   const previousStocksRef = useRef<string[]>([]);
@@ -288,10 +298,10 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           {/* Chart Type Toggle Button */}
           <button
             onClick={handleToggleChartType}
-            className={`flex items-center gap-2 px-3 py-2 text-white rounded-lg transition-colors shadow-sm ${
+            className={`flex items-center gap-2 px-3 py-2 text-white transition-colors shadow-sm ${
               visualTheme === 'warm'
-                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700'
-                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800'
+                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
+                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg'
             }`}
             title={chartType === 'line' ? t.switchToCandlestickChart : t.switchToLineChart}
           >
@@ -327,19 +337,22 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           isResizable={true}
           resizeHandles={['se']}
         >
-        {paginatedStocks.map((symbol) => (
-          <div key={symbol} className="relative">
-            {/* Drag Handle - transparent for minimal design */}
-            <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10" />
+        {trails.map((style, index) => {
+          const symbol = paginatedStocks[index];
+          return (
+            <animated.div key={symbol} className="relative" style={style}>
+              {/* Drag Handle - transparent for minimal design */}
+              <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10" />
 
-            {/* Stock Card */}
-            <StockCard
-              symbol={symbol}
-              startDate={startDate}
-              endDate={endDate}
-            />
-          </div>
-        ))}
+              {/* Stock Card */}
+              <StockCard
+                symbol={symbol}
+                startDate={startDate}
+                endDate={endDate}
+              />
+            </animated.div>
+          );
+        })}
       </GridLayout>
       </div>
     </div>
