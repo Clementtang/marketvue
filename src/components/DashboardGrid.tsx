@@ -11,7 +11,7 @@ import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
-import { animations, getStaggerDelay } from '../utils/animations';
+import { animations } from '../utils/animations';
 
 interface DashboardGridProps {
   stocks: string[];

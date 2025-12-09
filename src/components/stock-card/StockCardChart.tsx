@@ -84,8 +84,6 @@ const StockCardChart = memo(function StockCardChart({
           <LineChart
             data={aggregatedData}
             margin={CHART_CONFIG.MARGINS}
-            animationDuration={800}
-            animationEasing="ease-in-out"
           >
             <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={formatDate} />
             <YAxis tick={{ fontSize: 10 }} domain={['auto', 'auto']} />
