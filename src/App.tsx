@@ -72,9 +72,9 @@ function AppContent() {
 
   return (
     <ErrorBoundary language={language}>
-      <div className={`min-h-screen transition-colors flex flex-col ${
+      <div className={`min-h-screen transition-colors flex flex-col relative ${
         visualTheme === 'warm'
-          ? 'bg-warm-50 dark:bg-warm-900 text-warm-800 dark:text-warm-200'
+          ? 'warm-gradient-bg noise-texture text-warm-800 dark:text-warm-200'
           : 'bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
       }`}>
         <NotificationBanner t={t} />

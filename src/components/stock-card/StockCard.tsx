@@ -88,10 +88,10 @@ const StockCard = memo(function StockCard({ symbol, startDate, endDate }: StockC
 
   // Success state - render stock card with all sub-components
   return (
-    <div className={`h-full max-h-[220px] overflow-hidden p-3 flex flex-col transition-all duration-300 ${
+    <div className={`h-full max-h-[220px] overflow-hidden p-3 flex flex-col transition-all duration-300 ease-out ${
       visualTheme === 'warm'
-        ? 'bg-white dark:bg-warm-800 rounded-3xl shadow-md hover:shadow-xl border border-warm-200/50 dark:border-warm-700/50'
-        : 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700'
+        ? 'bg-white dark:bg-warm-800 rounded-3xl shadow-md hover:shadow-2xl hover:scale-[1.02] hover:-translate-y-1 border border-warm-200/50 dark:border-warm-700/50 hover:border-warm-accent-300 dark:hover:border-warm-accent-600/50'
+        : 'bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:scale-[1.02] hover:-translate-y-1 hover:border-blue-300 dark:hover:border-blue-500/50'
     }`}>
       {/* Header with company name and price */}
       <StockCardHeader

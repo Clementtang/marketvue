@@ -7,6 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Design Enhancement Phase 1: Quick Wins** (2025-12-09)
+  - **Typography Upgrade**: Replaced Inter font with DM Sans for improved personality and distinctiveness
+    - Added Space Grotesk as display font option for versatile heading styles
+    - Maintains Noto Sans TC for proper Chinese character rendering
+  - **Atmospheric Backgrounds**: Implemented gradient mesh backgrounds for Warm Minimal theme
+    - Radial gradient overlays creating depth and visual interest
+    - Different configurations for light and dark modes
+    - Subtle transitions between color zones
+  - **Texture Enhancement**: Added CSS noise texture overlay
+    - SVG-based fractal noise for organic feel
+    - Lower opacity (0.03) in light mode, higher (0.05) in dark mode
+    - Non-intrusive and performance-optimized
+  - **Micro-interactions**: Enhanced stock card hover animations
+    - Scale transformation (1.02) with upward translation (-1px)
+    - Elevated shadow effects (shadow-2xl for warm, shadow-lg for classic)
+    - Border color transitions on hover
+    - Smooth cubic-bezier easing (ease-out, 300ms)
+  - **Button Enhancements**: Comprehensive button interaction states
+    - Universal hover effect: translateY(-1px) for all buttons
+    - Active state feedback with instant transition
+    - Disabled state with 50% opacity and not-allowed cursor
+    - Theme-specific button classes:
+      - `.warm-primary-btn`: Terracotta accent with shadow elevation
+      - `.warm-secondary-btn`: Beige subtle style with border hover
+      - `.classic-primary-btn`: Blue gradient with clean transitions
+
+### Improved
+
+- **Visual Polish** (2025-12-09)
+  - Font personality: Moved away from generic Inter to more distinctive DM Sans
+  - Background depth: Added atmospheric gradient meshes replacing flat colors
+  - Surface texture: Implemented subtle noise overlay for organic aesthetic
+  - Hover feedback: All interactive elements now have refined micro-interactions
+  - Button states: Clear visual feedback for hover, active, and disabled states
+
+### Technical
+
+- Font configuration updated in `index.html` and `src/index.css`
+- New CSS classes: `.warm-gradient-bg`, `.noise-texture`, button enhancement classes
+- Stock card hover states refined in `src/components/stock-card/StockCard.tsx`
+- All changes follow frontend-design principles avoiding generic AI aesthetics
+
 ## [1.6.0] - 2025-12-08
 
 ### Added
