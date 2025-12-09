@@ -27,13 +27,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Border color transitions on hover
     - Smooth cubic-bezier easing (ease-out, 300ms)
   - **Button Enhancements**: Comprehensive button interaction states
-    - Universal hover effect: translateY(-1px) for all buttons
-    - Active state feedback with instant transition
+    - Hover color transitions and shadow elevation
     - Disabled state with 50% opacity and not-allowed cursor
     - Theme-specific button classes:
       - `.warm-primary-btn`: Terracotta accent with shadow elevation
       - `.warm-secondary-btn`: Beige subtle style with border hover
       - `.classic-primary-btn`: Blue gradient with clean transitions
+    - Note: Removed translateY animation per user feedback for more stable interaction
 
 ### Improved
 

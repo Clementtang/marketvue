@@ -49,15 +49,6 @@ button:not(:disabled) {
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-button:not(:disabled):hover {
-  transform: translateY(-1px);
-}
-
-button:not(:disabled):active {
-  transform: translateY(0);
-  transition-duration: 0.1s;
-}
-
 button:disabled {
   cursor: not-allowed;
   opacity: 0.5;
