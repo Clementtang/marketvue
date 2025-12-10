@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Keep Alive Mechanism** (2025-12-10)
+  - Fixed critical closure issue in useKeepAlive hook
+  - Ping function now uses useRef to avoid stale state capture
+  - Added persistence of last ping time to localStorage
+  - Restore last ping time on component mount
+  - Added debug logging and 5-second test ping for verification
+  - Ensures "Last ping" displays correctly in production
+
 ## [1.7.0] - 2025-12-09
 
 ### Added
