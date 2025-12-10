@@ -1,10 +1,14 @@
 import { useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { fetchStockData, getStockQueryKey } from '../../../api/stockApi';
+import { fetchStockDataBatched } from '../../../api/batchStockApi';
 import { getErrorMessage } from '../../../utils/errorHandlers';
 import { API_CONFIG } from '../../../config/constants';
 import type { StockData } from '../../../types/stock';
 import type { Translations, Language } from '../../../i18n/translations';
+
+// Enable batch API for better performance with multiple stocks
+const USE_BATCH_API = true;
 
 interface UseStockDataOptions {
   symbol: string;
@@ -51,13 +55,22 @@ export function useStockData({
     failureCount,
   } = useQuery({
     queryKey,
-    queryFn: () => fetchStockData({ symbol, startDate, endDate }),
-    // Retry configuration
+    queryFn: () => {
+      // Use batch API for better performance
+      if (USE_BATCH_API) {
+        return fetchStockDataBatched({ symbol, startDate, endDate });
+      }
+      return fetchStockData({ symbol, startDate, endDate });
+    },
+    // Retry configuration with longer delays for rate limit issues
     retry: API_CONFIG.RETRY_COUNT,
     retryDelay: (attemptIndex) => {
-      // Exponential backoff: 1s, 2s, 4s...
-      return Math.min(1000 * 2 ** attemptIndex, 30000);
+      // Longer backoff for rate limits: 2s, 4s, 8s, 16s...
+      return Math.min(2000 * 2 ** attemptIndex, 60000);
     },
+    // Cache data for longer to reduce requests
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes (formerly cacheTime)
     // Don't throw errors to the error boundary
     throwOnError: false,
   });

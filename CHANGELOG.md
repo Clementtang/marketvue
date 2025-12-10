@@ -17,6 +17,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Added debug logging and 5-second test ping for verification
   - Ensures "Last ping" displays correctly in production
 
+### Added
+
+- **Batch Stock API Integration** (2025-12-10)
+  - Implemented request queue mechanism to batch individual stock requests
+  - Added batchStockApi service to handle multiple stocks efficiently
+  - Uses parallel batch endpoint (`/api/v1/batch-stocks-parallel`) for better performance
+  - Automatically groups requests by date range and batches them
+  - Reduces rate limit issues when loading multiple stocks
+
+### Improved
+
+- **Rate Limit Optimization** (2025-12-10)
+  - Enhanced caching strategy: 5 minutes stale time, 30 minutes cache time
+  - Increased retry delays for rate limit errors: 2s, 4s, 8s, 16s backoff
+  - Batch requests handle up to 9 stocks per request (backend limit)
+  - Queues collect requests for 100ms before processing as batch
+  - Significantly reduces API calls when loading 18+ stocks
+
 ## [1.7.0] - 2025-12-09
 
 ### Added

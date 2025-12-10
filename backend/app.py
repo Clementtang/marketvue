@@ -85,6 +85,7 @@ def create_app(config_name='default'):
     )
 
     # Apply rate limiting to stock routes
+    # Standard endpoints: stricter limits
     limiter.limit("1000 per hour")(stock_bp)
     limiter.limit("100 per minute")(stock_bp)
 
