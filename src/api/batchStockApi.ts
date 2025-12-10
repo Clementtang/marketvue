@@ -9,12 +9,6 @@ import { API_CONFIG, MA_PERIODS } from '../config/constants';
  * Uses parallel batch endpoint for better performance.
  */
 
-interface BatchStockRequest {
-  symbols: string[];
-  start_date?: string;
-  end_date?: string;
-}
-
 interface BatchStockResponse {
   stocks: StockData[];
   errors: Array<{
@@ -141,7 +135,7 @@ class StockRequestQueue {
     reject: (error: Error) => void;
   }> = new Map();
 
-  private timer: NodeJS.Timeout | null = null;
+  private timer: ReturnType<typeof setTimeout> | null = null;
   private readonly BATCH_DELAY = 100; // 100ms delay to collect requests
 
   /**
