@@ -237,9 +237,12 @@ errorMessage = language === 'zh-TW'
 2. README.md + README_EN.md（如影響使用方式）
 
 3. package.json（更新版本號）
-   - 新功能: MINOR +1
-   - Bug 修復: PATCH +1
-   - 破壞性變更: MAJOR +1
+   - 新功能/改進: MINOR +1 (例: 1.6.0 → 1.7.0)
+   - Bug 修復: PATCH +1 (例: 1.7.0 → 1.7.1)
+   - 破壞性變更: MAJOR +1 (例: 1.7.0 → 2.0.0)
+   - 📚 **詳細規範參考**: .claude/versioning-guide.md
+   - ⚠️ **重要**: "Improved" 章節使用 MINOR，不是 PATCH
+   - ⚠️ **檢查清單**: 發布前執行版本號檢查清單
 
 4. 其他文件（如適用）
 ```
@@ -414,8 +417,12 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 ## 🔗 相關資源
 
+### 開發規範與指南
 - **通用設定**：`../../.claude/character.md`, `../../.claude/general-principles.md`
+- **版本號維護指南**：`.claude/versioning-guide.md` ⭐ 更新版本號前必讀
 - **專案文件**：`/Users/clementtang/stock-dashboard/docs/`
+
+### 專案文件
 - **開發藍圖**：`ROADMAP.md`
 - **貢獻指南**：`CONTRIBUTING.md`
 - **變更記錄**：`CHANGELOG.md`

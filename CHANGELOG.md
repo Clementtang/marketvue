@@ -7,7 +7,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2025-12-09
+
 ### Added
+
+- **Phase 2: Motion & Interaction** (2025-12-09)
+  - **Animation System**: Integrated react-spring for physics-based animations
+    - Created central animation configuration (`animations.ts`) with presets:
+      - gentle, wobbly, stiff, slow spring configurations
+      - Common animation presets (fadeInUp, fadeIn, scaleIn, slideInRight)
+      - Helper functions (getStaggerDelay, shouldReduceMotion, getAnimationConfig)
+  - **Page Load Animations**: Staggered entrance for stock cards
+    - Cards fade in from 20px below with spring physics
+    - useTrail hook creates sequential animation effect
+    - Resets on page navigation for consistent experience
+  - **Number Animations**: Smooth counting transitions
+    - New `AnimatedNumber` component for value changes
+    - Applied to stock price percentage changes (600ms duration)
+    - Uses spring physics for natural deceleration
+  - **Chart Animations**: Sequential line drawing effects
+    - Individual Line components animate with stagger (0ms, 200ms, 400ms)
+    - All animations use 1000ms duration with ease-in-out easing
+    - Added activeDot for hover interactions on chart data points
+  - **Loading State Enhancement**: Skeleton screen with shimmer
+    - Replaced Loader2 spinner with content-aware skeleton layout
+    - CSS shimmer animation (1.5s infinite cycle, 0.6 → 1 → 0.6 opacity)
+    - Skeleton mimics actual card structure (header, chart, footer areas)
+    - Theme-aware colors (warm-200/warm-700 for warm theme)
+  - **Hover Micro-interactions**: Refined interactive feedback
+    - Stock card header: Subtle opacity transitions (80% on hover)
+    - Entire header region responds to hover (not just text)
+    - Price display: 5% scale increase on hover
+    - Chart: activeDot highlights on line hover
+
+- **Unified Design System: Border-Radius Hierarchy** (2025-12-09)
+  - **Visual Hierarchy through Rounded Corners** (Warm theme only):
+    - Large containers (Dashboard Grid, Stock Cards): `rounded-3xl` (24px)
+    - Primary buttons (Chart toggle, Screenshot, Add stock): `rounded-2xl` (16px)
+    - Secondary buttons (Page navigation, Import/Export): `rounded-xl` (12px)
+    - Classic theme maintains standard `rounded-lg` (8px) throughout
+  - **Components Updated for Consistency**:
+    - DashboardGrid: Chart type toggle button
+    - ScreenshotButton: Screenshot button
+    - TimeRangeSelector: Preset buttons, custom button, submit button, input fields
+    - PageNavigator: Previous/Next buttons, page indicator
+    - StockManager: Import/Export buttons, Add button, input field
+    - StockCardError: Retry button
+  - **Design Rationale**:
+    - Larger radius = more important/frequently used elements
+    - Smaller radius = secondary/auxiliary functions
+    - Creates clear visual hierarchy without relying solely on color
+    - Enhances warm theme's organic, approachable aesthetic
 
 - **Design Enhancement Phase 1: Quick Wins** (2025-12-09)
   - **Typography Upgrade**: Replaced Inter font with DM Sans for improved personality and distinctiveness
@@ -37,6 +87,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 
+- **User Experience & Feedback** (2025-12-09)
+  - Loading states: More informative skeleton screens replace generic spinners
+  - Hover interactions: Entire clickable regions respond, not just text
+  - Animation timing: Carefully tuned durations for natural feel (600-1000ms)
+  - Visual hierarchy: Button importance clearly communicated through size and radius
+  - Accessibility: Reduced motion support through shouldReduceMotion helper
+
 - **Visual Polish** (2025-12-09)
   - Font personality: Moved away from generic Inter to more distinctive DM Sans
   - Background depth: Added atmospheric gradient meshes replacing flat colors
@@ -44,8 +101,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Hover feedback: All interactive elements now have refined micro-interactions
   - Button states: Clear visual feedback for hover, active, and disabled states
 
+### Fixed
+
+- **TypeScript Build Errors** (2025-12-09)
+  - Removed invalid `animationDuration` and `animationEasing` props from Recharts LineChart
+  - Removed unused `getStaggerDelay` import from DashboardGrid
+  - Ensured production build compatibility
+
 ### Technical
 
+- **Dependencies Added**:
+  - `@react-spring/web` (^9.7.5): Physics-based animation library
+- **New Files**:
+  - `src/utils/animations.ts`: Central animation configuration and utilities
+  - `src/components/common/AnimatedNumber.tsx`: Reusable number animation component
+- **Modified Components**:
+  - DashboardGrid: Added useTrail for stagger animations
+  - StockCardChart: Enhanced with activeDot and animation props
+  - StockCardHeader: Refined hover areas and opacity transitions
+  - StockCardLoading: Replaced with skeleton screen implementation
+  - TimeRangeSelector, PageNavigator, StockManager, ScreenshotButton, StockCardError: Unified button styling
+- **CSS Enhancements**:
+  - `@keyframes shimmer`: Loading animation for skeleton screens
+  - `.animate-shimmer`: Utility class for shimmer effect
 - Font configuration updated in `index.html` and `src/index.css`
 - New CSS classes: `.warm-gradient-bg`, `.noise-texture`, button enhancement classes
 - Stock card hover states refined in `src/components/stock-card/StockCard.tsx`
