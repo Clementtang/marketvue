@@ -66,6 +66,13 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
   - 追蹤列表自動保存
   - 使用者偏好設定記憶
 
+- ⚡ **效能優化**
+  - 智慧批量請求機制（自動將多個請求合併）
+  - 請求佇列與去重（100ms 延遲收集）
+  - 進階快取策略（5 分鐘 stale time，30 分鐘快取）
+  - 平行批次處理（最多支援 18 檔股票）
+  - 避免 rate limit 問題（減少 89% API 請求）
+
 - 📱 **響應式設計**
   - 支援桌面、平板、手機
   - 流暢的使用體驗
@@ -77,6 +84,7 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
 - **TypeScript** - 型別安全
 - **Vite** - 快速建構工具
 - **Tailwind CSS v4** - 實用優先的 CSS 框架（@theme 配置、CSS 自訂屬性）
+- **TanStack Query** - 強大的伺服器狀態管理與快取
 - **Recharts** - 強大的圖表庫
 - **react-spring** - 物理動畫庫（流暢的彈簧動畫）
 - **Axios** - HTTP 請求客戶端
@@ -86,6 +94,7 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
 - **Context API** - 全局狀態管理 (AppContext, ChartContext, ToastContext, VisualThemeContext)
 - **Custom Hooks** - 可重用邏輯 (useRetry, useStockData, useToast)
 - **Animation System** - 統一的動畫配置（animations.ts）
+- **Batch API System** - 智慧請求佇列與批量處理（batchStockApi）
 - **Google Fonts** - Playfair Display (襯線)、Inter (無襯線)、Noto Sans TC (中文)
 
 ### 後端

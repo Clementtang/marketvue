@@ -54,6 +54,13 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - Auto-save tracking list
   - Remember user preference settings
 
+- ⚡ **Performance Optimization**
+  - Intelligent batch request mechanism (automatically merges multiple requests)
+  - Request queue and deduplication (100ms collection delay)
+  - Advanced caching strategy (5min stale time, 30min cache)
+  - Parallel batch processing (supports up to 18 stocks)
+  - Avoids rate limit issues (reduces 89% API requests)
+
 - 📱 **Responsive Design**
   - Support for desktop, tablet, and mobile
   - Smooth user experience
@@ -64,11 +71,19 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 - **React 19** - Modern frontend framework
 - **TypeScript** - Type safety
 - **Vite** - Fast build tool
-- **Tailwind CSS** - Utility-first CSS framework
+- **Tailwind CSS v4** - Utility-first CSS framework (@theme config, CSS custom properties)
+- **TanStack Query** - Powerful server state management and caching
 - **Recharts** - Powerful charting library
+- **react-spring** - Physics-based animation library
 - **Axios** - HTTP client
 - **date-fns** - Date utility library
 - **Lucide Icons** - Beautiful icon library
+- **modern-screenshot** - High-quality screenshots (supports modern CSS)
+- **Context API** - Global state management (AppContext, ChartContext, ToastContext, VisualThemeContext)
+- **Custom Hooks** - Reusable logic (useRetry, useStockData, useToast)
+- **Animation System** - Unified animation configuration (animations.ts)
+- **Batch API System** - Intelligent request queue and batch processing (batchStockApi)
+- **Google Fonts** - Playfair Display (serif), Inter (sans-serif), Noto Sans TC (Chinese)
 
 ### Backend
 - **Flask** - Lightweight Python web framework
