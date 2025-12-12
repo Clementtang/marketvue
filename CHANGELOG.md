@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2025-12-12
+
+### Removed
+
+- **Frontend Keep-Alive Feature**
+  - Removed `useKeepAlive` hook and `KeepAliveToggle` component
+  - Reason: External monitoring service (UptimeRobot/HetrixTools) provides 100% reliable alternative
+  - Browser timer throttling made frontend keep-alive unreliable (30-40% success rate)
+  - Simplified UI by removing unnecessary user-facing controls
+  - See `docs/KEEP_ALIVE_REMOVAL.md` for detailed explanation and research findings
+
+### Technical
+
+- Removed 10 i18n translation keys related to keep-alive feature
+- Removed keep-alive section from ThemeSettings component
+- Updated documentation to reflect external monitoring approach
+- Reduced codebase by ~300 lines
+
+### Migration
+
+- **No user action required**
+- Backend availability maintained by external monitoring service
+- Recommended setup: HetrixTools, Exit1.dev, or cron-job.org
+- Setup guide: `docs/EXTERNAL_MONITORING_SERVICES.md`
+
 ## [1.8.0] - 2025-12-12
 
 ### Improved
