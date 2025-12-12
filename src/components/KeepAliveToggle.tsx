@@ -1,7 +1,29 @@
+import { useEffect, useState, useMemo } from 'react';
 import { useKeepAlive } from '../hooks/useKeepAlive';
 import { useApp } from '../contexts/AppContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { useTranslation } from '../i18n/translations';
+import type { Language } from '../i18n/translations';
+
+/**
+ * Format relative time helper function
+ */
+function formatRelativeTime(date: Date | null, language: Language, t: any): string {
+  if (!date) return t.never;
+
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+
+  if (diffMinutes < 1) {
+    return t.justNow;
+  } else if (diffMinutes < 60) {
+    return t.minutesAgo.replace('{0}', diffMinutes.toString());
+  } else {
+    return t.hoursAgo.replace('{0}', diffHours.toString());
+  }
+}
 
 /**
  * KeepAliveToggle Component
@@ -13,7 +35,7 @@ import { useTranslation } from '../i18n/translations';
  * - Toggle switch with visual feedback
  * - Bilingual support (zh-TW/en-US)
  * - Status indicator (Enabled/Disabled)
- * - Last ping time display
+ * - Relative time display ("2 min ago") with auto-update
  * - Descriptive help text
  */
 export default function KeepAliveToggle() {
@@ -22,14 +44,25 @@ export default function KeepAliveToggle() {
   const t = useTranslation(language);
   const { keepAliveEnabled, setKeepAliveEnabled, lastPingTime, isPinging } = useKeepAlive();
 
-  const formatLastPingTime = (date: Date | null) => {
-    if (!date) return t.never;
-    return date.toLocaleTimeString(language === 'zh-TW' ? 'zh-TW' : 'en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-    });
-  };
+  // State to trigger re-render every second for relative time updates
+  const [, setNow] = useState(new Date());
+
+  // Update display every second when enabled
+  useEffect(() => {
+    if (!keepAliveEnabled || !lastPingTime) return;
+
+    const interval = setInterval(() => {
+      setNow(new Date());
+    }, 1000); // Update every second
+
+    return () => clearInterval(interval);
+  }, [keepAliveEnabled, lastPingTime]);
+
+  // Memoize relative time calculation
+  const relativeTime = useMemo(
+    () => formatRelativeTime(lastPingTime, language, t),
+    [lastPingTime, language, t, keepAliveEnabled] // Re-calculate when dependencies change
+  );
 
   return (
     <div className="space-y-2">
@@ -90,7 +123,7 @@ export default function KeepAliveToggle() {
 
         {keepAliveEnabled && (
           <div className="text-gray-600 dark:text-gray-400">
-            {t.lastPing}: <span className="font-mono">{formatLastPingTime(lastPingTime)}</span>
+            {t.lastPing}: <span className="font-mono">{relativeTime}</span>
           </div>
         )}
       </div>

@@ -11,6 +11,10 @@ import { useEffect, useRef, useState, useCallback } from 'react';
  * - Automatic cleanup on component unmount
  * - Error handling (failures don't affect main functionality)
  * - Tracks last ping time for UI display
+ * - Page Visibility API: Immediate ping when tab becomes visible
+ *
+ * Note: Works best when combined with an external monitoring service (e.g., UptimeRobot)
+ * to ensure 100% reliability, as browser tab throttling can affect JavaScript timers.
  *
  * @returns {Object} - keepAliveEnabled, setKeepAliveEnabled, lastPingTime, isPinging
  */
@@ -103,15 +107,7 @@ export function useKeepAlive() {
         ping();
       }, 10 * 60 * 1000) as unknown as number; // 10 minutes
 
-      // Also do a test ping after 5 seconds for debugging
-      // Remove this in production once confirmed working
-      const debugTimeout = window.setTimeout(() => {
-        console.log('[KeepAlive] Debug ping after 5 seconds');
-        ping();
-      }, 5000);
-
       return () => {
-        clearTimeout(debugTimeout);
         if (intervalRef.current) {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
@@ -127,6 +123,24 @@ export function useKeepAlive() {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
       }
+    };
+  }, [keepAliveEnabled, ping]);
+
+  // Page Visibility API: Ping immediately when tab becomes visible
+  useEffect(() => {
+    if (!keepAliveEnabled) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[KeepAlive] Tab became visible, pinging immediately');
+        ping();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
   }, [keepAliveEnabled, ping]);
 

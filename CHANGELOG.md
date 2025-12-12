@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2025-12-12
+
+### Improved
+
+- **Keep-Alive Mechanism Enhancement**
+  - Improved UI: Relative time display ("2 min ago", "剛剛") with auto-update every second
+  - Added Page Visibility API: Immediate ping when tab becomes visible after being in background
+  - Better UX: Description text now recommends using external monitoring service (UptimeRobot)
+  - Fixed: Last ping time now updates automatically in real-time
+  - Performance: Optimized with useMemo to reduce unnecessary re-calculations
+
+### Technical
+
+- Added 4 new i18n translation keys: `justNow`, `minutesAgo`, `hoursAgo`, `keepAliveNote`
+- Updated `useKeepAlive` hook with visibilitychange event listener
+- Refactored `KeepAliveToggle` component with relative time formatting
+- Removed debug 5-second test ping (no longer needed)
+- Enhanced documentation: Added note about browser throttling limitations
+
 ### Fixed
 
 - **Keep Alive Mechanism** (2025-12-10)

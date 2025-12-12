@@ -124,6 +124,10 @@ export interface Translations {
   keepAliveDisabled: string;
   lastPing: string;
   never: string;
+  justNow: string;
+  minutesAgo: string;
+  hoursAgo: string;
+  keepAliveNote: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -246,11 +250,15 @@ export const translations: Record<Language, Translations> = {
 
     // Keep-Alive Settings
     keepAlive: 'Keep Backend Awake',
-    keepAliveDescription: 'Ping backend every 10 minutes to prevent sleep. Keep this page open for best results.',
+    keepAliveDescription: 'Ping backend every 10 minutes to prevent sleep. Works best with external monitoring service (e.g., UptimeRobot).',
     keepAliveEnabled: 'Enabled',
     keepAliveDisabled: 'Disabled',
     lastPing: 'Last ping',
     never: 'Never',
+    justNow: 'Just now',
+    minutesAgo: '{0} min ago',
+    hoursAgo: '{0} hr ago',
+    keepAliveNote: 'For 100% reliability, use external monitoring service (UptimeRobot)',
   },
   'zh-TW': {
     // Header
@@ -371,11 +379,15 @@ export const translations: Record<Language, Translations> = {
 
     // Keep-Alive Settings
     keepAlive: '保持後端運作',
-    keepAliveDescription: '每 10 分鐘 ping 後端以防止休眠。請保持頁面開啟以獲得最佳效果。',
+    keepAliveDescription: '每 10 分鐘 ping 後端以防止休眠。建議搭配外部監控服務（如 UptimeRobot）使用以獲得最佳效果。',
     keepAliveEnabled: '已啟用',
     keepAliveDisabled: '已停用',
     lastPing: '上次 ping',
     never: '從未',
+    justNow: '剛剛',
+    minutesAgo: '{0} 分鐘前',
+    hoursAgo: '{0} 小時前',
+    keepAliveNote: '若需 100% 可靠性，建議使用外部監控服務（UptimeRobot）',
   },
 };
 
