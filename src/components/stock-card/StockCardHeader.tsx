@@ -1,5 +1,4 @@
 import { memo, useMemo } from 'react';
-import { TrendingUp, TrendingDown } from 'lucide-react';
 import { AnimatedNumber } from '../common/AnimatedNumber';
 import type { StockData } from '../../types/stock';
 import type { Language } from '../../i18n/translations';
@@ -120,14 +119,10 @@ const StockCardHeader = memo(function StockCardHeader({
             className="flex items-center gap-0.5 text-xs font-medium whitespace-nowrap"
             style={{ color: priceInfo.upColor }}
           >
-            {priceInfo.isPositive ? (
-              <TrendingUp size={12} />
-            ) : (
-              <TrendingDown size={12} />
-            )}
             <span>
-              {priceInfo.isPositive ? '+' : ''}
+              {priceInfo.isPositive ? '+' : '-'}
               {formatPrice(Math.abs(stockData.change), currency)} (
+              {priceInfo.isPositive ? '+' : '-'}
               <AnimatedNumber
                 value={Math.abs(stockData.change_percent)}
                 decimals={2}

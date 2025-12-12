@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.1] - 2025-12-12
+
+### Improved
+
+- **Stock Price Display Enhancement**
+  - Added negative sign (-) for price decreases to match financial industry standards
+  - Added +/- signs to percentage change in parentheses for clarity
+  - Removed redundant trending arrow icons for cleaner UI
+  - Example: Now displays `-5.20 (-2.50%)` instead of `🔻 5.20 (2.50%)`
+  - Improves accessibility for colorblind users by providing explicit sign indicators
+
+### Technical
+
+- Updated `StockCardHeader.tsx` to display explicit +/- signs for both price and percentage changes
+- Removed `TrendingUp` and `TrendingDown` icon imports from lucide-react
+- Simplified price change display logic while maintaining color-coded indicators
+
 ## [1.9.0] - 2025-12-12
 
 ### Removed
