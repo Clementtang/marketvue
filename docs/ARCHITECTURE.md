@@ -7,19 +7,23 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 ## Architecture Diagram
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                       Frontend                           │
-│  ┌──────────────────────────────────────────────────┐  │
-│  │  React 19 + TypeScript + Vite                    │  │
-│  │  ┌────────────┐  ┌──────────────┐  ┌──────────┐ │  │
-│  │  │ Components │  │  State Mgmt  │  │ Services │ │  │
-│  │  │  - Stock   │  │  - Local     │  │ - API    │ │  │
-│  │  │    Cards   │  │    Storage   │  │   Client │ │  │
-│  │  │  - Manager │  │  - Theme     │  │ - Axios  │ │  │
-│  │  │  - Charts  │  │  - Language  │  │          │ │  │
-│  │  └────────────┘  └──────────────┘  └──────────┘ │  │
-│  └──────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                           Frontend                                │
+│  ┌───────────────────────────────────────────────────────────┐  │
+│  │  React 19 + TypeScript + Vite + Tailwind CSS v4          │  │
+│  │  ┌──────────┐  ┌──────────────┐  ┌────────┐  ┌────────┐ │  │
+│  │  │Components│  │  Context API │  │Services│  │Animation││  │
+│  │  │- Stock   │  │  - AppContext│  │- Batch │  │System  ││  │
+│  │  │  Card    │  │    (i18n,    │  │  Stock │  │- spring││  │
+│  │  │  Module  │  │     theme,   │  │  API   │  │- Fade  ││  │
+│  │  │- Manager │  │     date)    │  │  Queue │  │- Count ││  │
+│  │  │- Charts  │  │  - Visual    │  │- Axios │  │- Draw  ││  │
+│  │  │- Theme   │  │    Theme     │  │- React │  │        ││  │
+│  │  │  Guide   │  │  - Chart     │  │  Query │  │        ││  │
+│  │  │- Toast   │  │  - Toast     │  │        │  │        ││  │
+│  │  └──────────┘  └──────────────┘  └────────┘  └────────┘ │  │
+│  └───────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────┘
                             │
                     HTTP/JSON (REST API)
                             │
@@ -49,12 +53,20 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 ### Frontend
 - **React 19**: Latest version with improved performance
 - **TypeScript**: Type-safe code
-- **Vite**: Fast build tool and dev server
-- **Tailwind CSS**: Utility-first CSS framework
+- **Vite 7.1**: Fast build tool and dev server
+- **Tailwind CSS v4**: Utility-first CSS with @theme config and CSS custom properties
+- **TanStack Query**: Powerful server state management and caching
 - **Recharts**: Composable charting library
+- **react-spring**: Physics-based animation library
 - **Axios**: Promise-based HTTP client
 - **date-fns**: Modern date utility library
 - **Lucide Icons**: Beautiful SVG icon set
+- **modern-screenshot**: High-quality screenshots with modern CSS support
+- **Context API**: Global state management (AppContext, ChartContext, ToastContext, VisualThemeContext)
+- **Custom Hooks**: Reusable logic (useRetry, useStockData, useToast)
+- **Animation System**: Unified animation configuration (animations.ts)
+- **Batch API System**: Intelligent request queue and batch processing (batchStockApi)
+- **Google Fonts**: Playfair Display (serif), Inter (sans-serif), Noto Sans TC (Chinese)
 
 ### Backend
 - **Flask 3.0**: Lightweight Python web framework
@@ -72,16 +84,46 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 ```
 src/
 ├── components/
-│   ├── StockCard.tsx          # Individual stock display
-│   ├── StockManager.tsx       # Add/remove stocks
-│   ├── DashboardGrid.tsx      # Grid layout
-│   ├── TimeRangeSelector.tsx  # Date range picker
-│   ├── ThemeSettings.tsx      # Settings modal
-│   └── ColorThemeSelector.tsx # Color theme options
+│   ├── stock-card/              # Modular stock card system
+│   │   ├── StockCard.tsx        # Main component with pagination
+│   │   ├── StockCardHeader.tsx  # Company name, price, change
+│   │   ├── StockCardChart.tsx   # Price chart with MA lines
+│   │   ├── StockVolumeChart.tsx # Volume bar chart
+│   │   ├── StockCardFooter.tsx  # Chart type toggle
+│   │   ├── StockCardLoading.tsx # Skeleton loader with shimmer
+│   │   ├── StockCardError.tsx   # Error state UI
+│   │   └── hooks/
+│   │       └── useStockData.ts  # Data fetching with React Query
+│   ├── common/
+│   │   ├── Toast.tsx            # Toast notification component
+│   │   ├── AnimatedNumber.tsx   # Number counting animation
+│   │   └── ChartTooltip.tsx     # Chart tooltip component
+│   ├── StockManager.tsx         # Add/remove stocks with pagination
+│   ├── TimeRangeSelector.tsx    # Date range picker
+│   ├── DashboardGrid.tsx        # 3x3 grid layout with stagger animation
+│   ├── ScreenshotButton.tsx     # 16:9 screenshot with clipboard copy
+│   ├── ThemeSettings.tsx        # Settings modal
+│   ├── ThemeGuide.tsx           # Visual theme design guide
+│   └── ErrorBoundary.tsx        # Error boundary
+├── contexts/                    # React Context providers
+│   ├── AppContext.tsx           # i18n, theme, date range
+│   ├── ChartContext.tsx         # Chart type (candlestick/line)
+│   ├── ToastContext.tsx         # Toast notifications
+│   └── VisualThemeContext.tsx   # Visual theme (Classic/Warm Minimal)
+├── hooks/                       # Custom hooks
+│   ├── useRetry.ts              # Retry logic for API calls
+│   └── index.ts                 # Hook exports
+├── utils/
+│   ├── screenshot.ts            # Screenshot utility functions
+│   └── animations.ts            # Animation configuration
+├── config/
+│   └── chartTheme.ts            # Unified theme configuration
+├── api/
+│   └── batchStockApi.ts         # Batch request queue system
 ├── i18n/
-│   └── translations.ts        # Multi-language support
-├── App.tsx                    # Root component
-└── main.tsx                   # Application entry
+│   └── translations.ts          # Multi-language support
+├── App.tsx                      # Root component
+└── main.tsx                     # Application entry
 ```
 
 ### Backend Services (SOLID Architecture)
@@ -148,17 +190,26 @@ The backend follows **SOLID principles** with **Dependency Injection**:
 ### 1. User Adds a Stock
 
 ```
-User Input → StockManager → App State → DashboardGrid → StockCard
-                 ↓
-          localStorage (persist)
+User Input → StockManager → App State → localStorage (persist)
+                 ↓                           ↓
+          Auto-jump to last page ← DashboardGrid → StockCard
 ```
 
-### 2. Fetch Stock Data
+### 2. Fetch Stock Data (with React Query + Batch Queue)
 
 ```
-StockCard → Axios → Flask API → yfinance → Yahoo Finance
-    ↓           ↓         ↓
- Display ← Response ← Cache Check
+StockCard → useStockData (React Query)
+               ↓
+         Batch Request Queue (100ms collection window)
+               ↓
+         Merge multiple requests into single batch
+               ↓
+         Axios → Flask API → Flask-Caching (5min) → yfinance → Yahoo Finance
+               ↓         ↓                    ↓
+         React Query ← Response ← Cache Hit/Miss
+         Cache (5min stale, 30min GC)
+               ↓
+         Display with animations
 ```
 
 ### 3. Multi-language Company Names
@@ -167,6 +218,28 @@ StockCard → Axios → Flask API → yfinance → Yahoo Finance
 Stock Symbol → Backend Service → JSON Lookup → Return Name
                       ↓
                yfinance fallback (if not in JSON)
+```
+
+### 4. Visual Theme System
+
+```
+User Selection → VisualThemeContext → localStorage
+                       ↓
+         Apply theme CSS custom properties
+                       ↓
+         Components re-render with new theme
+```
+
+### 5. Animation System
+
+```
+Component Mount → react-spring hooks
+                       ↓
+         Stagger fade-in (stock cards)
+         Number counting (prices)
+         Line drawing (charts)
+                       ↓
+         Smooth 60fps animations
 ```
 
 ## Key Features Implementation
@@ -181,16 +254,58 @@ Stock Symbol → Backend Service → JSON Lookup → Return Name
 - Reduces server load
 - Real-time updates on chart
 
-### Theme System
-- CSS custom properties for colors
-- System preference detection
-- localStorage persistence
+### Visual Theme System
+- **Dual Theme Architecture**: Classic & Warm Minimal themes
+- **Classic Theme**: Modern blue tones, sans-serif fonts, professional feel
+- **Warm Minimal Theme**: Warm colors (beige, terracotta), serif fonts (Playfair Display), elegant rounded corners
+- **CSS Custom Properties**: Theme-specific color variables
+- **Dark/Light Mode**: Both themes support dark mode
+- **System Preference Detection**: Auto-detect user's color scheme preference
+- **localStorage Persistence**: Remember theme selection across sessions
+- **Theme Guide**: Interactive design guide (Warm theme exclusive)
+
+### Animation System
+- **react-spring**: Physics-based animations for natural feel
+- **Stagger Fade-in**: Stock cards appear sequentially (50ms delay)
+- **Number Counting**: Smooth price number animations with configurable duration
+- **Line Drawing**: Chart lines draw sequentially (price → MA20 → MA60 → volume)
+- **Skeleton Loading**: Shimmer effect during data fetch
+- **Hover Micro-interactions**: Scale and shadow effects on cards
+- **Performance**: GPU-accelerated transforms, 60fps target
+- **Accessibility**: Respects `prefers-reduced-motion`
 
 ### Caching Strategy
-- Backend: 5-minute cache for stock data
-- Cache backends: SimpleCache (default) or Redis (production)
-- Automatic fallback to SimpleCache if Redis fails
-- Frontend: localStorage for user preferences
+- **Backend**:
+  - Flask-Caching: 5-minute cache for stock data
+  - Cache backends: SimpleCache (default) or Redis (production)
+  - Automatic fallback to SimpleCache if Redis fails
+- **Frontend**:
+  - React Query: 5min stale time, 30min garbage collection
+  - Intelligent batch request queue (100ms collection delay)
+  - Request deduplication (reduces 89% of API calls)
+  - localStorage for user preferences and stock lists
+
+### Pagination System (v1.5.0)
+- **Capacity**: Support up to 18 stocks (2 pages × 9 stocks)
+- **Layout**: 3×3 grid per page
+- **Navigation**: Previous/Next page buttons with page indicator
+- **Smart Behavior**: Auto-jump to last page when adding new stock
+- **Persistence**: Current page saved in localStorage
+- **Screenshot Compatible**: Each page can be screenshot independently
+
+### Screenshot Feature (v1.5.0)
+- **Library**: modern-screenshot (supports modern CSS)
+- **Aspect Ratio**: 16:9 optimized for presentations
+- **Output**: High-quality PNG to clipboard
+- **Theme Support**: Works with both light/dark modes and visual themes
+- **Page Support**: Screenshot current page only (9 stocks max)
+
+### Clipboard Import/Export (v1.5.1)
+- **Export**: One-click export all stock symbols to clipboard (comma-separated)
+- **Import**: Batch import comma-separated stock symbols
+- **Smart Handling**: Automatic `.JP` ↔ `.T` symbol conversion for Japanese stocks
+- **Use Cases**: Cross-device sync, watchlist sharing, backup/restore
+- **Validation**: Invalid symbols are filtered with toast notifications
 
 ## Security Considerations
 
@@ -202,14 +317,23 @@ Stock Symbol → Backend Service → JSON Lookup → Return Name
 ## Performance Optimizations
 
 ### Frontend
-- Lazy chart rendering (double requestAnimationFrame)
-- Component memoization where appropriate
-- Vite code splitting for production
+- **Batch Request Queue**: Automatically merges multiple stock requests into single batch API call
+  - 100ms collection window
+  - Request deduplication
+  - Reduces API calls by 89%
+- **React Query Caching**: 5min stale time, 30min garbage collection
+- **Lazy Chart Rendering**: Double requestAnimationFrame for smooth rendering
+- **Component Memoization**: Strategic use of React.memo for expensive components
+- **Code Splitting**: Vite code splitting for optimal bundle size
+- **GPU-Accelerated Animations**: CSS transforms for 60fps animations
+- **Image Optimization**: Google Fonts with font-display: swap
 
 ### Backend
-- Flask-Caching for repeated requests
-- Efficient data processing
-- Minimal computation on server
+- **Flask-Caching**: 5-minute cache for stock data (634x performance improvement)
+- **Parallel Batch Processing**: ThreadPoolExecutor for concurrent stock fetching (2-3x faster)
+- **Redis Support**: Optional Redis backend for distributed caching
+- **Efficient Data Processing**: Optimized DataFrame to Dict conversion
+- **SOLID Architecture**: Single responsibility services for maintainability
 
 ## Deployment Considerations
 
@@ -225,14 +349,25 @@ Stock Symbol → Backend Service → JSON Lookup → Return Name
 
 ## Future Architecture Enhancements
 
+### Completed ✅
+- [x] Redis for distributed caching (v1.3.3 - Phase 3 Day 7)
+- [x] API versioning (v1.3.5 - Phase 3 Day 9)
+- [x] Kubernetes-ready health endpoints (v1.3.5 - Phase 3 Day 9)
+- [x] Visual theme system (v1.6.0)
+- [x] Animation system with react-spring (v1.7.0)
+- [x] Pagination for 18 stocks (v1.5.0)
+- [x] Screenshot feature (v1.5.0)
+- [x] Clipboard import/export (v1.5.1)
+- [x] Batch request queue optimization (v1.4.1)
+- [x] React Query integration (v1.4.1)
+
+### Planned 🎯
 - [ ] Real-time WebSocket updates
-- [x] Redis for distributed caching (Phase 3 Day 7)
 - [ ] PostgreSQL for user data
 - [ ] Microservices for scaling
 - [ ] GraphQL API option
 - [ ] Server-side rendering (SSR)
-- [x] API versioning (Phase 3 Day 9)
-- [x] Kubernetes-ready health endpoints (Phase 3 Day 9)
+- [ ] Multi-language news integration (Q2 2025)
 
 ---
 
