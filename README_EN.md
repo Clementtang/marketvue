@@ -41,9 +41,21 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - Each page can be screenshot independently
 
 - 🎨 **Customization Options**
-  - Color themes for price changes (Western red-up/green-down, Eastern green-up/red-down)
+  - Visual Theme System (Classic / Warm Minimal)
+    - **Warm Minimal Design**: Warm colors, serif fonts, elegant rounded corners
+    - **Classic Design**: Modern blue tones, sans-serif fonts, professional feel
+  - Price Change Color Themes (Western red-up/green-down, Eastern green-up/red-down)
   - Dark mode / Light mode
   - System auto-detection or manual switching
+  - Design Guide (exclusive to Warm Minimal theme)
+
+- ✨ **Smooth Animations & Interactions**
+  - Stock card stagger fade-in animation
+  - Smooth price number counting animation
+  - Sequential chart line drawing animation
+  - Skeleton loading animation (shimmer effect)
+  - Hover micro-interactions
+  - Unified rounded corner design system (Warm theme exclusive)
 
 - 🌐 **Multi-language Support**
   - Traditional Chinese (zh-TW)
@@ -89,7 +101,12 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 - **Flask** - Lightweight Python web framework
 - **yfinance** - Yahoo Finance stock data API
 - **Flask-CORS** - Cross-origin resource sharing support
-- **Flask-Caching** - Data caching optimization
+- **Flask-Caching** - Data caching optimization (Redis support)
+- **Flask-Limiter** - API rate limiting
+- **Marshmallow** - Request validation
+- **Gunicorn** - Production WSGI server
+- **SOLID Architecture** - Single responsibility service design
+- **API v1** - Versioned REST API (`/api/v1/*`)
 
 ## 📦 Installation
 
@@ -207,29 +224,83 @@ marketvue/
 ├── backend/                       # Flask backend
 │   ├── app.py                    # Flask main application
 │   ├── config.py                 # Configuration file
+│   ├── constants.py              # Constants definition
 │   ├── requirements.txt          # Python dependencies
 │   ├── data/
 │   │   └── company_names.json   # Multi-language company name mapping
 │   ├── routes/
 │   │   └── stock_routes.py      # API routes
-│   └── services/
-│       └── stock_service.py     # yfinance integration
+│   ├── schemas/
+│   │   └── stock_schemas.py     # Request/Response Schema
+│   ├── services/                 # SOLID architecture service layer
+│   │   ├── stock_service.py     # Coordinator (Facade)
+│   │   ├── stock_data_fetcher.py    # Data fetching
+│   │   ├── stock_data_transformer.py # Data transformation
+│   │   ├── price_calculator.py      # Price calculation
+│   │   └── company_name_service.py  # Company name service
+│   ├── utils/
+│   │   ├── decorators.py        # Error handling decorators
+│   │   └── error_handlers.py    # Error handlers
+│   └── tests/                    # Backend tests (73 tests)
 ├── src/                          # React frontend
 │   ├── components/
-│   │   ├── StockCard.tsx        # Stock card component
-│   │   ├── StockManager.tsx     # Stock manager component
-│   │   ├── TimeRangeSelector.tsx # Time range selector
-│   │   ├── DashboardGrid.tsx    # Dashboard grid
-│   │   ├── ThemeSettings.tsx    # Theme settings
-│   │   └── ColorThemeSelector.tsx # Color theme selector
+│   │   ├── stock-card/          # Stock card module
+│   │   │   ├── StockCard.tsx    # Main component
+│   │   │   ├── StockCardHeader.tsx
+│   │   │   ├── StockCardChart.tsx
+│   │   │   ├── StockVolumeChart.tsx
+│   │   │   ├── StockCardFooter.tsx
+│   │   │   ├── StockCardLoading.tsx
+│   │   │   ├── StockCardError.tsx
+│   │   │   └── hooks/useStockData.ts
+│   │   ├── common/
+│   │   │   ├── Toast.tsx        # Toast notification component
+│   │   │   ├── AnimatedNumber.tsx # Number animation component
+│   │   │   └── ChartTooltip.tsx # Chart tooltip component
+│   │   ├── StockManager.tsx
+│   │   ├── TimeRangeSelector.tsx
+│   │   ├── DashboardGrid.tsx
+│   │   ├── ScreenshotButton.tsx # Screenshot button component
+│   │   ├── ThemeSettings.tsx
+│   │   ├── ThemeGuide.tsx       # Theme design guide
+│   │   └── ErrorBoundary.tsx    # Error boundary
+│   ├── contexts/                 # React Context
+│   │   ├── AppContext.tsx       # Application settings
+│   │   ├── ChartContext.tsx     # Chart settings
+│   │   ├── ToastContext.tsx     # Toast notifications
+│   │   └── VisualThemeContext.tsx # Visual theme
+│   ├── hooks/                    # Custom Hooks
+│   │   ├── useRetry.ts          # Retry logic
+│   │   └── index.ts
+│   ├── utils/
+│   │   ├── screenshot.ts        # Screenshot utility functions
+│   │   └── animations.ts        # Animation configuration
+│   ├── config/
+│   │   └── chartTheme.ts        # Unified theme configuration
 │   ├── i18n/
 │   │   └── translations.ts      # Multi-language translations
 │   ├── App.tsx                   # Root component
 │   └── main.tsx                  # Entry point
-├── docs/                         # Documentation
+├── docs/                         # 📚 Documentation Center
+│   ├── README.md                # Documentation navigation index
+│   ├── DOCUMENTATION_GUIDE.md   # Documentation organization guide
 │   ├── API.md                   # API documentation
-│   └── ARCHITECTURE.md          # Architecture documentation
+│   ├── ARCHITECTURE.md          # Architecture documentation
+│   ├── DEPLOYMENT.md            # Deployment guide
+│   ├── DEPLOYMENT_CONFIG.md     # Deployment configuration
+│   ├── guides/                  # User guides (planned)
+│   ├── development/             # Development docs & planning
+│   ├── project-history/         # Project history (organized by Phase)
+│   │   ├── phases/              # Phase 1-3 work logs
+│   │   ├── optimizations/       # Optimization records
+│   │   ├── deployments/         # Deployment verification
+│   │   └── archive/             # Archived documents
+│   ├── security/                # Security documentation
+│   └── workflows/               # Workflow SOPs
+├── scripts/
+│   └── security-check.sh        # Security check script
 ├── package.json
+├── vercel.json                   # Vercel configuration
 ├── README.md
 └── README_EN.md
 ```
@@ -249,10 +320,51 @@ This is normal behavior, not an error. Subsequent visits will respond quickly.
 
 ## 📚 Documentation
 
-- [API Documentation](./docs/API.md) - Complete API endpoint reference
-- [Architecture Documentation](./docs/ARCHITECTURE.md) - System architecture and tech stack
-- [Contributing Guide](./CONTRIBUTING.md) - How to contribute to the project
-- [Changelog](./CHANGELOG.md) - Version history
+### Quick Navigation
+
+- **[📖 Documentation Center](./docs/README.md)** - Central navigation and index for all documentation
+- **[📋 Documentation Guide](./docs/DOCUMENTATION_GUIDE.md)** - How to organize and maintain project documentation
+
+### Technical Documentation
+
+- **[API Documentation](./docs/API.md)** - Complete API endpoint reference
+- **[Architecture Documentation](./docs/ARCHITECTURE.md)** - System architecture and technology stack
+- **[Deployment Guide](./docs/DEPLOYMENT.md)** - Vercel + Render deployment setup
+- **[Deployment Configuration](./docs/DEPLOYMENT_CONFIG.md)** - Environment variables and configuration details
+
+### Project Management
+
+- **[Project Progress Summary](./docs/project-history/PROJECT_PROGRESS_SUMMARY.md)** - Complete Phase 1-3 records
+- **[Recent Changes Timeline](./docs/project-history/recent-changes-timeline.md)** - Latest features and optimizations
+- **[Changelog](./CHANGELOG.md)** - Version change history
+- **[Roadmap](./ROADMAP.md)** - Future plans
+
+### Development Resources
+
+- **[Development Documentation](./docs/development/)** - Technical planning and meeting notes
+- **[Project History](./docs/project-history/)** - Work logs organized by phase
+  - [Phase 1: CI/CD + Testing Foundation](./docs/project-history/phases/phase1/)
+  - [Phase 2: Frontend Refactoring](./docs/project-history/phases/phase2/)
+  - [Phase 3: Backend Refactoring](./docs/project-history/phases/phase3/)
+- **[Security Documentation](./docs/security/README.md)** - Security audits and implementation guides
+- **[Workflows](./docs/workflows/)** - Branch management and quick reference
+
+### Contributing Guide
+
+- **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute to the project
+
+## 🧪 Testing
+
+```bash
+# Frontend tests (130 tests)
+npm test
+
+# Backend tests (73 tests)
+cd backend && source venv/bin/activate
+python -m pytest tests/ -v
+```
+
+Test coverage: Frontend 85%+ / Backend 87%+
 
 ## 🤝 Contributing
 
