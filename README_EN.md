@@ -356,15 +356,15 @@ This is normal behavior, not an error. Subsequent visits will respond quickly.
 ## 🧪 Testing
 
 ```bash
-# Frontend tests (130 tests)
+# Frontend tests (145 tests)
 npm test
 
-# Backend tests (73 tests)
+# Backend tests (215 tests)
 cd backend && source venv/bin/activate
 python -m pytest tests/ -v
 ```
 
-Test coverage: Frontend 85%+ / Backend 87%+
+Test coverage: Frontend 85%+ / Backend 89.87%
 
 ## 🤝 Contributing
 

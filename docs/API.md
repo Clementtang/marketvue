@@ -408,6 +408,148 @@ curl http://localhost:5001/api/v1/health/detailed
 
 ---
 
+## JavaScript / Axios Examples
+
+### Fetch Single Stock Data
+
+```javascript
+import axios from 'axios';
+
+async function getStockData(symbol, startDate, endDate) {
+  try {
+    const response = await axios.post('http://localhost:5001/api/v1/stock-data', {
+      symbol,
+      start_date: startDate,
+      end_date: endDate
+    });
+
+    console.log('Stock Data:', response.data);
+    return response.data;
+  } catch (error) {
+    if (error.response) {
+      // Server responded with error status
+      console.error('Error:', error.response.data.error);
+      console.error('Status:', error.response.status);
+    } else if (error.request) {
+      // Request made but no response
+      console.error('No response from server');
+    } else {
+      // Error in request setup
+      console.error('Request error:', error.message);
+    }
+    throw error;
+  }
+}
+
+// Usage
+getStockData('2330.TW', '2024-10-01', '2024-10-31');
+```
+
+### Fetch Multiple Stocks (Parallel)
+
+```javascript
+async function getBatchStocksParallel(symbols, startDate, endDate, maxWorkers = 5) {
+  try {
+    const response = await axios.post('http://localhost:5001/api/v1/batch-stocks-parallel', {
+      symbols,
+      start_date: startDate,
+      end_date: endDate,
+      max_workers: maxWorkers
+    });
+
+    const { stocks, errors, processing_time_ms } = response.data;
+
+    console.log(`Fetched ${stocks.length} stocks in ${processing_time_ms}ms`);
+
+    if (errors && errors.length > 0) {
+      console.warn('Some stocks failed:', errors);
+    }
+
+    return response.data;
+  } catch (error) {
+    console.error('Batch request failed:', error.response?.data || error.message);
+    throw error;
+  }
+}
+
+// Usage
+getBatchStocksParallel(
+  ['AAPL', '2330.TW', 'GOOGL', '0700.HK'],
+  '2024-10-01',
+  '2024-10-31'
+);
+```
+
+### Error Handling with Retry Logic
+
+```javascript
+async function fetchWithRetry(symbol, startDate, endDate, maxRetries = 3) {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const response = await axios.post(
+        'http://localhost:5001/api/v1/stock-data',
+        {
+          symbol,
+          start_date: startDate,
+          end_date: endDate
+        },
+        {
+          timeout: 30000, // 30 second timeout
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      const status = error.response?.status;
+
+      // Don't retry on 4xx errors (client errors)
+      if (status && status >= 400 && status < 500) {
+        throw error;
+      }
+
+      // Retry on 5xx errors (server errors) or network issues
+      if (attempt < maxRetries) {
+        const delay = Math.min(1000 * Math.pow(2, attempt), 10000);
+        console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      } else {
+        throw error;
+      }
+    }
+  }
+}
+
+// Usage
+fetchWithRetry('2330.TW', '2024-10-01', '2024-10-31')
+  .then(data => console.log('Success:', data))
+  .catch(error => console.error('Failed after retries:', error));
+```
+
+### Health Check Monitoring
+
+```javascript
+async function checkServiceHealth() {
+  try {
+    const response = await axios.get('http://localhost:5001/api/v1/health/detailed');
+    const health = response.data;
+
+    console.log('Service Status:', health.status);
+    console.log('Uptime:', health.uptime.formatted);
+    console.log('Cache Status:', health.dependencies.cache.status);
+
+    return health.status === 'healthy';
+  } catch (error) {
+    console.error('Health check failed:', error.message);
+    return false;
+  }
+}
+
+// Periodic health check
+setInterval(checkServiceHealth, 60000); // Every 60 seconds
+```
+
+---
+
 ## Notes
 
 - All dates should be in `YYYY-MM-DD` format

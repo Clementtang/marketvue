@@ -363,15 +363,15 @@ marketvue/
 ## 🧪 測試
 
 ```bash
-# 前端測試 (130 tests)
+# 前端測試 (145 tests)
 npm test
 
-# 後端測試 (73 tests)
+# 後端測試 (215 tests)
 cd backend && source venv/bin/activate
 python -m pytest tests/ -v
 ```
 
-測試覆蓋率：前端 85%+ / 後端 87%+
+測試覆蓋率：前端 85%+ / 後端 89.87%
 
 ## 🤝 貢獻
 
