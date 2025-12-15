@@ -1,8 +1,9 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, type ReactNode } from 'react';
 import type { Language } from '../i18n/translations';
 import type { ColorTheme } from '../components/ColorThemeSelector';
 import { COLOR_THEMES } from '../components/ColorThemeSelector';
 import type { ThemeMode } from '../components/ThemeSettings';
+import { usePersistedState } from '../hooks/usePersistedState';
 
 interface AppContextType {
   language: Language;
@@ -28,42 +29,10 @@ interface AppProviderProps {
 }
 
 export function AppProvider({ children }: AppProviderProps) {
-  const [language, setLanguageState] = useState<Language>('en-US');
-  const [colorTheme, setColorThemeState] = useState<ColorTheme>(COLOR_THEMES[1]); // Western style
-  const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedLanguage = localStorage.getItem('language');
-    if (savedLanguage) {
-      try {
-        setLanguageState(savedLanguage as Language);
-      } catch (e) {
-        console.error('Failed to load saved language:', e);
-      }
-    }
-
-    const savedColorTheme = localStorage.getItem('color-theme');
-    if (savedColorTheme) {
-      try {
-        setColorThemeState(JSON.parse(savedColorTheme));
-      } catch (e) {
-        console.error('Failed to load saved color theme:', e);
-      }
-    }
-
-    const savedThemeMode = localStorage.getItem('theme-mode');
-    if (savedThemeMode) {
-      try {
-        setThemeModeState(savedThemeMode as ThemeMode);
-      } catch (e) {
-        console.error('Failed to load saved theme mode:', e);
-      }
-    }
-
-    setIsInitialized(true);
-  }, []);
+  // Use persisted state for all three values
+  const [language, setLanguage] = usePersistedState<Language>('language', 'en-US');
+  const [colorTheme, setColorTheme] = usePersistedState<ColorTheme>('color-theme', COLOR_THEMES[1]);
+  const [themeMode, setThemeMode] = usePersistedState<ThemeMode>('theme-mode', 'system');
 
   // Apply dark mode based on theme mode
   useEffect(() => {
@@ -91,28 +60,6 @@ export function AppProvider({ children }: AppProviderProps) {
       return () => mediaQuery.removeEventListener('change', listener);
     }
   }, [themeMode]);
-
-  // Save to localStorage with wrapper functions
-  const setLanguage = (lang: Language) => {
-    setLanguageState(lang);
-    if (isInitialized) {
-      localStorage.setItem('language', lang);
-    }
-  };
-
-  const setColorTheme = (theme: ColorTheme) => {
-    setColorThemeState(theme);
-    if (isInitialized) {
-      localStorage.setItem('color-theme', JSON.stringify(theme));
-    }
-  };
-
-  const setThemeMode = (mode: ThemeMode) => {
-    setThemeModeState(mode);
-    if (isInitialized) {
-      localStorage.setItem('theme-mode', mode);
-    }
-  };
 
   const value: AppContextType = {
     language,

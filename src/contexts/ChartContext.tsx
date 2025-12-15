@@ -1,6 +1,7 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { format, subMonths } from 'date-fns';
 import type { DateRange } from '../components/TimeRangeSelector';
+import { usePersistedState } from '../hooks/usePersistedState';
 
 interface ChartContextType {
   chartType: 'line' | 'candlestick';
@@ -27,55 +28,17 @@ interface ChartProviderProps {
 }
 
 export function ChartProvider({ children }: ChartProviderProps) {
-  const [chartType, setChartTypeState] = useState<'line' | 'candlestick'>('line');
-  const [dateRange, setDateRangeState] = useState<DateRange>({
+  // Use persisted state for chart preferences
+  const [chartType, setChartType] = usePersistedState<'line' | 'candlestick'>('chart-type', 'line');
+  const [dateRange, setDateRange] = usePersistedState<DateRange>('date-range', {
     startDate: format(subMonths(new Date(), 1), 'yyyy-MM-dd'),
     endDate: format(new Date(), 'yyyy-MM-dd'),
     preset: '1m',
   });
-  const [currentPage, setCurrentPageState] = useState(1);
-  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Current page does not need persistence - always start from page 1 on refresh
+  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9; // 3x3 grid
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedChartType = localStorage.getItem('chart-type');
-    if (savedChartType === 'candlestick' || savedChartType === 'line') {
-      setChartTypeState(savedChartType);
-    }
-
-    const savedDateRange = localStorage.getItem('date-range');
-    if (savedDateRange) {
-      try {
-        setDateRangeState(JSON.parse(savedDateRange));
-      } catch (e) {
-        console.error('Failed to load saved date range:', e);
-      }
-    }
-
-    setIsInitialized(true);
-  }, []);
-
-  // Save to localStorage with wrapper functions
-  const setChartType = (type: 'line' | 'candlestick') => {
-    setChartTypeState(type);
-    if (isInitialized) {
-      localStorage.setItem('chart-type', type);
-    }
-  };
-
-  const setDateRange = (range: DateRange) => {
-    setDateRangeState(range);
-    if (isInitialized) {
-      localStorage.setItem('date-range', JSON.stringify(range));
-    }
-  };
-
-  const setCurrentPage = (page: number) => {
-    setCurrentPageState(page);
-    // No need to persist page number to localStorage
-    // Always start from page 1 on refresh
-  };
 
   const value: ChartContextType = {
     chartType,

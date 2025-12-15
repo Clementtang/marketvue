@@ -11,3 +11,5 @@ export {
   type UseRetryOptions,
   type UseRetryReturn,
 } from './useRetry';
+
+export { usePersistedState } from './usePersistedState';
