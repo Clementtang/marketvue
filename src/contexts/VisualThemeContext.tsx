@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
+import { logger } from '../utils/logger';
 
 // Visual theme types (Classic vs Warm Minimal)
 // Note: This is different from ColorTheme in ColorThemeSelector (Eastern/Western price colors)
@@ -28,7 +29,7 @@ export function VisualThemeProvider({ children }: VisualThemeProviderProps) {
         return stored;
       }
     } catch (error) {
-      console.error('Failed to load visual theme from localStorage:', error);
+      logger.error('Failed to load visual theme from localStorage:', error);
     }
     return DEFAULT_THEME;
   });
@@ -38,7 +39,7 @@ export function VisualThemeProvider({ children }: VisualThemeProviderProps) {
     try {
       localStorage.setItem(STORAGE_KEY, visualTheme);
     } catch (error) {
-      console.error('Failed to save visual theme to localStorage:', error);
+      logger.error('Failed to save visual theme to localStorage:', error);
     }
   }, [visualTheme]);
 

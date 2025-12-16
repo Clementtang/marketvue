@@ -1,6 +1,7 @@
 import axios from 'axios';
 import type { StockData, StockDataPoint } from '../types/stock';
 import { API_CONFIG, MA_PERIODS } from '../config/constants';
+import { logger } from '../utils/logger';
 
 /**
  * Batch Stock API Service
@@ -73,7 +74,7 @@ export async function fetchBatchStocks(
     chunks.push(symbols.slice(i, i + MAX_BATCH_SIZE));
   }
 
-  console.log(`[BatchAPI] Processing ${symbols.length} stocks in ${chunks.length} batch(es)`);
+  logger.debug(`[BatchAPI] Processing ${symbols.length} stocks in ${chunks.length} batch(es)`);
 
   // Process each chunk
   const promises = chunks.map(async (chunk) => {
@@ -101,7 +102,7 @@ export async function fetchBatchStocks(
         result.set(error.symbol, new Error(error.error));
       });
 
-      console.log(
+      logger.debug(
         `[BatchAPI] Batch completed: ${response.data.stocks?.length || 0} success, ` +
         `${response.data.errors?.length || 0} errors (${response.data.processing_time_ms}ms)`
       );
@@ -113,7 +114,7 @@ export async function fetchBatchStocks(
           : 'Unknown error';
         result.set(symbol, new Error(errorMessage));
       });
-      console.error(`[BatchAPI] Batch request failed:`, error);
+      logger.error(`[BatchAPI] Batch request failed:`, error);
     }
   });
 
@@ -191,7 +192,7 @@ class StockRequestQueue {
     this.queue.clear();
     this.timer = null;
 
-    console.log(`[RequestQueue] Processing batch of ${items.length} requests`);
+    logger.debug(`[RequestQueue] Processing batch of ${items.length} requests`);
 
     // Group by date range
     const groups = new Map<string, typeof items>();

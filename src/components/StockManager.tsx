@@ -4,6 +4,7 @@ import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { useToast } from '../contexts/ToastContext';
+import { logger } from '../utils/logger';
 
 interface StockManagerProps {
   stocks: string[];
@@ -69,7 +70,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
         `${t.exportedToClipboard || 'Exported to clipboard'}: ${stocks.length} ${t.stocksAdded || 'stocks'}`
       );
     } catch (err) {
-      console.error('Failed to copy to clipboard:', err);
+      logger.error('Failed to copy to clipboard:', err);
       showToast('error', t.exportFailed || 'Failed to export to clipboard');
     }
   };
@@ -130,7 +131,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
         );
       }
     } catch (err) {
-      console.error('Failed to read clipboard:', err);
+      logger.error('Failed to read clipboard:', err);
       showToast('error', t.importFailed || 'Failed to import from clipboard');
     }
   };

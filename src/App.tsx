@@ -18,6 +18,7 @@ import { ToastProvider } from './contexts/ToastContext';
 import { VisualThemeProvider, useVisualTheme } from './contexts/VisualThemeContext';
 import { ToastContainer } from './components/common/Toast';
 import { queryClient } from './config/queryClient';
+import { logger } from './utils/logger';
 
 function AppContent() {
   // Use Context hooks
@@ -40,7 +41,7 @@ function AppContent() {
       try {
         setStocks(JSON.parse(savedStocks));
       } catch (e) {
-        console.error('Failed to load saved stocks:', e);
+        logger.error('Failed to load saved stocks:', e);
       }
     }
     setIsInitialized(true);

@@ -1,4 +1,5 @@
 import { domToPng } from 'modern-screenshot';
+import { logger } from './logger';
 
 /**
  * Capture a DOM element as an image and copy to clipboard
@@ -12,7 +13,7 @@ export async function captureAndCopyToClipboard(
   try {
     const element = document.getElementById(elementId);
     if (!element) {
-      console.error(`Element with id "${elementId}" not found`);
+      logger.error(`Element with id "${elementId}" not found`);
       return false;
     }
 
@@ -44,10 +45,10 @@ export async function captureAndCopyToClipboard(
       }),
     ]);
 
-    console.log('Screenshot copied to clipboard successfully');
+    logger.info('Screenshot copied to clipboard successfully');
     return true;
   } catch (error) {
-    console.error('Failed to capture screenshot:', error);
+    logger.error('Failed to capture screenshot:', error);
     return false;
   }
 }

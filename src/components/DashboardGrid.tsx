@@ -12,6 +12,7 @@ import { useApp } from '../contexts/AppContext';
 import { useChart } from '../contexts/ChartContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { animations } from '../utils/animations';
+import { logger } from '../utils/logger';
 
 interface DashboardGridProps {
   stocks: string[];
@@ -133,7 +134,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           return acc;
         }, {} as Record<string, GridLayout.Layout>);
       } catch (e) {
-        console.error('Failed to load saved layout:', e);
+        logger.error('Failed to load saved layout:', e);
         localStorage.removeItem('dashboard-layout');
       }
     }
@@ -200,7 +201,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
               return acc;
             }, {} as Record<string, GridLayout.Layout>);
           } catch (e) {
-            console.error('Failed to parse saved layout:', e);
+            logger.error('Failed to parse saved layout:', e);
           }
         }
 
