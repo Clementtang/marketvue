@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, type ReactNode } from 'react';
 import { format, subMonths } from 'date-fns';
 import type { DateRange } from '../components/TimeRangeSelector';
 import { usePersistedState } from '../hooks/usePersistedState';
@@ -8,8 +8,6 @@ interface ChartContextType {
   setChartType: (type: 'line' | 'candlestick') => void;
   dateRange: DateRange;
   setDateRange: (range: DateRange) => void;
-  currentPage: number;
-  setCurrentPage: (page: number) => void;
   itemsPerPage: number;
 }
 
@@ -36,8 +34,6 @@ export function ChartProvider({ children }: ChartProviderProps) {
     preset: '1m',
   });
 
-  // Current page does not need persistence - always start from page 1 on refresh
-  const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 9; // 3x3 grid
 
   const value: ChartContextType = {
@@ -45,8 +41,6 @@ export function ChartProvider({ children }: ChartProviderProps) {
     setChartType,
     dateRange,
     setDateRange,
-    currentPage,
-    setCurrentPage,
     itemsPerPage,
   };
 

@@ -22,9 +22,12 @@ interface DashboardGridProps {
 const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   // Use Context
   const { language } = useApp();
-  const { chartType, setChartType, currentPage, setCurrentPage, itemsPerPage } = useChart();
+  const { chartType, setChartType, itemsPerPage } = useChart();
   const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
+
+  // Local state for pagination (no need to be global)
+  const [currentPage, setCurrentPage] = useState(1);
 
   const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
   const [containerWidth, setContainerWidth] = useState(1200);
@@ -293,7 +296,13 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
         <div className="flex items-center gap-3">
           {/* Page Navigator (only show if multiple pages) */}
-          <PageNavigator totalItems={stocks.length} language={language} />
+          <PageNavigator
+            totalItems={stocks.length}
+            language={language}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+          />
 
           {/* Chart Type Toggle Button */}
           <button

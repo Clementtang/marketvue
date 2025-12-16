@@ -1,11 +1,13 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useChart } from '../contexts/ChartContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
 import type { Language } from '../i18n/translations';
 
 interface PageNavigatorProps {
   totalItems: number;
   language: Language;
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  itemsPerPage: number;
 }
 
 /**
@@ -13,8 +15,13 @@ interface PageNavigatorProps {
  * Displays pagination controls for navigating between pages of stock cards
  * Only shown when there are more than 9 stocks (multiple pages)
  */
-const PageNavigator = ({ totalItems, language }: PageNavigatorProps) => {
-  const { currentPage, setCurrentPage, itemsPerPage } = useChart();
+const PageNavigator = ({
+  totalItems,
+  language,
+  currentPage,
+  setCurrentPage,
+  itemsPerPage
+}: PageNavigatorProps) => {
   const { visualTheme } = useVisualTheme();
 
   // Calculate total pages
