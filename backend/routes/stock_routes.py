@@ -8,6 +8,7 @@ from schemas.stock_schemas import (
     BatchStocksResponseSchema
 )
 from utils.cache import cache
+from utils.cache_keys import CacheKeyBuilder
 from utils.decorators import handle_errors, log_request
 from constants import CACHE_TIMEOUT_SECONDS, HTTP_OK
 import logging
@@ -45,13 +46,13 @@ def set_stock_service(service: StockService):
     _stock_service = service
 
 
-# Cache key functions
+# Cache key functions (using CacheKeyBuilder for consistency)
 def make_stock_data_cache_key():
     """
     Generate cache key for stock data requests.
 
-    Creates a unique cache key based on symbol and date range from the request JSON.
-    Returns None if request data is invalid or an error occurs.
+    Wrapper function that extracts parameters from Flask request context
+    and delegates to CacheKeyBuilder for key generation.
 
     Returns:
         str: Cache key in format "stock_data:{SYMBOL}:{start_date}:{end_date}"
@@ -66,12 +67,12 @@ def make_stock_data_cache_key():
         if not data:
             return None
 
-        symbol = data.get('symbol', '').upper()
+        symbol = data.get('symbol', '')
         start_date = data.get('start_date', '')
         end_date = data.get('end_date', '')
 
-        # Create cache key from request parameters
-        cache_key = f"stock_data:{symbol}:{start_date}:{end_date}"
+        # Delegate to CacheKeyBuilder for consistent key generation
+        cache_key = CacheKeyBuilder.build_stock_key(symbol, start_date, end_date)
         logger.debug(f"Generated cache key: {cache_key}")
         return cache_key
     except Exception as e:
@@ -83,9 +84,8 @@ def make_batch_stocks_cache_key():
     """
     Generate cache key for batch stocks requests.
 
-    Creates a unique cache key based on sorted symbols list and date range.
-    Symbols are sorted alphabetically to ensure consistent cache keys regardless
-    of the order they appear in the request.
+    Wrapper function that extracts parameters from Flask request context
+    and delegates to CacheKeyBuilder for key generation.
 
     Returns:
         str: Cache key in format "batch_stocks:{SYMBOL1,SYMBOL2}:{start_date}:{end_date}"
@@ -100,13 +100,12 @@ def make_batch_stocks_cache_key():
         if not data:
             return None
 
-        symbols = sorted([s.upper() for s in data.get('symbols', [])])
+        symbols = data.get('symbols', [])
         start_date = data.get('start_date', 'none')
         end_date = data.get('end_date', 'none')
 
-        # Create cache key from request parameters
-        symbols_str = ','.join(symbols)
-        cache_key = f"batch_stocks:{symbols_str}:{start_date}:{end_date}"
+        # Delegate to CacheKeyBuilder for consistent key generation
+        cache_key = CacheKeyBuilder.build_batch_key(symbols, start_date, end_date)
         logger.debug(f"Generated cache key: {cache_key}")
         return cache_key
     except Exception as e:
