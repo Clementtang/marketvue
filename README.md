@@ -69,6 +69,16 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
   - 一鍵切換不同清單
   - 舊資料自動遷移至預設清單
 
+- 🔍 **智慧搜尋建議**
+  - 即時搜尋自動完成（代號、公司名稱、別名）
+  - 內建 ~374 檔熱門股票資料庫
+  - 雙語股票名稱（中文/英文）
+  - 依相關度評分排序結果
+  - 彩色市場標籤（台股上市/上櫃/美股/日股/港股）
+  - 鍵盤導航支援（上/下箭頭、Enter、Escape）
+  - 已追蹤股票顯示勾選標記
+  - 手動輸入未收錄的股票代號
+
 - 💾 **本地儲存**
   - 追蹤列表自動保存
   - 使用者偏好設定記憶
@@ -169,14 +179,14 @@ PORT=5001 python app.py
 ## 🚀 使用說明
 
 1. **添加股票**
-   - 在輸入框中輸入股票代碼
+   - 在搜尋框中輸入股票代碼或公司名稱
+   - 從下拉建議中選擇股票，或按 Enter 手動新增
    - 支援的格式：
      - 台股上市：`2330.TW`（台積電）
      - 台股上櫃：`5904.TWO`（寶雅）
      - 美股：`AAPL`（蘋果）
      - 港股：`0700.HK`（騰訊）
      - 日股：`9983.JP`（FAST RETAILING）
-   - 點擊「新增」按鈕
    - 每個清單最多可追蹤 18 支股票
 
 2. **管理觀察清單**
@@ -286,6 +296,7 @@ marketvue/
 │   │   │   ├── AnimatedNumber.tsx # 數字動畫組件
 │   │   │   └── ChartTooltip.tsx # 圖表提示框組件
 │   │   ├── StockManager.tsx
+│   │   ├── StockSearchInput.tsx  # 股票搜尋輸入元件
 │   │   ├── TimeRangeSelector.tsx
 │   │   ├── DashboardGrid.tsx
 │   │   ├── ScreenshotButton.tsx # 截圖按鈕組件
@@ -301,9 +312,19 @@ marketvue/
 │   ├── hooks/                    # Custom Hooks
 │   │   ├── useRetry.ts          # 重試邏輯
 │   │   ├── useStockListReducer.ts # 清單狀態 Reducer
+│   │   ├── useStockSearch.ts    # 股票搜尋 Hook
 │   │   └── index.ts
+│   ├── data/
+│   │   └── stocks/              # 股票搜尋資料庫
+│   │       ├── tw-listed.json   # 台股上市 (~100 檔)
+│   │       ├── tw-otc.json      # 台股上櫃 (~54 檔)
+│   │       ├── us-popular.json  # 美股熱門 (~120 檔)
+│   │       ├── jp-popular.json  # 日股熱門 (~50 檔)
+│   │       ├── hk-popular.json  # 港股熱門 (~50 檔)
+│   │       └── index.ts         # 資料匯出
 │   ├── types/
-│   │   └── stockList.ts         # 清單型別定義
+│   │   ├── stockList.ts         # 清單型別定義
+│   │   └── stockSearch.ts       # 搜尋型別定義
 │   ├── utils/
 │   │   ├── screenshot.ts        # 截圖工具函式
 │   │   ├── animations.ts        # 動畫配置與工具

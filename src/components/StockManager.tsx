@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, X, Copy, ClipboardPaste } from 'lucide-react';
+import { X, Copy, ClipboardPaste } from 'lucide-react';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
@@ -12,6 +12,7 @@ import {
   RenameListModal,
   DeleteListConfirm,
 } from './stock-list';
+import { StockSearchInput } from './StockSearchInput';
 import type { StockList } from '../types/stockList';
 import { STOCK_LIST_CONFIG } from '../config/constants';
 
@@ -29,7 +30,6 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   const { showToast } = useToast();
   const { isStockLimitReached, actions } = useStockList();
 
-  const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
 
   // Modal states
@@ -88,18 +88,11 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    let symbol = inputValue.trim().toUpperCase();
-
-    if (!symbol) {
-      setError(t.pleaseEnterSymbol);
-      return;
-    }
-
+  const handleAddStock = (symbol: string) => {
     // Convert .JP to .T for Japanese stocks (yfinance requirement)
-    if (symbol.endsWith('.JP')) {
-      symbol = symbol.replace(/\.JP$/, '.T');
+    let processedSymbol = symbol;
+    if (processedSymbol.endsWith('.JP')) {
+      processedSymbol = processedSymbol.replace(/\.JP$/, '.T');
     }
 
     if (stocks.length >= STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST) {
@@ -107,13 +100,12 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
       return;
     }
 
-    if (stocks.includes(symbol)) {
+    if (stocks.includes(processedSymbol)) {
       setError(t.stockAlreadyAdded);
       return;
     }
 
-    onAddStock(symbol);
-    setInputValue('');
+    onAddStock(processedSymbol);
     setError('');
   };
 
@@ -244,44 +236,20 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           </div>
         </div>
 
-      {/* Add Stock Form */}
-      <form onSubmit={handleSubmit} className="mb-4">
-        <div className="flex gap-2">
-          <input
-            type="text"
-            value={inputValue}
-            onChange={(e) => {
-              setInputValue(e.target.value);
-              setError('');
-            }}
-            placeholder="TW Listed: 2330.TW | TW OTC: 5904.TWO | US: AAPL | JP: 9983.JP"
-            className={`flex-1 px-4 py-2 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none transition-colors ${
-              visualTheme === 'warm'
-                ? 'border-warm-300 dark:border-warm-600 rounded-2xl focus:ring-2 focus:ring-warm-accent-500 focus:border-transparent'
-                : 'border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
-            }`}
-            maxLength={10}
-          />
-          <button
-            type="submit"
-            disabled={isStockLimitReached}
-            className={`px-4 py-2 text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors ${
-              visualTheme === 'warm'
-                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
-                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg'
-            }`}
-          >
-            <Plus size={20} />
-            {t.add}
-          </button>
-        </div>
+      {/* Add Stock Search */}
+      <div className="mb-4">
+        <StockSearchInput
+          trackedSymbols={stocks}
+          onSelectStock={handleAddStock}
+          disabled={isStockLimitReached}
+        />
         {error && (
           <p className="text-red-500 dark:text-red-400 text-sm mt-2">{error}</p>
         )}
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
           {stocks.length}/{STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST} {t.stocksAdded}
         </p>
-      </form>
+      </div>
 
         {/* Stock List Section */}
         <div>

@@ -138,6 +138,16 @@ export interface Translations {
   deleteListWarning: string;
   listContainsStocks: string;
   maxListsReached: string;
+
+  // Stock Search
+  searchPlaceholder: string;
+  noSearchResults: string;
+  tryEnterSymbol: string;
+  marketTW: string;
+  marketTWO: string;
+  marketUS: string;
+  marketJP: string;
+  marketHK: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -279,6 +289,16 @@ export const translations: Record<Language, Translations> = {
     deleteListWarning: 'This action cannot be undone.',
     listContainsStocks: 'This list contains {count} stocks.',
     maxListsReached: 'Maximum lists reached (5)',
+
+    // Stock Search
+    searchPlaceholder: 'Search stock symbol or name...',
+    noSearchResults: 'No matching stocks found',
+    tryEnterSymbol: 'Press Enter to add manually',
+    marketTW: 'TW Listed',
+    marketTWO: 'TW OTC',
+    marketUS: 'US',
+    marketJP: 'JP',
+    marketHK: 'HK',
   },
   'zh-TW': {
     // Header
@@ -418,6 +438,16 @@ export const translations: Record<Language, Translations> = {
     deleteListWarning: '此操作無法復原。',
     listContainsStocks: '此清單包含 {count} 檔股票。',
     maxListsReached: '已達清單數量上限（5 個）',
+
+    // Stock Search
+    searchPlaceholder: '搜尋股票代號或名稱...',
+    noSearchResults: '找不到符合的股票',
+    tryEnterSymbol: '按 Enter 手動新增',
+    marketTW: '台股上市',
+    marketTWO: '台股上櫃',
+    marketUS: '美股',
+    marketJP: '日股',
+    marketHK: '港股',
   },
 };
 

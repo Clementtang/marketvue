@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2025-12-17
+
+### Added
+
+- **Stock Search with Autocomplete** (Phase 2 Complete)
+  - **Smart Search**: Search stocks by symbol, company name, or aliases
+  - **Autocomplete Suggestions**: Real-time dropdown suggestions as you type
+  - **Multi-Market Support**: Covers 5 markets with ~374 popular stocks
+    - Taiwan Listed (TW): ~100 stocks
+    - Taiwan OTC (TWO): ~54 stocks
+    - US Market: ~120 stocks
+    - Japan (JP): ~50 stocks
+    - Hong Kong (HK): ~50 stocks
+  - **Bilingual Stock Names**: Chinese and English names for all stocks
+  - **Relevance Scoring**: Results ranked by match quality
+    - Exact symbol match: 100 points
+    - Symbol starts with: 80 points
+    - Symbol contains: 60 points
+    - Name starts with: 50 points
+    - Alias match: 40 points
+    - Name contains: 30 points
+  - **Keyboard Navigation**: Arrow keys, Enter, Escape support
+  - **Market Badges**: Color-coded market indicators (TW/TWO/US/JP/HK)
+  - **Tracked Indicator**: Checkmark icon for already-tracked stocks
+  - **Manual Entry Fallback**: Press Enter to add unlisted symbols manually
+
+- **New Components**:
+  - `StockSearchInput`: Search input with integrated dropdown suggestions
+    - Auto-open dropdown on typing
+    - Click-outside to close
+    - Keyboard navigation support
+    - Clear button for quick reset
+
+- **New Data Files**:
+  - `src/data/stocks/tw-listed.json` - Taiwan listed stocks
+  - `src/data/stocks/tw-otc.json` - Taiwan OTC stocks
+  - `src/data/stocks/us-popular.json` - US popular stocks
+  - `src/data/stocks/jp-popular.json` - Japan popular stocks
+  - `src/data/stocks/hk-popular.json` - Hong Kong popular stocks
+  - `src/data/stocks/index.ts` - Unified data export
+
+- **New Hook**:
+  - `useStockSearch`: Search logic with scoring and filtering
+
+- **New Types**:
+  - `src/types/stockSearch.ts` - Search-related type definitions
+    - `StockEntry`, `SearchResult`, `SearchOptions`
+    - `MarketCode`, `BilingualName`, `MarketInfo`
+    - `SEARCH_SCORES`, `MARKET_INFO` constants
+
+### Improved
+
+- **Stock Input UX**: Replaced plain text input with smart search component
+  - More intuitive stock discovery
+  - Reduced typos and invalid symbols
+  - Faster stock addition workflow
+
+### Technical
+
+- **Static Data Approach**: Offline-capable, no API cost for search
+- **Pre-loaded Data**: All stocks loaded once on app initialization
+- **Efficient Search**: O(n) search with early termination
+- **Files Added**:
+  - `src/types/stockSearch.ts` - Type definitions
+  - `src/data/stocks/*.json` - Stock data files (5 files)
+  - `src/data/stocks/index.ts` - Data export utilities
+  - `src/hooks/useStockSearch.ts` - Search hook
+  - `src/components/StockSearchInput.tsx` - Search UI component
+- **Files Modified**:
+  - `src/components/StockManager.tsx` - Integrated search component
+  - `src/i18n/translations.ts` - Added 8 new translation keys
+
 ## [1.10.0] - 2025-12-17
 
 ### Added

@@ -62,9 +62,27 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - English (en-US)
   - Multi-language company name mapping (36+ companies)
 
+- 📋 **Multi-List Management**
+  - Up to 5 custom watchlists
+  - Each list can track up to 18 stocks
+  - Create, rename, delete lists
+  - One-click list switching
+  - Auto-migration of existing data to default list
+
+- 🔍 **Smart Search Suggestions**
+  - Real-time autocomplete (symbol, company name, aliases)
+  - Built-in database of ~374 popular stocks
+  - Bilingual stock names (Chinese/English)
+  - Results ranked by relevance score
+  - Color-coded market badges (TW Listed/OTC/US/JP/HK)
+  - Keyboard navigation (Arrow keys, Enter, Escape)
+  - Checkmark indicator for tracked stocks
+  - Manual entry for unlisted symbols
+
 - 💾 **Local Storage**
   - Auto-save tracking list
   - Remember user preference settings
+  - Schema versioning for future migrations
 
 - ⚡ **Performance Optimization**
   - Intelligent batch request mechanism (automatically merges multiple requests)
@@ -161,26 +179,40 @@ Backend API will run at `http://localhost:5001`
 ## 🚀 Usage Guide
 
 1. **Add Stocks**
-   - Enter stock ticker symbol in the input box
+   - Type stock symbol or company name in the search box
+   - Select from dropdown suggestions, or press Enter to add manually
    - Supported formats:
      - Taiwan Listed: `2330.TW` (TSMC)
      - Taiwan OTC: `5904.TWO` (Poya)
      - US Stocks: `AAPL` (Apple)
      - HK Stocks: `0700.HK` (Tencent)
      - JP Stocks: `9983.JP` (FAST RETAILING)
-   - Click "Add" button
-   - Track up to 9 stocks simultaneously
+   - Each list can track up to 18 stocks
 
-2. **Adjust Time Range**
+2. **Manage Watchlists**
+   - Click list selector to switch between lists
+   - Hover over list items to reveal action buttons
+   - Click "Create New List" to add a list (up to 5)
+   - Click pencil icon to rename a list
+   - Click trash icon to delete non-default lists
+
+3. **Adjust Time Range**
    - Select preset time ranges (1 week, 1 month, 3 months, 6 months, 1 year)
    - Or customize start and end dates
 
-3. **View Stock Information**
+4. **View Stock Information**
    - Check real-time prices and changes
    - Analyze moving average trends (MA20, MA60)
    - Monitor volume trends
+   - Toggle Candlestick / Line chart
 
-4. **Customize Settings**
+5. **Screenshot**
+   - Click the green "Screenshot" button in the top-right
+   - Dashboard screenshot is automatically copied to clipboard
+   - Paste directly into presentations, documents, or chat apps
+   - Auto-matches current theme (light/dark)
+
+6. **Customize Settings**
    - Click settings icon in top-right corner
    - Adjust color theme (Western/Eastern)
    - Toggle dark/light mode
@@ -253,11 +285,18 @@ marketvue/
 │   │   │   ├── StockCardLoading.tsx
 │   │   │   ├── StockCardError.tsx
 │   │   │   └── hooks/useStockData.ts
+│   │   ├── stock-list/          # Stock list management module
+│   │   │   ├── StockListSelector.tsx  # List selector
+│   │   │   ├── CreateListModal.tsx    # Create list modal
+│   │   │   ├── RenameListModal.tsx    # Rename modal
+│   │   │   ├── DeleteListConfirm.tsx  # Delete confirmation
+│   │   │   └── index.ts
 │   │   ├── common/
 │   │   │   ├── Toast.tsx        # Toast notification component
 │   │   │   ├── AnimatedNumber.tsx # Number animation component
 │   │   │   └── ChartTooltip.tsx # Chart tooltip component
 │   │   ├── StockManager.tsx
+│   │   ├── StockSearchInput.tsx  # Stock search input component
 │   │   ├── TimeRangeSelector.tsx
 │   │   ├── DashboardGrid.tsx
 │   │   ├── ScreenshotButton.tsx # Screenshot button component
@@ -268,13 +307,28 @@ marketvue/
 │   │   ├── AppContext.tsx       # Application settings
 │   │   ├── ChartContext.tsx     # Chart settings
 │   │   ├── ToastContext.tsx     # Toast notifications
-│   │   └── VisualThemeContext.tsx # Visual theme
+│   │   ├── VisualThemeContext.tsx # Visual theme
+│   │   └── StockListContext.tsx # Stock list management
 │   ├── hooks/                    # Custom Hooks
 │   │   ├── useRetry.ts          # Retry logic
+│   │   ├── useStockListReducer.ts # List state reducer
+│   │   ├── useStockSearch.ts    # Stock search hook
 │   │   └── index.ts
+│   ├── data/
+│   │   └── stocks/              # Stock search database
+│   │       ├── tw-listed.json   # Taiwan listed (~100 stocks)
+│   │       ├── tw-otc.json      # Taiwan OTC (~54 stocks)
+│   │       ├── us-popular.json  # US popular (~120 stocks)
+│   │       ├── jp-popular.json  # Japan popular (~50 stocks)
+│   │       ├── hk-popular.json  # Hong Kong popular (~50 stocks)
+│   │       └── index.ts         # Data export
+│   ├── types/
+│   │   ├── stockList.ts         # List type definitions
+│   │   └── stockSearch.ts       # Search type definitions
 │   ├── utils/
 │   │   ├── screenshot.ts        # Screenshot utility functions
-│   │   └── animations.ts        # Animation configuration
+│   │   ├── animations.ts        # Animation configuration
+│   │   └── migration.ts         # Data migration utility
 │   ├── config/
 │   │   └── chartTheme.ts        # Unified theme configuration
 │   ├── i18n/
