@@ -62,9 +62,17 @@ MarketVue 是一個現代化的股票追蹤儀表板，支援多個國際市場�
   - English
   - 公司名稱多語言對照（36+ 家公司）
 
+- 📋 **多清單管理**
+  - 最多 5 個自訂觀察清單
+  - 每個清單可追蹤 18 支股票
+  - 清單建立、重新命名、刪除功能
+  - 一鍵切換不同清單
+  - 舊資料自動遷移至預設清單
+
 - 💾 **本地儲存**
   - 追蹤列表自動保存
   - 使用者偏好設定記憶
+  - Schema 版本化支援未來遷移
 
 - ⚡ **效能優化**
   - 智慧批量請求機制（自動將多個請求合併）
@@ -169,25 +177,32 @@ PORT=5001 python app.py
      - 港股：`0700.HK`（騰訊）
      - 日股：`9983.JP`（FAST RETAILING）
    - 點擊「新增」按鈕
-   - 最多可追蹤 9 支股票
+   - 每個清單最多可追蹤 18 支股票
 
-2. **調整時間範圍**
+2. **管理觀察清單**
+   - 點擊清單選擇器切換不同清單
+   - 滑鼠移到清單項目上顯示操作按鈕
+   - 點擊「建立新清單」新增清單（最多 5 個）
+   - 點擊鉛筆圖示重新命名清單
+   - 點擊垃圾桶圖示刪除非預設清單
+
+3. **調整時間範圍**
    - 選擇預設時間範圍（1週、1月、3月、6月、1年）
    - 或自訂開始和結束日期
 
-3. **查看股票資訊**
+4. **查看股票資訊**
    - 查看即時價格和漲跌幅
    - 分析移動平均線趨勢（MA20、MA60）
    - 查看成交量走勢
    - 切換 K 線圖 / 折線圖
 
-4. **截圖功能**
+5. **截圖功能**
    - 點擊右上角綠色「截圖」按鈕
    - 儀表板截圖將自動複製到剪貼簿
    - 可直接貼上到簡報、文件或聊天軟體
    - 自動匹配當前主題（淺色/深色）
 
-5. **自訂設定**
+6. **自訂設定**
    - 點擊右上角設定圖示
    - 調整顏色主題（Western/Eastern）
    - 切換深色/淺色模式
@@ -260,6 +275,12 @@ marketvue/
 │   │   │   ├── StockCardLoading.tsx
 │   │   │   ├── StockCardError.tsx
 │   │   │   └── hooks/useStockData.ts
+│   │   ├── stock-list/          # 股票清單管理模組
+│   │   │   ├── StockListSelector.tsx  # 清單選擇器
+│   │   │   ├── CreateListModal.tsx    # 建立清單 Modal
+│   │   │   ├── RenameListModal.tsx    # 重命名 Modal
+│   │   │   ├── DeleteListConfirm.tsx  # 刪除確認 Dialog
+│   │   │   └── index.ts
 │   │   ├── common/
 │   │   │   ├── Toast.tsx        # Toast 通知組件
 │   │   │   ├── AnimatedNumber.tsx # 數字動畫組件
@@ -275,13 +296,18 @@ marketvue/
 │   │   ├── AppContext.tsx       # 應用設定
 │   │   ├── ChartContext.tsx     # 圖表設定
 │   │   ├── ToastContext.tsx     # Toast 通知
-│   │   └── VisualThemeContext.tsx # 視覺主題
+│   │   ├── VisualThemeContext.tsx # 視覺主題
+│   │   └── StockListContext.tsx # 股票清單管理
 │   ├── hooks/                    # Custom Hooks
 │   │   ├── useRetry.ts          # 重試邏輯
+│   │   ├── useStockListReducer.ts # 清單狀態 Reducer
 │   │   └── index.ts
+│   ├── types/
+│   │   └── stockList.ts         # 清單型別定義
 │   ├── utils/
 │   │   ├── screenshot.ts        # 截圖工具函式
-│   │   └── animations.ts        # 動畫配置與工具
+│   │   ├── animations.ts        # 動畫配置與工具
+│   │   └── migration.ts         # 資料遷移工具
 │   ├── config/
 │   │   └── chartTheme.ts        # 統一主題配置
 │   ├── i18n/

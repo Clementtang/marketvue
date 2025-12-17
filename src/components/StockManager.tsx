@@ -4,7 +4,16 @@ import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
 import { useToast } from '../contexts/ToastContext';
+import { useStockList } from '../contexts/StockListContext';
 import { logger } from '../utils/logger';
+import {
+  StockListSelector,
+  CreateListModal,
+  RenameListModal,
+  DeleteListConfirm,
+} from './stock-list';
+import type { StockList } from '../types/stockList';
+import { STOCK_LIST_CONFIG } from '../config/constants';
 
 interface StockManagerProps {
   stocks: string[];
@@ -18,9 +27,66 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
   const { showToast } = useToast();
+  const { isStockLimitReached, actions } = useStockList();
 
   const [inputValue, setInputValue] = useState('');
   const [error, setError] = useState('');
+
+  // Modal states
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [createModalMode, setCreateModalMode] = useState<'create' | 'copy'>('create');
+  const [renameModalOpen, setRenameModalOpen] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [selectedList, setSelectedList] = useState<StockList | null>(null);
+
+  // List management handlers
+  const handleCreateNew = () => {
+    setCreateModalMode('create');
+    setCreateModalOpen(true);
+  };
+
+  const handleSaveAsCopy = () => {
+    setCreateModalMode('copy');
+    setCreateModalOpen(true);
+  };
+
+  const handleRename = (list: StockList) => {
+    setSelectedList(list);
+    setRenameModalOpen(true);
+  };
+
+  const handleDelete = (list: StockList) => {
+    setSelectedList(list);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleCreateConfirm = (name: string) => {
+    if (createModalMode === 'create') {
+      const success = actions.createList(name);
+      if (success) {
+        showToast('success', t.listCreated || 'List created');
+      }
+    } else {
+      const success = actions.saveCurrentAsNew(name);
+      if (success) {
+        showToast('success', t.listCreated || 'List created');
+      }
+    }
+  };
+
+  const handleRenameConfirm = (id: string, name: string) => {
+    const success = actions.renameList(id, name);
+    if (success) {
+      showToast('success', t.listRenamed || 'List renamed');
+    }
+  };
+
+  const handleDeleteConfirm = (id: string) => {
+    const success = actions.deleteList(id);
+    if (success) {
+      showToast('success', t.listDeleted || 'List deleted');
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,7 +102,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
       symbol = symbol.replace(/\.JP$/, '.T');
     }
 
-    if (stocks.length >= 18) {
+    if (stocks.length >= STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST) {
       setError(t.maxStocksReached);
       return;
     }
@@ -110,7 +176,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           continue;
         }
 
-        if (stocks.length + addedCount >= 18) {
+        if (stocks.length + addedCount >= STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST) {
           break;
         }
 
@@ -137,44 +203,46 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
   };
 
   return (
-    <div className={`shadow-sm p-6 transition-all duration-300 h-full ${
-      visualTheme === 'warm'
-        ? 'bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50'
-        : 'bg-white dark:bg-gray-800 rounded-lg'
-    }`}>
-      <div className="flex items-center justify-between mb-4">
-        <h2 className={`text-xl font-semibold ${
-          visualTheme === 'warm'
-            ? 'text-warm-800 dark:text-warm-100 font-serif'
-            : 'text-gray-800 dark:text-white'
-        }`}>{t.stockManager}</h2>
+    <>
+      <div className={`shadow-sm p-6 transition-all duration-300 h-full ${
+        visualTheme === 'warm'
+          ? 'bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50'
+          : 'bg-white dark:bg-gray-800 rounded-lg'
+      }`}>
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+          <h2 className={`text-xl font-semibold ${
+            visualTheme === 'warm'
+              ? 'text-warm-800 dark:text-warm-100 font-serif'
+              : 'text-gray-800 dark:text-white'
+          }`}>{t.stockManager}</h2>
 
-        {/* Import/Export Buttons */}
-        <div className="flex gap-2">
-          <button
-            onClick={handleExportToClipboard}
-            disabled={stocks.length === 0}
-            className={`px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors ${
-              visualTheme === 'warm' ? 'rounded-xl' : 'rounded-lg'
-            }`}
-            title={t.exportToClipboard || 'Export to clipboard'}
-          >
-            <Copy size={16} />
-            <span className="hidden sm:inline">{t.export || 'Export'}</span>
-          </button>
-          <button
-            onClick={handleImportFromClipboard}
-            disabled={stocks.length >= 18}
-            className={`px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors ${
-              visualTheme === 'warm' ? 'rounded-xl' : 'rounded-lg'
-            }`}
-            title={t.importFromClipboard || 'Import from clipboard'}
-          >
-            <ClipboardPaste size={16} />
-            <span className="hidden sm:inline">{t.import || 'Import'}</span>
-          </button>
+          {/* Import/Export Buttons */}
+          <div className="flex gap-2">
+            <button
+              onClick={handleExportToClipboard}
+              disabled={stocks.length === 0}
+              className={`px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors ${
+                visualTheme === 'warm' ? 'rounded-xl' : 'rounded-lg'
+              }`}
+              title={t.exportToClipboard || 'Export to clipboard'}
+            >
+              <Copy size={16} />
+              <span className="hidden sm:inline">{t.export || 'Export'}</span>
+            </button>
+            <button
+              onClick={handleImportFromClipboard}
+              disabled={isStockLimitReached}
+              className={`px-3 py-1.5 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5 text-sm transition-colors ${
+                visualTheme === 'warm' ? 'rounded-xl' : 'rounded-lg'
+              }`}
+              title={t.importFromClipboard || 'Import from clipboard'}
+            >
+              <ClipboardPaste size={16} />
+              <span className="hidden sm:inline">{t.import || 'Import'}</span>
+            </button>
+          </div>
         </div>
-      </div>
 
       {/* Add Stock Form */}
       <form onSubmit={handleSubmit} className="mb-4">
@@ -196,7 +264,7 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           />
           <button
             type="submit"
-            disabled={stocks.length >= 18}
+            disabled={isStockLimitReached}
             className={`px-4 py-2 text-white disabled:bg-gray-400 dark:disabled:bg-gray-600 disabled:cursor-not-allowed flex items-center gap-2 transition-colors ${
               visualTheme === 'warm'
                 ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
@@ -211,52 +279,96 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           <p className="text-red-500 dark:text-red-400 text-sm mt-2">{error}</p>
         )}
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-2">
-          {stocks.length}/18 {t.stocksAdded}
+          {stocks.length}/{STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST} {t.stocksAdded}
         </p>
       </form>
 
-      {/* Stock List */}
-      {stocks.length > 0 && (
+        {/* Stock List Section */}
         <div>
-          <h3 className={`text-sm font-medium mb-2 ${
-            visualTheme === 'warm'
-              ? 'text-warm-700 dark:text-warm-300 font-serif'
-              : 'text-gray-700 dark:text-gray-300'
-          }`}>{t.trackedStocks}</h3>
-          <div className="flex flex-wrap gap-2">
-            {stocks.map((symbol) => (
-              <div
-                key={symbol}
-                className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${
-                  visualTheme === 'warm'
-                    ? 'bg-warm-accent-50 dark:bg-warm-accent-900/30 text-warm-accent-700 dark:text-warm-accent-300 border-warm-accent-200 dark:border-warm-accent-700'
-                    : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700'
-                }`}
-              >
-                <span className="font-medium">{symbol}</span>
-                <button
-                  onClick={() => onRemoveStock(symbol)}
-                  className={`rounded-full p-0.5 transition-colors ${
-                    visualTheme === 'warm'
-                      ? 'hover:bg-warm-accent-100 dark:hover:bg-warm-accent-800/50'
-                      : 'hover:bg-blue-100 dark:hover:bg-blue-800/50'
-                  }`}
-                  title={`Remove ${symbol}`}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ))}
+          {/* List Selector + Label Row */}
+          <div className="flex items-center gap-3 mb-3 flex-wrap">
+            <StockListSelector
+              onCreateNew={handleCreateNew}
+              onSaveAsCopy={handleSaveAsCopy}
+              onRename={handleRename}
+              onDelete={handleDelete}
+            />
+            <span className={`text-sm font-medium ${
+              visualTheme === 'warm'
+                ? 'text-warm-600 dark:text-warm-400'
+                : 'text-gray-500 dark:text-gray-400'
+            }`}>
+              {t.trackedStocks}
+            </span>
           </div>
-        </div>
-      )}
 
-      {stocks.length === 0 && (
-        <div className="text-center py-8 text-gray-400 dark:text-gray-500">
-          <p>{t.noStocksYet}</p>
+          {/* Stock Tags */}
+          {stocks.length > 0 ? (
+            <div className="flex flex-wrap gap-2">
+              {stocks.map((symbol) => (
+                <div
+                  key={symbol}
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${
+                    visualTheme === 'warm'
+                      ? 'bg-warm-accent-50 dark:bg-warm-accent-900/30 text-warm-accent-700 dark:text-warm-accent-300 border-warm-accent-200 dark:border-warm-accent-700'
+                      : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700'
+                  }`}
+                >
+                  <span className="font-medium">{symbol}</span>
+                  <button
+                    onClick={() => onRemoveStock(symbol)}
+                    className={`rounded-full p-0.5 transition-colors ${
+                      visualTheme === 'warm'
+                        ? 'hover:bg-warm-accent-100 dark:hover:bg-warm-accent-800/50'
+                        : 'hover:bg-blue-100 dark:hover:bg-blue-800/50'
+                    }`}
+                    title={`Remove ${symbol}`}
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className={`text-center py-6 rounded-xl ${
+              visualTheme === 'warm'
+                ? 'bg-warm-50/50 dark:bg-warm-900/20 text-warm-500 dark:text-warm-400'
+                : 'bg-gray-50 dark:bg-gray-700/30 text-gray-400 dark:text-gray-500'
+            }`}>
+              <p>{t.noStocksYet}</p>
+            </div>
+          )}
         </div>
-      )}
-    </div>
+      </div>
+
+      {/* Modals */}
+      <CreateListModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onConfirm={handleCreateConfirm}
+        mode={createModalMode}
+      />
+
+      <RenameListModal
+        isOpen={renameModalOpen}
+        list={selectedList}
+        onClose={() => {
+          setRenameModalOpen(false);
+          setSelectedList(null);
+        }}
+        onConfirm={handleRenameConfirm}
+      />
+
+      <DeleteListConfirm
+        isOpen={deleteConfirmOpen}
+        list={selectedList}
+        onClose={() => {
+          setDeleteConfirmOpen(false);
+          setSelectedList(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+      />
+    </>
   );
 };
 

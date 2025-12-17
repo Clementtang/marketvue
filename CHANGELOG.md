@@ -7,6 +7,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2025-12-17
+
+### Added
+
+- **Stock List Management System** (Phase 1 Complete)
+  - **Multiple Watchlists**: Users can now create up to 5 custom watchlists
+  - **List Operations**:
+    - Create new lists with custom names
+    - Rename existing lists
+    - Delete non-default lists with confirmation
+    - Save current list as a copy
+  - **Seamless List Switching**: Click to switch between watchlists instantly
+  - **Per-List Stock Tracking**: Each list supports up to 18 stocks independently
+  - **Automatic Data Migration**: Existing users' stocks automatically migrate to default list
+  - **Persistent Storage**: All lists saved to localStorage with schema versioning
+
+- **New Components**:
+  - `StockListSelector`: Dropdown component for switching between watchlists
+    - Inline hover actions (rename/delete buttons appear on hover)
+    - Smooth animations for dropdown and action buttons
+    - Stock count badge for each list
+  - `CreateListModal`: Modal for creating new lists or saving copies
+  - `RenameListModal`: Modal for renaming existing lists
+  - `DeleteListConfirm`: Confirmation dialog for list deletion
+
+- **New Architecture**:
+  - `StockListContext`: React Context for global list state management
+  - `useStockListReducer`: Reducer pattern for predictable state updates
+  - `migration.ts`: Utility for migrating legacy `tracked-stocks` data
+  - Type definitions in `src/types/stockList.ts`
+  - Constants in `src/config/constants.ts` (STOCK_LIST_CONFIG)
+
+### Improved
+
+- **UX Enhancement**: Relocated list selector from header to stock list section
+  - List selector now positioned above "Tracked Stocks" label
+  - Creates clearer visual hierarchy and semantic grouping
+  - Header area is now cleaner with only title and import/export buttons
+
+- **Empty State Design**: Improved empty state with subtle background styling
+
+### Technical
+
+- **State Management**: Implemented React Context + Reducer pattern
+  - Actions: CREATE_LIST, DELETE_LIST, RENAME_LIST, SWITCH_LIST, ADD_STOCK, REMOVE_STOCK, SET_STOCKS
+  - Schema versioning for future migrations
+- **Data Structure**:
+  ```typescript
+  interface StockList {
+    id: string;
+    name: string;
+    stocks: string[];
+    createdAt: string;
+    updatedAt: string;
+    isDefault: boolean;
+  }
+  ```
+- **Storage Key**: `marketvue-stock-lists` (migrates from `tracked-stocks`)
+- **Bilingual Support**: 20+ new translation keys for list management UI
+- **Files Added**:
+  - `src/types/stockList.ts` - Type definitions
+  - `src/hooks/useStockListReducer.ts` - State reducer
+  - `src/contexts/StockListContext.tsx` - Context provider
+  - `src/utils/migration.ts` - Data migration utility
+  - `src/components/stock-list/` - UI components (4 files)
+- **Files Modified**:
+  - `src/App.tsx` - Integrated StockListProvider
+  - `src/components/StockManager.tsx` - Integrated list management UI
+  - `src/config/constants.ts` - Added STOCK_LIST_CONFIG
+  - `src/hooks/index.ts` - Export reducer utilities
+  - `src/i18n/translations.ts` - Added translations
+
 ## [1.9.1] - 2025-12-12
 
 ### Improved

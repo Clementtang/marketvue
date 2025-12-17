@@ -116,6 +116,28 @@ export interface Translations {
 
   // Notification Banner
   freeHostingNotice: string;
+
+  // Stock List Management
+  defaultList: string;
+  createNewList: string;
+  saveAsCopy: string;
+  renameList: string;
+  deleteList: string;
+  listName: string;
+  listNamePlaceholder: string;
+  listNameRequired: string;
+  listNameTooLong: string;
+  create: string;
+  save: string;
+  cancel: string;
+  delete: string;
+  listCreated: string;
+  listRenamed: string;
+  listDeleted: string;
+  deleteListConfirm: string;
+  deleteListWarning: string;
+  listContainsStocks: string;
+  maxListsReached: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -235,6 +257,28 @@ export const translations: Record<Language, Translations> = {
 
     // Notification Banner
     freeHostingNotice: 'Using free hosting: Backend sleeps after 15min idle. First load may take 30-60s.',
+
+    // Stock List Management
+    defaultList: 'Default',
+    createNewList: 'Create New List',
+    saveAsCopy: 'Save as Copy',
+    renameList: 'Rename',
+    deleteList: 'Delete List',
+    listName: 'List Name',
+    listNamePlaceholder: 'Enter list name...',
+    listNameRequired: 'List name is required',
+    listNameTooLong: 'Name must be 30 characters or less',
+    create: 'Create',
+    save: 'Save',
+    cancel: 'Cancel',
+    delete: 'Delete',
+    listCreated: 'List created',
+    listRenamed: 'List renamed',
+    listDeleted: 'List deleted',
+    deleteListConfirm: 'Are you sure you want to delete "{name}"?',
+    deleteListWarning: 'This action cannot be undone.',
+    listContainsStocks: 'This list contains {count} stocks.',
+    maxListsReached: 'Maximum lists reached (5)',
   },
   'zh-TW': {
     // Header
@@ -352,6 +396,28 @@ export const translations: Record<Language, Translations> = {
 
     // Notification Banner
     freeHostingNotice: '採用免費託管服務：後端閒置 15 分鐘後休眠，首次載入可能需要 30-60 秒',
+
+    // Stock List Management
+    defaultList: '預設',
+    createNewList: '建立新清單',
+    saveAsCopy: '另存為新清單',
+    renameList: '重新命名',
+    deleteList: '刪除清單',
+    listName: '清單名稱',
+    listNamePlaceholder: '輸入清單名稱...',
+    listNameRequired: '請輸入清單名稱',
+    listNameTooLong: '名稱不能超過 30 個字元',
+    create: '建立',
+    save: '儲存',
+    cancel: '取消',
+    delete: '刪除',
+    listCreated: '清單已建立',
+    listRenamed: '清單已重新命名',
+    listDeleted: '清單已刪除',
+    deleteListConfirm: '確定要刪除「{name}」清單嗎？',
+    deleteListWarning: '此操作無法復原。',
+    listContainsStocks: '此清單包含 {count} 檔股票。',
+    maxListsReached: '已達清單數量上限（5 個）',
   },
 };
 

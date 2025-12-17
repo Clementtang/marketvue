@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/react';
@@ -16,51 +16,31 @@ import { AppProvider, useApp } from './contexts/AppContext';
 import { ChartProvider, useChart } from './contexts/ChartContext';
 import { ToastProvider } from './contexts/ToastContext';
 import { VisualThemeProvider, useVisualTheme } from './contexts/VisualThemeContext';
+import { StockListProvider, useStockList } from './contexts/StockListContext';
 import { ToastContainer } from './components/common/Toast';
 import { queryClient } from './config/queryClient';
-import { logger } from './utils/logger';
 
 function AppContent() {
   // Use Context hooks
   const { language, colorTheme, setColorTheme, themeMode, setThemeMode, setLanguage } = useApp();
   const { dateRange } = useChart();
   const { visualTheme } = useVisualTheme();
+  const { stocks, actions } = useStockList();
 
-  // Local state (stocks management)
-  const [stocks, setStocks] = useState<string[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
+  // Local UI state
   const [showThemeGuide, setShowThemeGuide] = useState(false);
 
   // Get translations
   const t = useTranslation(language);
 
-  // Load stocks from localStorage (other settings handled by Context)
-  useEffect(() => {
-    const savedStocks = localStorage.getItem('tracked-stocks');
-    if (savedStocks) {
-      try {
-        setStocks(JSON.parse(savedStocks));
-      } catch (e) {
-        logger.error('Failed to load saved stocks:', e);
-      }
-    }
-    setIsInitialized(true);
-  }, []);
-
-  // Save stocks to localStorage (skip initial render)
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem('tracked-stocks', JSON.stringify(stocks));
-    }
-  }, [stocks, isInitialized]);
-
+  // Stock management callbacks (now using StockListContext)
   const handleAddStock = useCallback((symbol: string) => {
-    setStocks((prev) => [...prev, symbol]);
-  }, []);
+    actions.addStock(symbol);
+  }, [actions]);
 
   const handleRemoveStock = useCallback((symbol: string) => {
-    setStocks((prev) => prev.filter((s) => s !== symbol));
-  }, []);
+    actions.removeStock(symbol);
+  }, [actions]);
 
   // Show Theme Guide if requested
   if (showThemeGuide) {
@@ -168,10 +148,12 @@ function App() {
       <AppProvider>
         <VisualThemeProvider>
           <ChartProvider>
-            <ToastProvider>
-              <AppContent />
-              <ToastContainer />
-            </ToastProvider>
+            <StockListProvider>
+              <ToastProvider>
+                <AppContent />
+                <ToastContainer />
+              </ToastProvider>
+            </StockListProvider>
           </ChartProvider>
         </VisualThemeProvider>
       </AppProvider>

@@ -157,3 +157,29 @@ export const VALIDATION = {
   MAX_STOCK_SYMBOL_LENGTH: 10,
   MAX_STOCK_CARDS: 20,
 } as const;
+
+/**
+ * Stock List Management Configuration
+ */
+export const STOCK_LIST_CONFIG = {
+  /** Maximum number of watchlists per user */
+  MAX_LISTS: 5,
+
+  /** Maximum stocks per list */
+  MAX_STOCKS_PER_LIST: 18,
+
+  /** Maximum characters for list name */
+  MAX_LIST_NAME_LENGTH: 30,
+
+  /** Default list ID (cannot be deleted) */
+  DEFAULT_LIST_ID: 'default',
+
+  /** localStorage key for stock lists */
+  STORAGE_KEY: 'marketvue-stock-lists',
+
+  /** Legacy localStorage key (for migration) */
+  LEGACY_STORAGE_KEY: 'tracked-stocks',
+
+  /** Current schema version */
+  SCHEMA_VERSION: 1,
+} as const;

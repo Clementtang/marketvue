@@ -13,3 +13,5 @@ export {
 } from './useRetry';
 
 export { usePersistedState } from './usePersistedState';
+
+export { stockListReducer, createInitialState } from './useStockListReducer';
