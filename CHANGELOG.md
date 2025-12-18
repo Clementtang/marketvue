@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.12.0] - 2025-12-18
+
+### Added
+
+- **Smart Summary Bar - Collapsible Control Panel**
+  - **Space Optimization**: Collapse stock manager and time range selector to maximize dashboard viewing area
+  - **Summary Bar**: When collapsed, displays a compact bar showing:
+    - List name with stock count badge
+    - First 3 stock symbols with "+N" indicator for additional stocks
+    - Current time range preset (1M, 3M, 6M, etc.)
+    - Expand button with subtle animation
+  - **Smooth Transitions**: CSS fade-in animation for seamless expand/collapse experience
+  - **State Persistence**: Collapse state saved to localStorage, remembered across sessions
+  - **Bilingual Support**: "Expand" / "Collapse" labels in English and Chinese
+  - **Theme Support**: Fully styled for both Classic and Warm Minimal themes
+  - **Responsive Design**: Adapts gracefully across desktop, tablet, and mobile
+
+- **New Components**:
+  - `ControlPanel.tsx`: Wrapper component managing collapse/expand logic
+  - `SummaryBar.tsx`: Compact summary display for collapsed state
+
+- **New CSS Animation**:
+  - `.animate-fade-in`: Smooth 0.25s fade-in with subtle translateY effect
+
+### Improved
+
+- **Dashboard UX**: Users can now collapse controls to focus on charts
+- **Vertical Alignment**: Summary bar elements properly aligned (consistent with StockListSelector)
+- **Hover Effects**: Refined button interactions without distracting shadows
+  - Border color transitions instead of shadow effects
+  - Subtle icon animations (ChevronUp/ChevronDown)
+
+### Technical
+
+- **Files Added**:
+  - `src/components/ControlPanel.tsx` - Collapsible panel wrapper
+  - `src/components/SummaryBar.tsx` - Collapsed state summary bar
+- **Files Modified**:
+  - `src/App.tsx` - Integrated ControlPanel wrapper
+  - `src/i18n/translations.ts` - Added `expandPanel`, `collapsePanel` keys
+  - `src/index.css` - Added `animate-fade-in` keyframe animation
+
 ## [1.11.0] - 2025-12-17
 
 ### Added

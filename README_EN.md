@@ -79,6 +79,13 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - Checkmark indicator for tracked stocks
   - Manual entry for unlisted symbols
 
+- 📐 **Collapsible Control Panel**
+  - One-click collapse for stock manager and time range selector
+  - Smart summary bar when collapsed (list name, stock count, time range)
+  - Maximize dashboard chart viewing area
+  - Collapse state automatically remembered
+  - Smooth expand/collapse animations
+
 - 💾 **Local Storage**
   - Auto-save tracking list
   - Remember user preference settings

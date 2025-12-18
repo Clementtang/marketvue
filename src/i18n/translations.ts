@@ -148,6 +148,10 @@ export interface Translations {
   marketUS: string;
   marketJP: string;
   marketHK: string;
+
+  // Control Panel
+  expandPanel: string;
+  collapsePanel: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -299,6 +303,10 @@ export const translations: Record<Language, Translations> = {
     marketUS: 'US',
     marketJP: 'JP',
     marketHK: 'HK',
+
+    // Control Panel
+    expandPanel: 'Expand',
+    collapsePanel: 'Collapse',
   },
   'zh-TW': {
     // Header
@@ -448,6 +456,10 @@ export const translations: Record<Language, Translations> = {
     marketUS: '美股',
     marketJP: '日股',
     marketHK: '港股',
+
+    // Control Panel
+    expandPanel: '展開',
+    collapsePanel: '收合',
   },
 };
 

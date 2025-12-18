@@ -5,6 +5,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import StockManager from './components/StockManager';
 import TimeRangeSelector from './components/TimeRangeSelector';
 import DashboardGrid from './components/DashboardGrid';
+import ControlPanel from './components/ControlPanel';
 import ThemeSettings from './components/ThemeSettings';
 import ThemeGuide from './components/ThemeGuide';
 import NotificationBanner from './components/NotificationBanner';
@@ -25,7 +26,7 @@ function AppContent() {
   const { language, colorTheme, setColorTheme, themeMode, setThemeMode, setLanguage } = useApp();
   const { dateRange } = useChart();
   const { visualTheme } = useVisualTheme();
-  const { stocks, actions } = useStockList();
+  const { stocks, actions, activeList } = useStockList();
 
   // Local UI state
   const [showThemeGuide, setShowThemeGuide] = useState(false);
@@ -107,20 +108,26 @@ function AppContent() {
 
         {/* Main Content */}
         <main className="container mx-auto px-4 py-8 max-w-7xl flex-grow">
-          {/* Stock Manager and Time Range Selector */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-            <div className="lg:col-span-2">
-              <StockManager
-                stocks={stocks}
-                onAddStock={handleAddStock}
-                onRemoveStock={handleRemoveStock}
-              />
-            </div>
+          {/* Collapsible Control Panel */}
+          <ControlPanel
+            stocks={stocks}
+            listName={activeList.name}
+            datePreset={dateRange.preset || '1m'}
+          >
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2">
+                <StockManager
+                  stocks={stocks}
+                  onAddStock={handleAddStock}
+                  onRemoveStock={handleRemoveStock}
+                />
+              </div>
 
-            <div className="lg:col-span-1">
-              <TimeRangeSelector />
+              <div className="lg:col-span-1">
+                <TimeRangeSelector />
+              </div>
             </div>
-          </div>
+          </ControlPanel>
 
           {/* Dashboard Grid */}
           <DashboardGrid
