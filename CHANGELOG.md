@@ -7,6 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.13.0] - 2025-12-19
+
+### Added
+
+- **Stock Search Database Expansion** (3x+ coverage increase)
+  - **Taiwan Listed (TW)**: 97 → 392 stocks (+295 stocks, 4.0x increase)
+    - Added major semiconductor companies, financial institutions, electronics manufacturers
+    - Covers Taiwan 50, Mid-Cap 100 constituents, and sector leaders
+  - **Taiwan OTC (TWO)**: 50 → 156 stocks (+106 stocks, 3.1x increase)
+    - Added IC design houses, biotech companies, software providers
+    - Expanded coverage of growth-oriented OTC market
+  - **Japan (JP)**: 50 → 151 stocks (+101 stocks, 3.0x increase)
+    - Full Nikkei 225 coverage with major constituents
+    - Added software/SaaS companies: freee, Cybozu, Sansan, Money Forward
+    - Added startups/growth stocks: Mercari, ZOZO, BASE, Giftee
+    - Added retail brands: Don Quijote, Nitori, ABC-Mart, Shimamura
+    - Enhanced gaming sector: Nintendo, Capcom, Square Enix, Konami, SEGA
+  - **US Market**: 122 → 379 stocks (+257 stocks, 3.1x increase)
+    - Comprehensive S&P 500 and NASDAQ 100 coverage
+    - Added fintech: Coinbase, SoFi, Robinhood, Affirm
+    - Added Chinese ADRs: Alibaba, JD.com, PDD, NIO, XPeng, Li Auto
+    - Added gaming: EA, Take-Two, Roblox, Unity
+    - Added healthcare, energy, industrials sector leaders
+  - **Hong Kong (HK)**: Unchanged at 50 stocks (per user request)
+
+- **Industry Sector Classification System**
+  - New `sector` field added to all TW, TWO, JP, and US stocks
+  - 16 sector categories: Semiconductors, Electronics, Software, Internet, Financial, Consumer, Healthcare, Industrial, Energy, Materials, Telecom, Transportation, RealEstate, Gaming, Automotive, Retail
+  - TypeScript type: `SectorCode` union type in `src/types/stockSearch.ts`
+  - Enables future sector-based filtering and organization features
+
+### Technical
+
+- **Data Structure Updates**:
+  - All stock data files updated to version "2.0.0"
+  - Added optional `sector?: SectorCode` field to `StockEntry` interface
+  - Backward compatible: existing code works without sector field
+- **Files Modified**:
+  - `src/types/stockSearch.ts`: Added `SectorCode` type definition
+  - `src/data/stocks/tw-listed.json`: 97 → 392 stocks + sector field
+  - `src/data/stocks/tw-otc.json`: 50 → 156 stocks + sector field
+  - `src/data/stocks/jp-popular.json`: 50 → 151 stocks + sector field
+  - `src/data/stocks/us-popular.json`: 122 → 379 stocks + sector field
+- **Total Stock Coverage**: 374 → 1,128 stocks (+754, 3.0x overall increase)
+
 ## [1.12.0] - 2025-12-18
 
 ### Added

@@ -71,7 +71,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 
 - 🔍 **Smart Search Suggestions**
   - Real-time autocomplete (symbol, company name, aliases)
-  - Built-in database of ~374 popular stocks
+  - Built-in database of 1,128 popular stocks (with sector classification)
   - Bilingual stock names (Chinese/English)
   - Results ranked by relevance score
   - Color-coded market badges (TW Listed/OTC/US/JP/HK)
@@ -323,11 +323,11 @@ marketvue/
 │   │   └── index.ts
 │   ├── data/
 │   │   └── stocks/              # Stock search database
-│   │       ├── tw-listed.json   # Taiwan listed (~100 stocks)
-│   │       ├── tw-otc.json      # Taiwan OTC (~54 stocks)
-│   │       ├── us-popular.json  # US popular (~120 stocks)
-│   │       ├── jp-popular.json  # Japan popular (~50 stocks)
-│   │       ├── hk-popular.json  # Hong Kong popular (~50 stocks)
+│   │       ├── tw-listed.json   # Taiwan listed (392 stocks)
+│   │       ├── tw-otc.json      # Taiwan OTC (156 stocks)
+│   │       ├── us-popular.json  # US popular (379 stocks)
+│   │       ├── jp-popular.json  # Japan popular (151 stocks)
+│   │       ├── hk-popular.json  # Hong Kong popular (50 stocks)
 │   │       └── index.ts         # Data export
 │   ├── types/
 │   │   ├── stockList.ts         # List type definitions

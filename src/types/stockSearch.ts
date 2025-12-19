@@ -20,6 +20,27 @@ export interface BilingualName {
 }
 
 /**
+ * Sector/Industry classification
+ */
+export type SectorCode =
+  | 'Semiconductors'
+  | 'Electronics'
+  | 'Software'
+  | 'Internet'
+  | 'Financial'
+  | 'Consumer'
+  | 'Healthcare'
+  | 'Industrial'
+  | 'Energy'
+  | 'Materials'
+  | 'Telecom'
+  | 'Transportation'
+  | 'RealEstate'
+  | 'Gaming'
+  | 'Automotive'
+  | 'Retail';
+
+/**
  * Individual stock entry in the search database
  */
 export interface StockEntry {
@@ -29,6 +50,8 @@ export interface StockEntry {
   name: BilingualName;
   /** Market identifier */
   market: MarketCode;
+  /** Industry/sector classification (optional for backward compatibility) */
+  sector?: SectorCode;
   /** Alternative names/aliases for search matching */
   aliases?: string[];
 }
