@@ -326,7 +326,7 @@ def create_app(config_name='default'):
     def health():
         return jsonify({
             'status': 'healthy',
-            'service': 'stock-dashboard-api',
+            'service': 'marketvue-api',
             'version': '1.0.0',
             'environment': config_name
         })

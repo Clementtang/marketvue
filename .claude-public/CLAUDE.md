@@ -42,7 +42,7 @@
 ## 📁 專案結構
 
 ```
-stock-dashboard/
+marketvue/
 ├── backend/                    # Flask 後端
 │   ├── app.py                  # 主應用
 │   ├── routes/stock_routes.py  # API 路由

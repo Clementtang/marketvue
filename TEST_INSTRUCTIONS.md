@@ -20,7 +20,7 @@
 
 1. 在瀏覽器中打開測試文件：
    ```
-   file:///Users/clementtang/stock-dashboard/test-localstorage.html
+   file:///Users/clementtang/marketvue/test-localstorage.html
    ```
 
 2. 按照頁面上的說明依序執行 6 個測試：

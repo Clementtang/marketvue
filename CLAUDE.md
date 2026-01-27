@@ -19,7 +19,7 @@ say "工作完成了呢。[簡短描述完成的工作]"
 ## 專案資訊
 
 - **名稱**：MarketVue（即時多市場股票追蹤儀表板）
-- **路徑**：`/Users/clementtang/stock-dashboard`
+- **路徑**：`/Users/clementtang/marketvue`
 - **部署**：Vercel（前端）+ Render（後端）
 
 ## 開發規範

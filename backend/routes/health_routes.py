@@ -82,7 +82,7 @@ def health_check():
     """
     return jsonify({
         'status': 'healthy',
-        'service': 'stock-dashboard-api',
+        'service': 'marketvue-api',
         'version': '1.0.0',
     }), HTTP_OK
 
@@ -113,7 +113,7 @@ def detailed_health_check():
 
     return jsonify({
         'status': overall_status,
-        'service': 'stock-dashboard-api',
+        'service': 'marketvue-api',
         'version': '1.0.0',
         'api_version': 'v1',
         'timestamp': datetime.utcnow().isoformat() + 'Z',

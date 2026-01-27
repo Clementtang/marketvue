@@ -49,7 +49,7 @@ class TestHealthEndpoint:
         data = response.get_json()
 
         assert data['status'] == 'healthy'
-        assert data['service'] == 'stock-dashboard-api'
+        assert data['service'] == 'marketvue-api'
         assert data['version'] == '1.0.0'
 
 

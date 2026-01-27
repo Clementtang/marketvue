@@ -27,7 +27,7 @@
 - **當前版本**：v1.4.0
 - **授權**：MIT License
 - **儲存庫**：https://github.com/Clementtang/marketvue.git
-- **本地路徑**：`/Users/clementtang/stock-dashboard`
+- **本地路徑**：`/Users/clementtang/marketvue`
 
 ⚠️ **重要**：所有檔案操作都應該使用這個路徑，不要使用 `/tmp/` 或其他臨時路徑。
 
@@ -103,7 +103,7 @@ const translations = useTranslation(language);
 ### 專案結構
 
 ```
-/Users/clementtang/stock-dashboard/
+/Users/clementtang/marketvue/
 ├── backend/                          # Flask 後端
 │   ├── app.py                        # 主應用
 │   ├── config.py                     # 設定
@@ -380,7 +380,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 5. **驗證健康狀態**：
    ```bash
    curl https://marketvue-api.onrender.com/api/health
-   # Expected: {"service":"stock-dashboard-api","status":"healthy"}
+   # Expected: {"service":"marketvue-api","status":"healthy"}
    ```
 
 #### 部署配置詳情
@@ -420,7 +420,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 ### 開發規範與指南
 - **通用設定**：`../../.claude/character.md`, `../../.claude/general-principles.md`
 - **版本號維護指南**：`.claude/versioning-guide.md` ⭐ 更新版本號前必讀
-- **專案文件**：`/Users/clementtang/stock-dashboard/docs/`
+- **專案文件**：`/Users/clementtang/marketvue/docs/`
 
 ### 專案文件
 - **開發藍圖**：`ROADMAP.md`

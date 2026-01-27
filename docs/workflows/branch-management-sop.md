@@ -40,7 +40,7 @@ claude/[描述]-[隨機ID]
 
 #### Step 1: 同步遠端分支
 ```bash
-cd /Users/clementtang/stock-dashboard
+cd /Users/clementtang/marketvue
 git fetch --prune
 ```
 

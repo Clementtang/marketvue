@@ -231,7 +231,7 @@ Monitor service health and readiness.
 ```json
 {
   "status": "healthy",
-  "service": "stock-dashboard-api",
+  "service": "marketvue-api",
   "version": "1.0.0"
 }
 ```
@@ -243,7 +243,7 @@ Monitor service health and readiness.
 ```json
 {
   "status": "healthy",
-  "service": "stock-dashboard-api",
+  "service": "marketvue-api",
   "version": "1.0.0",
   "api_version": "v1",
   "timestamp": "2025-11-24T04:30:00Z",

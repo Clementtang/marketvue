@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Project Rebranding: stock-dashboard → marketvue**
+  - Renamed local project folder from `stock-dashboard` to `marketvue` (matches GitHub repo name)
+  - Updated API service name from `stock-dashboard-api` to `marketvue-api`
+  - Updated all path references in documentation and configuration files
+  - Files updated:
+    - `backend/routes/health_routes.py`: Service identifier in health check responses
+    - `backend/tests/test_health_routes.py`: Updated test assertions
+    - `.claude/instructions.md`: Local path references
+    - `.claude-public/CLAUDE.md`: Directory structure documentation
+    - `docs/API.md`: API response examples
+    - `docs/DEPLOYMENT_CONFIG.md`: Deployment verification examples
+    - `docs/security/guides/implementation-guide.md`: Code examples
+    - `docs/workflows/branch-management-sop.md`: Path references
+    - `.scripts/README.md`: Script documentation
+    - `TEST_INSTRUCTIONS.md`: Test file paths
+    - `CLAUDE.md`: Project structure
+  - Note: `docs/project-history/` files preserved with original names for historical accuracy
+
 ## [1.13.0] - 2025-12-19
 
 ### Added
@@ -1201,10 +1221,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Phase 2 Day 5 - Backend Refactoring & Function Splitting** (2025-11-17)
   - Refactored StockService.get_stock_data() method using Single Responsibility Principle:
-    - Extracted _fetch_history(): Fetches historical data from yfinance with fallback logic
-    - Extracted _convert_to_data_points(): Converts DataFrame to data point dictionaries
-    - Extracted _calculate_price_info(): Calculates current price, change, and change percentage
-    - Extracted _get_ticker_info_safe(): Safely retrieves ticker info with error handling
+    - Extracted \_fetch_history(): Fetches historical data from yfinance with fallback logic
+    - Extracted \_convert_to_data_points(): Converts DataFrame to data point dictionaries
+    - Extracted \_calculate_price_info(): Calculates current price, change, and change percentage
+    - Extracted \_get_ticker_info_safe(): Safely retrieves ticker info with error handling
     - Main method reduced from 88 lines to 35 lines (orchestration only)
   - Created error handling decorators (`backend/utils/decorators.py`):
     - handle_errors: Centralized exception handling (ValidationError→400, ValueError→400, Exception→500)
@@ -1361,6 +1381,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.4] - 2025-11-09
 
 ### Fixed
+
 - **Build Error**: Fixed TypeScript compilation error preventing Vercel deployment
   - Issue: TS6133 error - 'domainMin' declared but never used in CandlestickChart component
   - Location: src/components/CandlestickChart.tsx:36:45
@@ -1372,6 +1393,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.4] - 2025-11-09 (Earlier Fix)
 
 ### Fixed
+
 - **Candlestick Chart Coordinate Calculation**: Fixed critical issue where high-volatility stocks rendered outside chart bounds
   - Issue: K-line charts for high-volatility stocks (e.g., 6763.TWO with 9.3% daily range) extended beyond the bottom of the chart area
   - Root cause: Initial implementation used fixed 10% estimation for price range, which failed for stocks with larger daily movements
@@ -1384,12 +1406,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Result: Perfect rendering for all stocks regardless of volatility (tested 0.5% - 10% daily ranges)
 
 ### Improved
+
 - **Chart Margin Accuracy**: Corrected chart height calculation to account for top/bottom margins
   - ResponsiveContainer height: 145px
   - Actual drawing area: 135px (145 - 5 top - 5 bottom margin)
   - Ensures pixel-perfect alignment for all price points
 
 ### Technical Details
+
 - Modified `CandlestickChart` component to pre-calculate price domain in parent (lines 249-254)
 - Updated coordinate calculation formula in `Candlestick` component:
   ```typescript
@@ -1406,6 +1430,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.3] - 2025-11-09
 
 ### Fixed
+
 - **Candlestick Chart Rendering**: Fixed critical React key duplication error in K-line chart
   - Issue: Console showed "Encountered two children with the same key" errors for ErrorBar components
   - Root cause: Using Bar + ErrorBar approach caused React key conflicts when rendering bullish/bearish candles
@@ -1414,6 +1439,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Result: Eliminated all console errors and improved rendering performance
 
 ### Technical Details
+
 - Removed `Bar` and `ErrorBar` components from candlestick implementation
 - Added new `Candlesticks` component that renders using `<Customized>` wrapper
 - Each candlestick consists of:
@@ -1427,6 +1453,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.2] - 2025-11-06
 
 ### Fixed
+
 - **Rate Limit Error Handling**: Fixed incorrect error message for 429 (Too Many Requests) errors
   - Issue: When backend rate limit was exceeded (429 status), frontend incorrectly displayed "Stock symbol not found" error
   - Root cause: Missing 429 status code handling in error logic
@@ -1436,6 +1463,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Users can manually retry after waiting
 
 ### Technical Details
+
 - Added `rateLimitExceeded` translation key to `translations.ts` (zh-TW + en-US)
 - Modified `StockCard.tsx` error handling to detect 429 status code
 - Updated retry logic to exclude 429 errors from automatic retries (along with 404)
@@ -1444,6 +1472,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.1] - 2025-11-06
 
 ### Improved
+
 - **Smart 503 Error Handling**: Optimized retry logic for Render Free tier cold starts
   - Implemented status-code-specific retry delays
   - 503 errors now use longer retry intervals (5s, 10s, 15s) to accommodate 30-60 second cold start time
@@ -1455,6 +1484,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Users are informed about expected wait times during cold starts
 
 ### Technical Details
+
 - Modified `StockCard.tsx` retry mechanism to differentiate between error types
 - Cold start delays: [5000ms, 10000ms, 15000ms] for 503 errors
 - Standard delays: exponential backoff up to 5000ms for other errors
@@ -1463,6 +1493,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.0] - 2025-11-06
 
 ### Added
+
 - **18 Stock Support**: Increased maximum trackable stocks from 9 to 18
   - Updated `StockManager` validation to allow up to 18 stocks
   - Enhanced `DashboardGrid` layout to support 6x3 grid (18 stocks)
@@ -1486,6 +1517,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Zero infrastructure changes (uses existing SimpleCache in-memory storage)
 
 ### Fixed
+
 - **Volume Display Bug**: Changed stock card footer to show average volume instead of last day volume
   - Previously showed volume of the last trading day in the date range
   - Issue: Volume appeared unchanged when switching time ranges with same end date
@@ -1495,6 +1527,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Bilingual labels: "平均成交量" (zh-TW) / "Avg Volume" (en-US)
 
 ### Changed
+
 - Grid layout now supports up to 6 rows (previously 3 rows) for better 18-stock display
 - Stock counter now shows "X/18" instead of "X/9"
 - Error messages are now more specific and user-friendly
@@ -1505,6 +1538,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.2.1] - 2025-11-04
 
 ### Removed
+
 - **News Feature**: Completely removed news functionality from the application
   - Removed backend news API endpoint (`/api/stock-news/<symbol>`)
   - Removed `StockService.get_stock_news()` method
@@ -1514,13 +1548,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed all news-related state management
 
 ### Rationale
+
 The yfinance news API has significant limitations that make it unsuitable for our user base:
+
 - ❌ **No Chinese language support**: Only provides English news
 - ❌ **Limited Taiwan stock coverage**: Small/mid-cap Taiwan stocks have no news
 - ❌ **Inconsistent quality**: News coverage varies greatly by market and stock size
 - ✅ **Better alternatives exist**: Google News RSS and NewsAPI.ai offer better multilingual support
 
 The news feature will be **re-implemented in Q2 2025** (P2 priority) using a hybrid news aggregation approach:
+
 - Taiwan stocks (.TW, .TWO) → Google News RSS (Traditional Chinese)
 - US stocks → NewsAPI.org or Google News RSS (English)
 - Hong Kong stocks (.HK) → Google News RSS (Chinese/English)
@@ -1531,6 +1568,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 ## [1.2.0] - 2025-11-04
 
 ### Added
+
 - **Notification Banner**: Added dismissible warning banner about free hosting limitations
   - Displays information about backend sleep time and first-load delays
   - Banner remembers dismissal state using localStorage
@@ -1552,6 +1590,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
   - Enables Core Web Vitals and performance tracking in Vercel dashboard
 
 ### Changed
+
 - **Application Branding**: Updated application name from "Stock Dashboard" to "MarketVue"
   - Updated browser title in index.html
   - Updated all UI text in translations (English and Traditional Chinese)
@@ -1563,6 +1602,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 - **Package Version**: Bumped version to 1.2.0
 
 ### Fixed
+
 - **Dark Mode Styling**: Improved notification banner appearance in dark mode
   - Adjusted background opacity from 20% to 30% for better visibility
   - Changed border color to lighter yellow-700/50 to remove harsh orange line
@@ -1575,6 +1615,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
   - Footer now stays at bottom when content is short, without being sticky
 
 ### Technical
+
 - Created NotificationBanner component with localStorage integration
 - Created Footer component with bilingual link support
 - Added new translation keys: freeHostingNotice, madeBy, viewOnGitHub
@@ -1589,6 +1630,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 ## [1.1.1] - 2025-11-04
 
 ### Fixed
+
 - **API URL Configuration**: Corrected duplicate `/api` path in environment variables
   - Removed `/api` suffix from `VITE_API_URL` base URL
   - Fixed double `/api/api` path issue causing API request failures in production
@@ -1597,6 +1639,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 ## [1.1.0] - 2025-11-03
 
 ### Added
+
 - **Production Deployment Support**: Complete deployment configuration for Vercel + Render
   - Environment variable configuration (.env.example, .env.production)
   - Render deployment configuration (render.yaml)
@@ -1605,16 +1648,19 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 - **TypeScript Type Definitions**: Added @types/react-grid-layout for production builds
 
 ### Changed
+
 - Updated CORS configuration with production environment documentation
 - Enhanced README with deployment guide link
 
 ### Documentation
+
 - Added complete deployment guide in English and Traditional Chinese
 - Updated README files with deployment links
 
 ## [1.0.0] - 2025-10-31
 
 ### Added
+
 - **Multi-Market Support**: Track stocks from Taiwan (Listed/OTC), US, Hong Kong, and Japan markets
 - **Technical Indicators**: MA20 and MA60 moving averages with interactive charts
 - **Real-time Data**: Live stock prices and changes powered by yfinance
@@ -1634,6 +1680,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 - **Time Range Selection**: Preset ranges (1W, 1M, 3M, 6M, 1Y) or custom dates
 
 ### Technical
+
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Recharts
 - **Backend**: Flask, yfinance, Flask-CORS, Flask-Caching
 - **Build Tools**: Vite for fast development and optimized production builds
@@ -1641,6 +1688,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 - **Date Handling**: date-fns for reliable date operations
 
 ### Documentation
+
 - Comprehensive README in both Chinese and English
 - API documentation
 - Architecture documentation
@@ -1654,6 +1702,7 @@ This ensures all users, especially Chinese-speaking users, receive relevant news
 > 📍 **查看專案發展規劃：** [ROADMAP.md](./ROADMAP.md)
 
 本專案持續開發中，未來功能規劃請參考 [ROADMAP.md](./ROADMAP.md)，包含：
+
 - **Q1 2025**: K線圖、18檔股票支援、API優化
 - **Q2 2025**: 技術指標擴充、匯出數據、測試提升
 - **Q3-Q4 2025**: 投資組合追蹤、行動應用、AI洞察

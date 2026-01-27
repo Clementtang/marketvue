@@ -104,7 +104,7 @@ gunicorn --bind 0.0.0.0:$PORT app:app
 
 ### Health Check
 - **Path**: `/api/health`
-- **Expected Response**: `{"service":"stock-dashboard-api","status":"healthy"}`
+- **Expected Response**: `{"service":"marketvue-api","status":"healthy"}`
 
 ### Service URL
 - **Production URL**: `https://marketvue-api.onrender.com`
@@ -173,7 +173,7 @@ curl https://marketvue-api.onrender.com/api/health
 3. ✅ **Verify Health Endpoint**
    ```
    curl https://marketvue-api.onrender.com/api/health
-   Expected: {"service":"stock-dashboard-api","status":"healthy"}
+   Expected: {"service":"marketvue-api","status":"healthy"}
    ```
 
 ### Common Mistakes to Avoid
