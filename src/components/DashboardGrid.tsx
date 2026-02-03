@@ -1,18 +1,18 @@
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import GridLayout from 'react-grid-layout';
-import 'react-grid-layout/css/styles.css';
-import 'react-resizable/css/styles.css';
-import { BarChart3, CandlestickChart as CandlestickIcon } from 'lucide-react';
-import { useTrail, animated } from '@react-spring/web';
-import StockCard from './stock-card';
-import ScreenshotButton from './ScreenshotButton';
-import PageNavigator from './PageNavigator';
-import { useTranslation } from '../i18n/translations';
-import { useApp } from '../contexts/AppContext';
-import { useChart } from '../contexts/ChartContext';
-import { useVisualTheme } from '../contexts/VisualThemeContext';
-import { animations } from '../utils/animations';
-import { logger } from '../utils/logger';
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
+import GridLayout from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import { BarChart3, CandlestickChart as CandlestickIcon } from "lucide-react";
+import { useTrail, animated } from "@react-spring/web";
+import StockCard from "./stock-card";
+import ScreenshotButton from "./ScreenshotButton";
+import PageNavigator from "./PageNavigator";
+import { useTranslation } from "../i18n/translations";
+import { useApp } from "../contexts/AppContext";
+import { useChart } from "../contexts/ChartContext";
+import { useVisualTheme } from "../contexts/VisualThemeContext";
+import { animations } from "../utils/animations";
+import { logger } from "../utils/logger";
 
 interface DashboardGridProps {
   stocks: string[];
@@ -42,8 +42,8 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
   // Stagger animation for stock cards
   const trails = useTrail(paginatedStocks.length, {
-    from: { opacity: 0, transform: 'translateY(20px)' },
-    to: { opacity: 1, transform: 'translateY(0px)' },
+    from: { opacity: 0, transform: "translateY(20px)" },
+    to: { opacity: 1, transform: "translateY(0px)" },
     config: animations.gentle,
     reset: true, // Reset animation when page changes
   });
@@ -54,8 +54,8 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     const previousStocks = previousStocksRef.current;
 
     // Check if stocks actually changed (not just re-rendered)
-    const stocksString = stocks.join(',');
-    const previousStocksString = previousStocks.join(',');
+    const stocksString = stocks.join(",");
+    const previousStocksString = previousStocks.join(",");
 
     if (stocksString !== previousStocksString && previousStocks.length > 0) {
       const totalPages = Math.ceil(stocks.length / itemsPerPage);
@@ -82,7 +82,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
   // Memoized width update handler
   const updateWidth = useCallback(() => {
-    const container = document.getElementById('grid-container');
+    const container = document.getElementById("grid-container");
     if (container && container.offsetWidth > 0) {
       setContainerWidth(container.offsetWidth);
     }
@@ -92,10 +92,10 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   useEffect(() => {
     // Small delay to ensure DOM is fully rendered
     const timer = setTimeout(updateWidth, 100);
-    window.addEventListener('resize', updateWidth);
+    window.addEventListener("resize", updateWidth);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener('resize', updateWidth);
+      window.removeEventListener("resize", updateWidth);
     };
   }, [updateWidth]);
 
@@ -103,39 +103,47 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   useEffect(() => {
     // Check URL parameter for reset
     const urlParams = new URLSearchParams(window.location.search);
-    const shouldReset = urlParams.get('reset') === 'true';
+    const shouldReset = urlParams.get("reset") === "true";
 
     if (shouldReset) {
-      localStorage.removeItem('dashboard-layout');
-      localStorage.removeItem('dashboard-layout-version');
+      localStorage.removeItem("dashboard-layout");
+      localStorage.removeItem("dashboard-layout-version");
       // Remove reset parameter from URL
-      urlParams.delete('reset');
-      const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-      window.history.replaceState({}, '', newUrl);
+      urlParams.delete("reset");
+      const newUrl =
+        window.location.pathname +
+        (urlParams.toString() ? "?" + urlParams.toString() : "");
+      window.history.replaceState({}, "", newUrl);
     }
 
     // Check layout version
-    const layoutVersion = localStorage.getItem('dashboard-layout-version');
-    if (layoutVersion !== 'snapshot-v20-pagination') {
+    const layoutVersion = localStorage.getItem("dashboard-layout-version");
+    if (layoutVersion !== "snapshot-v20-pagination") {
       // Clear old layout when upgrading to pagination version
-      localStorage.removeItem('dashboard-layout');
-      localStorage.setItem('dashboard-layout-version', 'snapshot-v20-pagination');
+      localStorage.removeItem("dashboard-layout");
+      localStorage.setItem(
+        "dashboard-layout-version",
+        "snapshot-v20-pagination",
+      );
     }
 
     // Load saved layout from localStorage (contains ALL stocks, not just current page)
-    const savedLayout = localStorage.getItem('dashboard-layout');
+    const savedLayout = localStorage.getItem("dashboard-layout");
     let existingLayout: Record<string, GridLayout.Layout> = {};
 
     if (savedLayout) {
       try {
         const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
-        existingLayout = parsed.reduce((acc, item) => {
-          acc[item.i] = item;
-          return acc;
-        }, {} as Record<string, GridLayout.Layout>);
+        existingLayout = parsed.reduce(
+          (acc, item) => {
+            acc[item.i] = item;
+            return acc;
+          },
+          {} as Record<string, GridLayout.Layout>,
+        );
       } catch (e) {
-        logger.error('Failed to load saved layout:', e);
-        localStorage.removeItem('dashboard-layout');
+        logger.error("Failed to load saved layout:", e);
+        localStorage.removeItem("dashboard-layout");
       }
     }
 
@@ -180,7 +188,9 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
     // Check if all items are stacked vertically (all x=0)
     if (correctedLayout.length >= 3) {
-      const allAtXZero = correctedLayout.filter(item => item.x === 0).length === correctedLayout.length;
+      const allAtXZero =
+        correctedLayout.filter((item) => item.x === 0).length ===
+        correctedLayout.length;
 
       if (allAtXZero) {
         const fixedLayout = correctedLayout.map((item, index) => ({
@@ -191,26 +201,32 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         setLayout(fixedLayout);
 
         // Merge with existing layout from other pages
-        const savedLayout = localStorage.getItem('dashboard-layout');
+        const savedLayout = localStorage.getItem("dashboard-layout");
         let allLayouts: Record<string, GridLayout.Layout> = {};
         if (savedLayout) {
           try {
             const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
-            allLayouts = parsed.reduce((acc, item) => {
-              acc[item.i] = item;
-              return acc;
-            }, {} as Record<string, GridLayout.Layout>);
+            allLayouts = parsed.reduce(
+              (acc, item) => {
+                acc[item.i] = item;
+                return acc;
+              },
+              {} as Record<string, GridLayout.Layout>,
+            );
           } catch (e) {
-            logger.error('Failed to parse saved layout:', e);
+            logger.error("Failed to parse saved layout:", e);
           }
         }
 
         // Update with current page's layout
-        fixedLayout.forEach(item => {
+        fixedLayout.forEach((item) => {
           allLayouts[item.i] = item;
         });
 
-        localStorage.setItem('dashboard-layout', JSON.stringify(Object.values(allLayouts)));
+        localStorage.setItem(
+          "dashboard-layout",
+          JSON.stringify(Object.values(allLayouts)),
+        );
         return;
       }
     }
@@ -218,41 +234,49 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     setLayout(correctedLayout);
 
     // Merge current page layout with existing layouts from other pages
-    const savedLayout = localStorage.getItem('dashboard-layout');
+    const savedLayout = localStorage.getItem("dashboard-layout");
     let allLayouts: Record<string, GridLayout.Layout> = {};
     if (savedLayout) {
       try {
         const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
-        allLayouts = parsed.reduce((acc, item) => {
-          acc[item.i] = item;
-          return acc;
-        }, {} as Record<string, GridLayout.Layout>);
+        allLayouts = parsed.reduce(
+          (acc, item) => {
+            acc[item.i] = item;
+            return acc;
+          },
+          {} as Record<string, GridLayout.Layout>,
+        );
       } catch (e) {
-        console.error('Failed to parse saved layout:', e);
+        console.error("Failed to parse saved layout:", e);
       }
     }
 
     // Update with current page's layout
-    correctedLayout.forEach(item => {
+    correctedLayout.forEach((item) => {
       allLayouts[item.i] = item;
     });
 
-    localStorage.setItem('dashboard-layout', JSON.stringify(Object.values(allLayouts)));
+    localStorage.setItem(
+      "dashboard-layout",
+      JSON.stringify(Object.values(allLayouts)),
+    );
   }, []);
 
   // Toggle chart type handler - must be before early return to follow Hooks rules
   const handleToggleChartType = useCallback(() => {
-    const newType = chartType === 'line' ? 'candlestick' : 'line';
+    const newType = chartType === "line" ? "candlestick" : "line";
     setChartType(newType);
   }, [chartType, setChartType]);
 
   if (stocks.length === 0) {
     return (
-      <div className={`rounded-lg shadow-sm p-12 text-center transition-colors ${
-        visualTheme === 'warm'
-          ? 'bg-warm-100 dark:bg-warm-800'
-          : 'bg-white dark:bg-gray-800'
-      }`}>
+      <div
+        className={`rounded-lg shadow-sm p-12 text-center transition-colors ${
+          visualTheme === "warm"
+            ? "bg-warm-100 dark:bg-warm-800"
+            : "bg-white dark:bg-gray-800"
+        }`}
+      >
         <div className="text-gray-400 dark:text-gray-500 mb-4">
           <svg
             className="w-24 h-24 mx-auto"
@@ -271,29 +295,34 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
           {t.noStocksAddedYet}
         </h3>
-        <p className="text-gray-500 dark:text-gray-400">
-          {t.addStocksToStart}
-        </p>
+        <p className="text-gray-500 dark:text-gray-400">{t.addStocksToStart}</p>
       </div>
     );
   }
 
   return (
-    <div className={`shadow-sm p-6 transition-colors ${
-      visualTheme === 'warm'
-        ? 'bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50'
-        : 'bg-white dark:bg-gray-800 rounded-lg'
-    }`} id="grid-container">
+    <div
+      className={`shadow-sm p-6 transition-colors ${
+        visualTheme === "warm"
+          ? "bg-warm-100 dark:bg-warm-800 rounded-3xl border border-warm-200/50 dark:border-warm-700/50"
+          : "bg-white dark:bg-gray-800 rounded-lg"
+      }`}
+      id="grid-container"
+    >
       {/* Dashboard Header - constrained to grid width */}
       <div
         className="flex items-center justify-between mb-4 mx-auto"
         style={{ maxWidth: Math.max(containerWidth - 48, 300) }}
       >
-        <h2 className={`text-xl font-semibold ${
-          visualTheme === 'warm'
-            ? 'text-warm-800 dark:text-warm-100 font-serif'
-            : 'text-gray-800 dark:text-white'
-        }`}>{t.dashboardGrid}</h2>
+        <h2
+          className={`text-xl font-semibold ${
+            visualTheme === "warm"
+              ? "text-warm-800 dark:text-warm-100 font-serif"
+              : "text-gray-800 dark:text-white"
+          }`}
+        >
+          {t.dashboardGrid}
+        </h2>
 
         <div className="flex items-center gap-3">
           {/* Page Navigator (only show if multiple pages) */}
@@ -309,16 +338,22 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           <button
             onClick={handleToggleChartType}
             className={`flex items-center gap-2 px-3 py-2 text-white transition-colors shadow-sm ${
-              visualTheme === 'warm'
-                ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
-                : 'bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg'
+              visualTheme === "warm"
+                ? "bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl"
+                : "bg-blue-600 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800 rounded-lg"
             }`}
-            title={chartType === 'line' ? t.switchToCandlestickChart : t.switchToLineChart}
+            title={
+              chartType === "line"
+                ? t.switchToCandlestickChart
+                : t.switchToLineChart
+            }
           >
-            {chartType === 'line' ? (
+            {chartType === "line" ? (
               <>
                 <CandlestickIcon size={18} />
-                <span className="text-sm font-medium">{t.candlestickChart}</span>
+                <span className="text-sm font-medium">
+                  {t.candlestickChart}
+                </span>
               </>
             ) : (
               <>
@@ -329,7 +364,10 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           </button>
 
           {/* Screenshot Button */}
-          <ScreenshotButton targetElementId="dashboard-grid-layout" language={language} />
+          <ScreenshotButton
+            targetElementId="dashboard-grid-layout"
+            language={language}
+          />
         </div>
       </div>
 
@@ -345,25 +383,25 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           compactType="vertical"
           preventCollision={false}
           isResizable={true}
-          resizeHandles={['se']}
+          resizeHandles={["se"]}
         >
-        {trails.map((style, index) => {
-          const symbol = paginatedStocks[index];
-          return (
-            <animated.div key={symbol} className="relative" style={style}>
-              {/* Drag Handle - transparent for minimal design */}
-              <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10" />
+          {trails.map((style, index) => {
+            const symbol = paginatedStocks[index];
+            return (
+              <animated.div key={symbol} className="relative" style={style}>
+                {/* Drag Handle - transparent for minimal design */}
+                <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10" />
 
-              {/* Stock Card */}
-              <StockCard
-                symbol={symbol}
-                startDate={startDate}
-                endDate={endDate}
-              />
-            </animated.div>
-          );
-        })}
-      </GridLayout>
+                {/* Stock Card */}
+                <StockCard
+                  symbol={symbol}
+                  startDate={startDate}
+                  endDate={endDate}
+                />
+              </animated.div>
+            );
+          })}
+        </GridLayout>
       </div>
     </div>
   );
