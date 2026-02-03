@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **Dependency Updates** (2025-01-27)
+- **Dependency Updates** (2026-02-03)
   - Updated React ecosystem: react/react-dom 19.2.0 → 19.2.4
   - Updated data fetching: @tanstack/react-query 5.90.10 → 5.90.20
   - Updated HTTP client: axios 1.12.2 → 1.13.4
