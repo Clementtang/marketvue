@@ -9,6 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Dependency Updates** (2025-01-27)
+  - Updated React ecosystem: react/react-dom 19.2.0 → 19.2.4
+  - Updated data fetching: @tanstack/react-query 5.90.10 → 5.90.20
+  - Updated HTTP client: axios 1.12.2 → 1.13.4
+  - Updated charting: recharts 3.3.0 → 3.7.0
+  - Updated icons: lucide-react 0.546.0 → 0.563.0
+  - Updated build tools: vite 7.1.11 → 7.3.1
+  - Updated testing: jsdom 27.2.0 → 28.0.0, vitest 4.0.13 → 4.0.18
+  - Updated types: @types/node 24.9.1 → 25.2.0
+  - Updated linting: eslint-plugin-react-hooks 5.2.0 → 7.0.1
+  - Updated ESLint config for react-hooks v7 flat config format
+  - Note: react-grid-layout kept at 1.5.x (v2 requires significant refactoring)
+
 - **Project Rebranding: stock-dashboard → marketvue**
   - Renamed local project folder from `stock-dashboard` to `marketvue` (matches GitHub repo name)
   - Updated API service name from `stock-dashboard-api` to `marketvue-api`
