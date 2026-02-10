@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Custom hook for persisting state to localStorage
@@ -18,7 +18,7 @@ import { useState, useEffect } from 'react';
  */
 export function usePersistedState<T>(
   key: string,
-  defaultValue: T
+  defaultValue: T,
 ): [T, (value: T | ((prev: T) => T)) => void] {
   const [state, setState] = useState<T>(defaultValue);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -28,7 +28,13 @@ export function usePersistedState<T>(
     try {
       const saved = localStorage.getItem(key);
       if (saved) {
-        setState(JSON.parse(saved) as T);
+        try {
+          setState(JSON.parse(saved) as T);
+        } catch {
+          // Handle legacy plain strings (e.g. "candlestick" stored without JSON.stringify)
+          setState(saved as unknown as T);
+          localStorage.setItem(key, JSON.stringify(saved));
+        }
       }
     } catch (error) {
       console.error(`Failed to load "${key}" from localStorage:`, error);
@@ -41,9 +47,8 @@ export function usePersistedState<T>(
   // Save to localStorage on state change (after initialization)
   const setPersistedState = (value: T | ((prev: T) => T)) => {
     setState((prev) => {
-      const newValue = typeof value === 'function'
-        ? (value as (prev: T) => T)(prev)
-        : value;
+      const newValue =
+        typeof value === "function" ? (value as (prev: T) => T)(prev) : value;
 
       // Only save to localStorage after initial load is complete
       if (isInitialized) {

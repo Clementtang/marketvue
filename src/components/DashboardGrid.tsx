@@ -388,9 +388,25 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           {trails.map((style, index) => {
             const symbol = paginatedStocks[index];
             return (
-              <animated.div key={symbol} className="relative" style={style}>
-                {/* Drag Handle - transparent for minimal design */}
-                <div className="drag-handle absolute top-2 left-2 right-2 h-6 cursor-move z-10" />
+              <animated.div
+                key={symbol}
+                className="relative group/card"
+                style={style}
+              >
+                {/* Drag Handle - grip icon at top-left corner */}
+                <div className="drag-handle absolute top-1.5 left-1.5 w-5 h-5 cursor-grab active:cursor-grabbing z-10 flex items-center justify-center opacity-0 group-hover/card:opacity-40 transition-opacity duration-200 rounded">
+                  <svg
+                    width="10"
+                    height="10"
+                    viewBox="0 0 10 10"
+                    className="text-gray-400 dark:text-gray-500"
+                  >
+                    <circle cx="2" cy="2" r="1" fill="currentColor" />
+                    <circle cx="6" cy="2" r="1" fill="currentColor" />
+                    <circle cx="2" cy="6" r="1" fill="currentColor" />
+                    <circle cx="6" cy="6" r="1" fill="currentColor" />
+                  </svg>
+                </div>
 
                 {/* Stock Card */}
                 <StockCard

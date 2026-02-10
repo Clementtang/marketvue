@@ -1,8 +1,8 @@
-import { memo, useMemo } from 'react';
-import { AnimatedNumber } from '../common/AnimatedNumber';
-import type { StockData } from '../../types/stock';
-import type { Language } from '../../i18n/translations';
-import type { ColorTheme } from '../ColorThemeSelector';
+import { memo, useMemo } from "react";
+import { AnimatedNumber } from "../common/AnimatedNumber";
+import type { StockData } from "../../types/stock";
+import type { Language } from "../../i18n/translations";
+import type { ColorTheme } from "../ColorThemeSelector";
 
 interface StockCardHeaderProps {
   stockData: StockData;
@@ -23,9 +23,11 @@ const StockCardHeader = memo(function StockCardHeader({
 }: StockCardHeaderProps) {
   // Determine if this is a Taiwan or Japan stock (ends with .TW, .TWO, or .T)
   const isAsianStock = useMemo(() => {
-    return stockData.symbol.endsWith('.TW') ||
-           stockData.symbol.endsWith('.TWO') ||
-           stockData.symbol.endsWith('.T');
+    return (
+      stockData.symbol.endsWith(".TW") ||
+      stockData.symbol.endsWith(".TWO") ||
+      stockData.symbol.endsWith(".T")
+    );
   }, [stockData.symbol]);
 
   // Memoized display name (company name only, without symbol)
@@ -34,9 +36,10 @@ const StockCardHeader = memo(function StockCardHeader({
       return stockData.symbol || symbol;
     }
 
-    const companyName = language === 'zh-TW'
-      ? stockData.company_name['zh-TW']
-      : stockData.company_name['en-US'];
+    const companyName =
+      language === "zh-TW"
+        ? stockData.company_name["zh-TW"]
+        : stockData.company_name["en-US"];
 
     return companyName || stockData.symbol;
   }, [stockData, language, symbol]);
@@ -50,26 +53,29 @@ const StockCardHeader = memo(function StockCardHeader({
 
   // Get currency code based on symbol
   const getCurrency = (symbol: string): string => {
-    if (symbol.endsWith('.TW') || symbol.endsWith('.TWO')) return 'TWD';
-    if (symbol.endsWith('.T')) return 'JPY';
-    if (symbol.endsWith('.HK')) return 'HKD';
-    return 'USD'; // Default for US stocks and others
+    if (symbol.endsWith(".TW") || symbol.endsWith(".TWO")) return "TWD";
+    if (symbol.endsWith(".T")) return "JPY";
+    if (symbol.endsWith(".HK")) return "HKD";
+    return "USD"; // Default for US stocks and others
   };
 
   // Format price with thousand separators
   const formatPrice = (price: number, currency: string): string => {
-    if (currency === 'JPY') {
+    if (currency === "JPY") {
       // Japanese Yen: no decimals, with thousand separators
-      return price.toLocaleString('en-US', { maximumFractionDigits: 0 });
+      return price.toLocaleString("en-US", { maximumFractionDigits: 0 });
     }
     // Others: 2 decimals, with thousand separators
-    return price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    return price.toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   };
 
   const currency = getCurrency(stockData.symbol);
   const formattedPrice = stockData.current_price
     ? formatPrice(stockData.current_price, currency)
-    : 'N/A';
+    : "N/A";
 
   return (
     <div className="flex items-start justify-between mb-1.5 gap-2">
@@ -97,7 +103,10 @@ const StockCardHeader = memo(function StockCardHeader({
             >
               {stockData.symbol}
             </h3>
-            <span className="text-xs text-gray-500 dark:text-gray-400 truncate transition-all duration-200 group-hover:opacity-70" title={displayName}>
+            <span
+              className="text-xs text-gray-500 dark:text-gray-400 truncate transition-all duration-200 group-hover:opacity-70"
+              title={displayName}
+            >
               {displayName}
             </span>
           </>
@@ -105,8 +114,8 @@ const StockCardHeader = memo(function StockCardHeader({
       </div>
 
       {/* Right: Price (top), Change (bottom) */}
-      <div className="flex flex-col items-end justify-start flex-shrink-0">
-        <div className="flex items-baseline gap-1 transition-transform duration-200 hover:scale-105">
+      <div className="flex flex-col items-end justify-start flex-shrink-0 cursor-default">
+        <div className="flex items-baseline gap-1">
           <span className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap leading-tight">
             {formattedPrice}
           </span>
@@ -120,15 +129,16 @@ const StockCardHeader = memo(function StockCardHeader({
             style={{ color: priceInfo.upColor }}
           >
             <span>
-              {priceInfo.isPositive ? '+' : '-'}
+              {priceInfo.isPositive ? "+" : "-"}
               {formatPrice(Math.abs(stockData.change), currency)} (
-              {priceInfo.isPositive ? '+' : '-'}
+              {priceInfo.isPositive ? "+" : "-"}
               <AnimatedNumber
                 value={Math.abs(stockData.change_percent)}
                 decimals={2}
                 suffix="%"
                 duration={600}
-              />)
+              />
+              )
             </span>
           </div>
         )}

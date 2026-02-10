@@ -5,6 +5,49 @@ All notable changes to MarketVue will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.14.1] - 2026-02-10
+
+### Improved
+
+- **Stock Card Interaction Redesign — Drag Handle + News Button**
+  - Drag handle: full-width invisible bar → compact grip icon (4-dot pattern) at top-left corner
+    - Only visible on card hover (`opacity-0` → `opacity-40`), Notion/Trello-style grip pattern
+    - Precise 20×20px hit area instead of full header coverage, eliminates cursor conflict with interactive elements
+    - Cursor: `cursor-grab` / `active:cursor-grabbing` for clearer drag affordance
+  - News button: moved from Header to Footer (chart legend area)
+    - Always visible (`opacity-60`, hover `opacity-100`), accessible on mobile without hover dependency
+    - Zero conflict with drag handle — Footer is completely outside drag zone
+  - Removed `relative z-20` workaround from Header (no longer needed)
+
+### Fixed
+
+- **Stock Card Cursor Behavior**
+  - Price/change area: set `cursor-default`, removed unintended `hover:scale-105` zoom effect
+  - Footer info row: set `cursor-pointer` on hover for better interactivity cue
+- **News Article Sort Order**
+  - Articles now sorted by `published_at` descending (newest first)
+  - Previously returned in arbitrary order from Google News RSS feed
+- **localStorage Legacy String Handling**
+  - `usePersistedState` now gracefully handles bare strings (e.g. `candlestick` stored without `JSON.stringify`)
+  - Falls back to raw string value instead of crashing with `SyntaxError`
+  - Auto-migrates legacy values to valid JSON format on first read
+
+## [1.14.0] - 2026-02-09
+
+### Added
+
+- **Stock News Integration** (v1.14.0)
+  - Per-stock news viewing via hover-revealed icon button on each stock card
+  - Mixed news sources: Finnhub Company News API (US stocks), Google News RSS (TW/HK/JP stocks)
+  - Responsive news panel: right-side slide panel (desktop), full-screen modal (mobile)
+  - Bilingual news support: English for US stocks, Traditional Chinese for TW/HK stocks
+  - News caching with 15-minute TTL to minimize API calls
+  - Skeleton loading animation and empty state handling
+  - New backend endpoint: `GET /api/v1/news/<symbol>`
+  - 10 new i18n keys for news UI strings
+  - 56 new backend tests (277 total, 88.79% coverage)
+  - 6 new frontend tests (165 total)
+
 ## [Unreleased]
 
 ### Changed
