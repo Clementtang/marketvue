@@ -16,6 +16,7 @@ from utils.config_validator import validate_config
 from routes.stock_routes import stock_bp
 from routes.health_routes import health_bp
 from routes.legacy_routes import legacy_bp
+from routes.news_routes import news_bp
 
 # Initial basic logging (will be reconfigured in create_app)
 logging.basicConfig(
@@ -140,6 +141,7 @@ def create_app(config_name='default'):
     # API v1 routes (primary)
     app.register_blueprint(stock_bp)      # /api/v1/stock-data, /api/v1/batch-stocks
     app.register_blueprint(health_bp)     # /api/v1/health, /api/v1/health/detailed
+    app.register_blueprint(news_bp)       # /api/v1/news/<symbol>
     # Legacy routes for backward compatibility (deprecated)
     app.register_blueprint(legacy_bp)     # /api/stock-data, /api/batch-stocks, /api/health
 
@@ -157,6 +159,7 @@ def create_app(config_name='default'):
                 'v1': {
                     'stock_data': '/api/v1/stock-data',
                     'batch_stocks': '/api/v1/batch-stocks',
+                    'news': '/api/v1/news/<symbol>',
                     'health': '/api/v1/health',
                     'health_detailed': '/api/v1/health/detailed',
                     'health_ready': '/api/v1/health/ready',

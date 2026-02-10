@@ -98,6 +98,18 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - Parallel batch processing (supports up to 18 stocks)
   - Avoids rate limit issues (reduces 89% API requests)
 
+- 📰 **Stock News Integration**
+  - Built-in news button on each stock card for quick access to stock news
+  - Mixed news sources: Finnhub Company News (US stocks), Google News RSS (TW/HK/JP stocks)
+  - Responsive news panel: right-side slide panel (desktop), full-screen modal (mobile)
+  - Bilingual news: English for US stocks, Traditional Chinese for TW/HK stocks
+  - 15-minute cache to minimize API calls
+
+- 🔀 **Drag & Drop Reordering**
+  - Freely drag stock cards to rearrange order
+  - Precise grip icon drag handle (top-left corner)
+  - Layout order auto-saved
+
 - 📱 **Responsive Design**
   - Support for desktop, tablet, and mobile
   - Smooth user experience
@@ -105,6 +117,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 ## 🛠️ Tech Stack
 
 ### Frontend
+
 - **React 19** - Modern frontend framework
 - **TypeScript** - Type safety
 - **Vite** - Fast build tool
@@ -123,6 +136,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 - **Google Fonts** - Playfair Display (serif), Inter (sans-serif), Noto Sans TC (Chinese)
 
 ### Backend
+
 - **Flask** - Lightweight Python web framework
 - **yfinance** - Yahoo Finance stock data API
 - **Flask-CORS** - Cross-origin resource sharing support
@@ -136,6 +150,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 ## 📦 Installation
 
 ### Prerequisites
+
 - Node.js 18+ and npm
 - Python 3.8+
 - Git
@@ -227,31 +242,35 @@ Backend API will run at `http://localhost:5001`
 
 ## 📊 Supported Markets
 
-| Market | Ticker Format | Example |
-|--------|---------------|---------|
-| Taiwan Listed | `XXXX.TW` | 2330.TW (TSMC) |
-| Taiwan OTC | `XXXX.TWO` | 5904.TWO (Poya) |
-| United States | `SYMBOL` | AAPL (Apple) |
-| Hong Kong | `XXXX.HK` | 0700.HK (Tencent) |
-| Japan | `XXXX.JP` | 9983.JP (UNIQLO) |
+| Market        | Ticker Format | Example           |
+| ------------- | ------------- | ----------------- |
+| Taiwan Listed | `XXXX.TW`     | 2330.TW (TSMC)    |
+| Taiwan OTC    | `XXXX.TWO`    | 5904.TWO (Poya)   |
+| United States | `SYMBOL`      | AAPL (Apple)      |
+| Hong Kong     | `XXXX.HK`     | 0700.HK (Tencent) |
+| Japan         | `XXXX.JP`     | 9983.JP (UNIQLO)  |
 
 ## 🌐 Multi-language Company Names
 
 MarketVue includes built-in multi-language name mappings for 36+ major companies:
 
 **Taiwan Stocks**
+
 - TSMC (2330.TW), Hon Hai (2317.TW), MediaTek (2454.TW)
 - President Chain Store (2912.TW), Taiwan FamilyMart (5903.TWO), Poya (5904.TWO)
 - Taiwan Mobile (3045.TW), Far EasTone Telecom (4904.TW), Chunghwa Telecom (2412.TW)
 
 **US Stocks**
+
 - Apple (AAPL), Microsoft (MSFT), Google (GOOGL)
 - Tesla (TSLA), Amazon (AMZN), NVIDIA (NVDA)
 
 **Hong Kong Stocks**
+
 - Tencent (0700.HK), Alibaba (9988.HK), AIA (1299.HK)
 
 **Japan Stocks**
+
 - UNIQLO (9983.JP), MUJI (7453.JP), LINE Yahoo (4689.JP)
 
 Stocks not in the mapping table will automatically display English names provided by Yahoo Finance.

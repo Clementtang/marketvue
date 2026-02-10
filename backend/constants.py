@@ -29,6 +29,11 @@ HTTP_BAD_REQUEST = 400  # Client error - invalid input
 HTTP_NOT_FOUND = 404  # Resource not found
 HTTP_INTERNAL_ERROR = 500  # Server error
 
+# News feature configuration
+NEWS_CACHE_TIMEOUT = 900  # 15 minutes - How long to cache news responses
+NEWS_DEFAULT_LIMIT = 10  # Default number of news articles per request
+NEWS_REQUEST_TIMEOUT = 10  # Seconds - timeout for external news API requests
+
 # Logging configuration
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'  # Standard log format
 LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'  # Date format for logs

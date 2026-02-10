@@ -114,3 +114,20 @@ class CacheKeyBuilder:
         """
         # max_workers affects performance but not data, so we use the same cache key as batch
         return CacheKeyBuilder.build_batch_key(symbols, start_date, end_date)
+
+    @staticmethod
+    def build_news_key(symbol: str) -> str:
+        """
+        Generate cache key for news data.
+
+        Args:
+            symbol: Stock ticker symbol (will be uppercased)
+
+        Returns:
+            Cache key string in format "news:{SYMBOL}"
+
+        Examples:
+            >>> CacheKeyBuilder.build_news_key('aapl')
+            'news:AAPL'
+        """
+        return f"news:{symbol.upper()}"
