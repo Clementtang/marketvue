@@ -114,8 +114,8 @@ const StockCardHeader = memo(function StockCardHeader({
       </div>
 
       {/* Right: Price (top), Change (bottom) */}
-      <div className="flex flex-col items-end justify-start flex-shrink-0">
-        <div className="flex items-baseline gap-1 transition-transform duration-200 hover:scale-105">
+      <div className="flex flex-col items-end justify-start flex-shrink-0 cursor-default">
+        <div className="flex items-baseline gap-1">
           <span className="text-base font-bold text-gray-900 dark:text-white whitespace-nowrap leading-tight">
             {formattedPrice}
           </span>

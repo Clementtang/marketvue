@@ -66,6 +66,7 @@ class NewsService:
         try:
             fetch_limit = limit * page
             articles = self._fetch_from_source(symbol, fetch_limit)
+            articles = self._sort_by_date(articles)
 
             start_index = (page - 1) * limit
             paginated = articles[start_index:start_index + limit]
@@ -139,6 +140,16 @@ class NewsService:
         if lang_key == 'zh-TW':
             return f"{company_name}+股票"
         return company_name
+
+    @staticmethod
+    def _sort_by_date(articles: list) -> list:
+        """Sort articles by published_at descending (newest first)."""
+        def parse_date(article):
+            try:
+                return datetime.strptime(article.get('published_at', ''), '%Y-%m-%dT%H:%M:%SZ')
+            except (ValueError, TypeError):
+                return datetime.min
+        return sorted(articles, key=parse_date, reverse=True)
 
     @staticmethod
     def is_us_stock(symbol: str) -> bool:
