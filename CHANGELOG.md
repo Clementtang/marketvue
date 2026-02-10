@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Improved
 
-- **Stock Card Interaction Redesign — Drag Handle + News Button** (v1.14.1)
+- **Stock Card Interaction Redesign — Drag Handle + News Button**
   - Drag handle: full-width invisible bar → compact grip icon (4-dot pattern) at top-left corner
     - Only visible on card hover (`opacity-0` → `opacity-40`), Notion/Trello-style grip pattern
     - Precise 20×20px hit area instead of full header coverage, eliminates cursor conflict with interactive elements
@@ -18,7 +18,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Always visible (`opacity-60`, hover `opacity-100`), accessible on mobile without hover dependency
     - Zero conflict with drag handle — Footer is completely outside drag zone
   - Removed `relative z-20` workaround from Header (no longer needed)
-  - Files changed: `DashboardGrid.tsx`, `StockCardHeader.tsx`, `StockCardFooter.tsx`, `StockCard.tsx`
+
+### Fixed
+
+- **Stock Card Cursor Behavior**
+  - Price/change area: set `cursor-default`, removed unintended `hover:scale-105` zoom effect
+  - Footer info row: set `cursor-pointer` on hover for better interactivity cue
+- **News Article Sort Order**
+  - Articles now sorted by `published_at` descending (newest first)
+  - Previously returned in arbitrary order from Google News RSS feed
+- **localStorage Legacy String Handling**
+  - `usePersistedState` now gracefully handles bare strings (e.g. `candlestick` stored without `JSON.stringify`)
+  - Falls back to raw string value instead of crashing with `SyntaxError`
+  - Auto-migrates legacy values to valid JSON format on first read
 
 ## [1.14.0] - 2026-02-09
 
