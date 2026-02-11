@@ -64,7 +64,7 @@ class TestFinnhubNewsFetcher:
         mock_response.raise_for_status.return_value = None
 
         with patch('services.finnhub_news_fetcher.requests.get', return_value=mock_response):
-            articles = fetcher.fetch('AAPL', limit=10)
+            articles = fetcher.fetch('AAPL')
 
         assert len(articles) == 2
         assert articles[0]['id'] == 'finnhub_15805925'
@@ -73,16 +73,16 @@ class TestFinnhubNewsFetcher:
         assert articles[0]['language'] == 'en-US'
         assert articles[0]['url'] == 'https://www.marketwatch.com/story/apple-new-product'
 
-    def test_fetch_with_limit(self, fetcher, sample_finnhub_response):
-        """should respect the limit parameter"""
+    def test_fetch_returns_all_articles(self, fetcher, sample_finnhub_response):
+        """should return all valid articles without truncation"""
         mock_response = MagicMock()
         mock_response.json.return_value = sample_finnhub_response
         mock_response.raise_for_status.return_value = None
 
         with patch('services.finnhub_news_fetcher.requests.get', return_value=mock_response):
-            articles = fetcher.fetch('AAPL', limit=1)
+            articles = fetcher.fetch('AAPL')
 
-        assert len(articles) == 1
+        assert len(articles) == 2
 
     def test_fetch_no_api_key(self, fetcher_no_key):
         """should return empty list when API key is not set"""

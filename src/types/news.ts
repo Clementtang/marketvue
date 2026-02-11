@@ -13,6 +13,5 @@ export interface NewsResponse {
   symbol: string;
   news: NewsArticle[];
   total: number;
-  has_more: boolean;
   cached_at: string;
 }

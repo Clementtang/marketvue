@@ -14,7 +14,7 @@ from services.news_service import NewsService
 from utils.cache import cache
 from utils.cache_keys import CacheKeyBuilder
 from utils.decorators import handle_errors, log_request
-from constants import NEWS_CACHE_TIMEOUT, NEWS_DEFAULT_LIMIT, HTTP_OK
+from constants import NEWS_CACHE_TIMEOUT, HTTP_OK
 
 logger = logging.getLogger(__name__)
 
@@ -60,14 +60,10 @@ def get_news(symbol):
     """
     GET /api/v1/news/<symbol>
 
-    Fetch news articles for a given stock symbol.
+    Fetch all news articles from the past 72 hours for a given stock symbol.
 
     Path params:
         symbol: Stock ticker symbol (e.g., 'AAPL', '2330.TW')
-
-    Query params:
-        limit: Number of articles per page (default: 10, max: 50)
-        page: Page number, 1-indexed (default: 1)
 
     Returns:
         JSON with news articles in unified format
@@ -82,22 +78,8 @@ def get_news(symbol):
             'Only letters, numbers, dots, hyphens, and carets allowed (max 10 chars).'
         )
 
-    # Parse query parameters
-    limit = request.args.get('limit', NEWS_DEFAULT_LIMIT, type=int)
-    page = request.args.get('page', 1, type=int)
-
-    # Validate parameters
-    if limit < 1 or limit > 50:
-        raise ValueError('Limit must be between 1 and 50')
-    if page < 1:
-        raise ValueError('Page must be 1 or greater')
-
     # Fetch news
     news_service = get_news_service()
-    result = news_service.get_news(
-        symbol=symbol.upper(),
-        limit=limit,
-        page=page
-    )
+    result = news_service.get_news(symbol=symbol.upper())
 
     return jsonify(result), HTTP_OK

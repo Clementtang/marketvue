@@ -72,7 +72,6 @@ class TestGoogleNewsFetcher:
             articles = fetcher.fetch(
                 query='台積電+股票',
                 symbol='2330.TW',
-                limit=10,
                 hl='zh-TW',
                 gl='TW'
             )
@@ -84,26 +83,24 @@ class TestGoogleNewsFetcher:
         assert articles[0]['image'] is None
         assert articles[0]['summary'] is None
 
-    def test_fetch_with_limit(self, fetcher, sample_feed):
-        """should respect the limit parameter"""
+    def test_fetch_returns_all_entries(self, fetcher, sample_feed):
+        """should return all valid entries without truncation"""
         with patch('services.google_news_fetcher.feedparser.parse', return_value=sample_feed):
             articles = fetcher.fetch(
                 query='台積電+股票',
                 symbol='2330.TW',
-                limit=1,
                 hl='zh-TW',
                 gl='TW'
             )
 
-        assert len(articles) == 1
+        assert len(articles) == 2
 
     def test_fetch_empty_feed(self, fetcher, empty_feed):
         """should return empty list for empty feed"""
         with patch('services.google_news_fetcher.feedparser.parse', return_value=empty_feed):
             articles = fetcher.fetch(
                 query='test',
-                symbol='TEST',
-                limit=10
+                symbol='TEST'
             )
 
         assert articles == []
@@ -113,8 +110,7 @@ class TestGoogleNewsFetcher:
         with patch('services.google_news_fetcher.feedparser.parse', return_value=error_feed):
             articles = fetcher.fetch(
                 query='test',
-                symbol='TEST',
-                limit=10
+                symbol='TEST'
             )
 
         assert articles == []
@@ -136,8 +132,7 @@ class TestGoogleNewsFetcher:
         with patch('services.google_news_fetcher.feedparser.parse', return_value=feed):
             articles = fetcher.fetch(
                 query='test',
-                symbol='TEST',
-                limit=10
+                symbol='TEST'
             )
 
         assert len(articles) == 1
@@ -147,11 +142,28 @@ class TestGoogleNewsFetcher:
         with patch('services.google_news_fetcher.feedparser.parse', side_effect=Exception("Network error")):
             articles = fetcher.fetch(
                 query='test',
-                symbol='TEST',
-                limit=10
+                symbol='TEST'
             )
 
         assert articles == []
+
+    def test_filter_by_time_window_removes_old_articles(self, fetcher):
+        """should filter out articles older than 72 hours"""
+        articles = [
+            {'published_at': '2020-01-01T00:00:00Z', 'headline': 'Old article'},
+            {'published_at': '2099-01-01T00:00:00Z', 'headline': 'Future article'},
+        ]
+        result = fetcher._filter_by_time_window(articles)
+        assert len(result) == 1
+        assert result[0]['headline'] == 'Future article'
+
+    def test_filter_by_time_window_keeps_unparseable(self, fetcher):
+        """should keep articles with unparseable dates"""
+        articles = [
+            {'published_at': 'not-a-date', 'headline': 'Bad date article'},
+        ]
+        result = fetcher._filter_by_time_window(articles)
+        assert len(result) == 1
 
     def test_language_determination_zh_tw(self, fetcher):
         """should determine zh-TW language correctly"""
@@ -208,7 +220,6 @@ class TestGoogleNewsFetcher:
             articles = fetcher.fetch(
                 query='test',
                 symbol='2330.TW',
-                limit=10,
                 hl='zh-TW',
                 gl='TW'
             )
@@ -226,8 +237,8 @@ class TestGoogleNewsFetcher:
 
         with patch('services.google_news_fetcher.feedparser.parse', return_value=empty_feed):
             start = time.time()
-            fetcher.fetch(query='test1', symbol='T1', limit=5)
-            fetcher.fetch(query='test2', symbol='T2', limit=5)
+            fetcher.fetch(query='test1', symbol='T1')
+            fetcher.fetch(query='test2', symbol='T2')
             elapsed = time.time() - start
 
         assert elapsed >= 0.1

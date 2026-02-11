@@ -4,7 +4,6 @@ Tests for News Routes (Flask endpoints)
 Tests cover:
 - GET /api/v1/news/<symbol> success
 - Invalid symbol format
-- Query parameter validation
 - Error handling
 """
 
@@ -37,7 +36,6 @@ class TestNewsEndpoint:
                 }
             ],
             'total': 1,
-            'has_more': False,
             'cached_at': '2026-02-09T10:05:00Z'
         }
         set_news_service(self.mock_service)
@@ -54,27 +52,15 @@ class TestNewsEndpoint:
         assert len(data['news']) == 1
         assert data['news'][0]['headline'] == 'Apple announces new product'
         assert 'total' in data
-        assert 'has_more' in data
         assert 'cached_at' in data
 
-    def test_get_news_with_limit(self, client):
-        """should pass limit parameter to service"""
-        client.get('/api/v1/news/AAPL?limit=5')
-        call_kwargs = self.mock_service.get_news.call_args[1]
-        assert call_kwargs['limit'] == 5
-
-    def test_get_news_with_page(self, client):
-        """should pass page parameter to service"""
-        client.get('/api/v1/news/AAPL?page=2')
-        call_kwargs = self.mock_service.get_news.call_args[1]
-        assert call_kwargs['page'] == 2
-
-    def test_get_news_default_params(self, client):
-        """should use default limit=10 and page=1"""
+    def test_get_news_no_pagination_params(self, client):
+        """should call service without limit/page params"""
         client.get('/api/v1/news/AAPL')
         call_kwargs = self.mock_service.get_news.call_args[1]
-        assert call_kwargs['limit'] == 10
-        assert call_kwargs['page'] == 1
+        assert 'limit' not in call_kwargs
+        assert 'page' not in call_kwargs
+        assert call_kwargs['symbol'] == 'AAPL'
 
     def test_get_news_tw_stock(self, client):
         """should handle TW stock symbol with dot"""
@@ -82,7 +68,6 @@ class TestNewsEndpoint:
             'symbol': '2330.TW',
             'news': [],
             'total': 0,
-            'has_more': False,
             'cached_at': '2026-02-09T10:05:00Z'
         }
 
@@ -97,7 +82,6 @@ class TestNewsEndpoint:
             'symbol': '0700.HK',
             'news': [],
             'total': 0,
-            'has_more': False,
             'cached_at': '2026-02-09T10:05:00Z'
         }
 
@@ -116,26 +100,6 @@ class TestNewsEndpoint:
     def test_get_news_symbol_too_long(self, client):
         """should return 400 for symbol longer than 10 chars"""
         response = client.get('/api/v1/news/VERYLONGSYMBOL')
-
-        assert response.status_code == 400
-
-    def test_get_news_invalid_limit(self, client):
-        """should return 400 for limit out of range"""
-        response = client.get('/api/v1/news/AAPL?limit=100')
-
-        assert response.status_code == 400
-        data = response.get_json()
-        assert 'error' in data
-
-    def test_get_news_invalid_limit_zero(self, client):
-        """should return 400 for limit=0"""
-        response = client.get('/api/v1/news/AAPL?limit=0')
-
-        assert response.status_code == 400
-
-    def test_get_news_invalid_page(self, client):
-        """should return 400 for page=0"""
-        response = client.get('/api/v1/news/AAPL?page=0')
 
         assert response.status_code == 400
 

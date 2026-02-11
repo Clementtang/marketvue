@@ -5,6 +5,29 @@ All notable changes to MarketVue will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.15.0] - 2026-02-11
+
+### Improved
+
+- **News Feature — 72h Time Window & Unlimited Articles**
+  - Unified 72-hour time window across all news sources
+    - Finnhub (US stocks): API date range changed from 7 days to 72 hours
+    - Google News RSS (TW/HK/JP): added post-fetch 72h filter (`_filter_by_time_window()`)
+    - NewsService: added secondary 72h filter as safety net
+  - Removed article limit and pagination
+    - Backend: removed `limit`/`page` parameters from API endpoint, service, and fetchers
+    - Frontend: simplified `useNewsData` hook to single fetch, removed "Load More" button
+    - API response simplified: removed `has_more` field, returns all 72h articles at once
+  - New constant `NEWS_TIME_WINDOW_HOURS = 72` in `backend/constants.py`
+  - Removed `NEWS_DEFAULT_LIMIT` constant (no longer needed)
+  - Updated design doc with Phase 4 implementation details
+
+### Technical
+
+- **Finnhub API Key Configuration**
+  - Added `FINNHUB_API_KEY` environment variable on Render production
+  - US stock news now operational in production (previously returned empty list)
+
 ## [1.14.1] - 2026-02-10
 
 ### Improved

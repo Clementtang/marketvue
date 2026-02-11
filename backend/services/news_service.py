@@ -8,8 +8,10 @@ Single responsibility: Coordinate news fetching across different sources.
 """
 
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
+
+from constants import NEWS_TIME_WINDOW_HOURS
 
 from .company_name_service import CompanyNameService
 from .finnhub_news_fetcher import FinnhubNewsFetcher
@@ -32,8 +34,8 @@ class NewsService:
 
     Examples:
         >>> service = NewsService()
-        >>> result = service.get_news('AAPL', limit=10, page=1)
-        >>> result = service.get_news('2330.TW', limit=10, page=1)
+        >>> result = service.get_news('AAPL')
+        >>> result = service.get_news('2330.TW')
     """
 
     def __init__(
@@ -46,38 +48,30 @@ class NewsService:
         self._google_fetcher = google_fetcher or GoogleNewsFetcher()
         self._name_service = name_service or CompanyNameService()
 
-    def get_news(self, symbol: str, limit: int = 10, page: int = 1) -> Dict:
+    def get_news(self, symbol: str) -> Dict:
         """
         Fetch news for a given stock symbol.
 
         Routes to the appropriate fetcher based on symbol suffix,
-        applies pagination, and returns a unified response.
+        returns all articles from the past 72 hours sorted by date.
 
         Args:
             symbol: Stock ticker symbol (e.g., 'AAPL', '2330.TW')
-            limit: Number of articles per page
-            page: Page number (1-indexed)
 
         Returns:
-            Dictionary with symbol, news list, total count, has_more flag, cached_at
+            Dictionary with symbol, news list, total count, cached_at
         """
         symbol = symbol.upper()
 
         try:
-            fetch_limit = limit * page
-            articles = self._fetch_from_source(symbol, fetch_limit)
+            articles = self._fetch_from_source(symbol)
             articles = self._sort_by_date(articles)
-
-            start_index = (page - 1) * limit
-            paginated = articles[start_index:start_index + limit]
-            total = len(articles)
-            has_more = start_index + limit < total
+            articles = self._filter_by_time_window(articles)
 
             return {
                 'symbol': symbol,
-                'news': paginated,
-                'total': total,
-                'has_more': has_more,
+                'news': articles,
+                'total': len(articles),
                 'cached_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             }
 
@@ -87,27 +81,25 @@ class NewsService:
                 'symbol': symbol,
                 'news': [],
                 'total': 0,
-                'has_more': False,
                 'cached_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
             }
 
-    def _fetch_from_source(self, symbol: str, limit: int) -> list:
+    def _fetch_from_source(self, symbol: str) -> list:
         """Route to the correct fetcher based on symbol suffix."""
         upper_symbol = symbol.upper()
 
         if upper_symbol.endswith('.TW') or upper_symbol.endswith('.TWO'):
-            return self._fetch_google_news(symbol, limit, hl='zh-TW', gl='TW', lang_key='zh-TW')
+            return self._fetch_google_news(symbol, hl='zh-TW', gl='TW', lang_key='zh-TW')
         elif upper_symbol.endswith('.HK'):
-            return self._fetch_google_news(symbol, limit, hl='zh-TW', gl='HK', lang_key='zh-TW')
+            return self._fetch_google_news(symbol, hl='zh-TW', gl='HK', lang_key='zh-TW')
         elif upper_symbol.endswith('.T'):
-            return self._fetch_google_news(symbol, limit, hl='en', gl='JP', lang_key='en-US')
+            return self._fetch_google_news(symbol, hl='en', gl='JP', lang_key='en-US')
         else:
-            return self._finnhub_fetcher.fetch(symbol, limit)
+            return self._finnhub_fetcher.fetch(symbol)
 
     def _fetch_google_news(
         self,
         symbol: str,
-        limit: int,
         hl: str,
         gl: str,
         lang_key: str
@@ -119,7 +111,6 @@ class NewsService:
         return self._google_fetcher.fetch(
             query=query,
             symbol=symbol,
-            limit=limit,
             hl=hl,
             gl=gl
         )
@@ -150,6 +141,22 @@ class NewsService:
             except (ValueError, TypeError):
                 return datetime.min
         return sorted(articles, key=parse_date, reverse=True)
+
+    @staticmethod
+    def _filter_by_time_window(articles: list) -> list:
+        """Filter articles to only include those within the 72h time window."""
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=NEWS_TIME_WINDOW_HOURS)
+        filtered = []
+        for article in articles:
+            try:
+                published = datetime.strptime(
+                    article.get('published_at', ''), '%Y-%m-%dT%H:%M:%SZ'
+                ).replace(tzinfo=timezone.utc)
+                if published >= cutoff:
+                    filtered.append(article)
+            except (ValueError, TypeError):
+                filtered.append(article)
+        return filtered
 
     @staticmethod
     def is_us_stock(symbol: str) -> bool:

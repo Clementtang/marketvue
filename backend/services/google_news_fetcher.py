@@ -7,14 +7,14 @@ Single responsibility: Retrieve and transform Google News RSS data.
 
 import logging
 import time
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 from typing import Dict, List, Optional
 from urllib.parse import quote
 
 import feedparser
 
-from constants import NEWS_REQUEST_TIMEOUT
+from constants import NEWS_REQUEST_TIMEOUT, NEWS_TIME_WINDOW_HOURS
 
 logger = logging.getLogger(__name__)
 
@@ -48,17 +48,17 @@ class GoogleNewsFetcher:
         self,
         query: str,
         symbol: str,
-        limit: int = 10,
         hl: str = "zh-TW",
         gl: str = "TW"
     ) -> List[Dict]:
         """
         Fetch news from Google News RSS for a given search query.
 
+        Returns all articles from the past 72 hours.
+
         Args:
             query: Search query (company name + optional keywords)
             symbol: Stock symbol for ID generation
-            limit: Maximum number of articles to return
             hl: Language/locale parameter (e.g., 'zh-TW', 'en')
             gl: Country/region parameter (e.g., 'TW', 'HK', 'JP')
 
@@ -80,7 +80,7 @@ class GoogleNewsFetcher:
             language = self._determine_language(hl)
             articles = []
 
-            for i, entry in enumerate(feed.entries[:limit]):
+            for i, entry in enumerate(feed.entries):
                 try:
                     article = self._transform_entry(entry, symbol, i, language)
                     if article:
@@ -89,6 +89,7 @@ class GoogleNewsFetcher:
                     logger.warning(f"Failed to parse RSS entry for '{query}': {str(e)}")
                     continue
 
+            articles = self._filter_by_time_window(articles)
             logger.info(f"Fetched {len(articles)} articles from Google News for '{query}'")
             return articles
 
@@ -150,6 +151,22 @@ class GoogleNewsFetcher:
         if hasattr(source_detail, 'get'):
             return source_detail.get('title', None)
         return None
+
+    @staticmethod
+    def _filter_by_time_window(articles: List[Dict]) -> List[Dict]:
+        """Filter articles to only include those within the 72h time window."""
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=NEWS_TIME_WINDOW_HOURS)
+        filtered = []
+        for article in articles:
+            try:
+                published = datetime.strptime(
+                    article.get('published_at', ''), '%Y-%m-%dT%H:%M:%SZ'
+                ).replace(tzinfo=timezone.utc)
+                if published >= cutoff:
+                    filtered.append(article)
+            except (ValueError, TypeError):
+                filtered.append(article)
+        return filtered
 
     def _determine_language(self, hl: str) -> str:
         """Determine the full language tag from the hl parameter."""

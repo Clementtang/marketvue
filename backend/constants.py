@@ -31,7 +31,7 @@ HTTP_INTERNAL_ERROR = 500  # Server error
 
 # News feature configuration
 NEWS_CACHE_TIMEOUT = 900  # 15 minutes - How long to cache news responses
-NEWS_DEFAULT_LIMIT = 10  # Default number of news articles per request
+NEWS_TIME_WINDOW_HOURS = 72  # Only show news from the past 72 hours
 NEWS_REQUEST_TIMEOUT = 10  # Seconds - timeout for external news API requests
 
 # Logging configuration

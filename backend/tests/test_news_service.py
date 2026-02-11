@@ -8,7 +8,7 @@ Tests cover:
 - HK stocks -> Google News zh-TW
 - JP stocks -> Google News en
 - Company name lookup integration
-- Pagination logic
+- 72h time window filtering
 - Error handling
 """
 
@@ -202,12 +202,12 @@ class TestNewsServiceCompanyNameLookup:
         assert '9999.TW' in call_args[1]['query']
 
 
-class TestNewsServicePagination:
-    """Tests for pagination logic"""
+class TestNewsServiceResponseFormat:
+    """Tests for response format (no pagination)"""
 
     @pytest.fixture
-    def service_with_many_articles(self):
-        """Create a service that returns many articles."""
+    def service_with_articles(self):
+        """Create a service that returns articles."""
         mock_finnhub = MagicMock()
         mock_finnhub.fetch.return_value = [
             {
@@ -228,35 +228,22 @@ class TestNewsServicePagination:
             name_service=MagicMock()
         )
 
-    def test_first_page(self, service_with_many_articles):
-        """should return first page of results"""
-        result = service_with_many_articles.get_news('AAPL', limit=10, page=1)
-        assert len(result['news']) == 10
+    def test_returns_all_articles(self, service_with_articles):
+        """should return all articles without pagination"""
+        result = service_with_articles.get_news('AAPL')
+        assert len(result['news']) == 25
         assert result['total'] == 25
-        assert result['has_more'] is True
 
-    def test_second_page(self, service_with_many_articles):
-        """should return second page of results"""
-        result = service_with_many_articles.get_news('AAPL', limit=10, page=2)
-        assert len(result['news']) == 10
-        assert result['has_more'] is True
-
-    def test_last_page(self, service_with_many_articles):
-        """should return last page with has_more=False"""
-        result = service_with_many_articles.get_news('AAPL', limit=10, page=3)
-        assert len(result['news']) == 5
-        assert result['has_more'] is False
-
-    def test_response_format(self, service_with_many_articles):
+    def test_response_format(self, service_with_articles):
         """should return correct response format"""
-        result = service_with_many_articles.get_news('AAPL', limit=10, page=1)
+        result = service_with_articles.get_news('AAPL')
 
         assert 'symbol' in result
         assert 'news' in result
         assert 'total' in result
-        assert 'has_more' in result
         assert 'cached_at' in result
         assert result['symbol'] == 'AAPL'
+        assert 'has_more' not in result
 
 
 class TestNewsServiceErrorHandling:
@@ -276,7 +263,6 @@ class TestNewsServiceErrorHandling:
         result = service.get_news('AAPL')
         assert result['news'] == []
         assert result['total'] == 0
-        assert result['has_more'] is False
 
     def test_symbol_uppercase(self):
         """should uppercase the symbol in response"""

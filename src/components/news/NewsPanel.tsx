@@ -42,7 +42,7 @@ const NewsPanel = memo(function NewsPanel({
   const isMobile = useIsMobile();
   const immediate = shouldReduceMotion();
 
-  const { news, isLoading, error, fetchNextPage, hasMore } = useNewsData({
+  const { news, isLoading, error } = useNewsData({
     symbol,
     enabled: isOpen,
   });
@@ -167,21 +167,6 @@ const NewsPanel = memo(function NewsPanel({
                       t={t}
                     />
                   ))}
-                  {hasMore && (
-                    <div className="p-4 flex justify-center">
-                      <button
-                        onClick={fetchNextPage}
-                        disabled={isLoading}
-                        className={`px-6 py-2 text-sm font-medium transition-colors ${
-                          visualTheme === "warm"
-                            ? "text-warm-accent-600 hover:bg-warm-100/80 dark:text-warm-accent-400 dark:hover:bg-warm-700/50 rounded-2xl border border-warm-300 dark:border-warm-600"
-                            : "text-blue-600 hover:bg-gray-50 dark:text-blue-400 dark:hover:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600"
-                        }`}
-                      >
-                        {isLoading ? "..." : t.loadMore}
-                      </button>
-                    </div>
-                  )}
                 </>
               )}
             </div>

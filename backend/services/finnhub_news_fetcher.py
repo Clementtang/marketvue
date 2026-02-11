@@ -12,7 +12,7 @@ from typing import Dict, List, Optional
 
 import requests
 
-from constants import NEWS_REQUEST_TIMEOUT
+from constants import NEWS_REQUEST_TIMEOUT, NEWS_TIME_WINDOW_HOURS
 
 logger = logging.getLogger(__name__)
 
@@ -40,13 +40,14 @@ class FinnhubNewsFetcher:
         self._base_url = base_url or self.BASE_URL
         self._timeout = timeout
 
-    def fetch(self, symbol: str, limit: int = 10) -> List[Dict]:
+    def fetch(self, symbol: str) -> List[Dict]:
         """
         Fetch company news from Finnhub for a given symbol.
 
+        Returns all articles from the past 72 hours.
+
         Args:
             symbol: Stock ticker symbol (e.g., 'AAPL')
-            limit: Maximum number of articles to return
 
         Returns:
             List of news article dictionaries in unified format
@@ -57,12 +58,12 @@ class FinnhubNewsFetcher:
 
         try:
             today = datetime.now().strftime('%Y-%m-%d')
-            week_ago = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+            start_date = (datetime.now() - timedelta(hours=NEWS_TIME_WINDOW_HOURS)).strftime('%Y-%m-%d')
 
             url = f"{self._base_url}/company-news"
             params = {
                 'symbol': symbol.upper(),
-                'from': week_ago,
+                'from': start_date,
                 'to': today,
                 'token': self._api_key
             }
@@ -78,7 +79,7 @@ class FinnhubNewsFetcher:
 
             articles = [
                 self._transform_article(article)
-                for article in raw_articles[:limit]
+                for article in raw_articles
                 if self._is_valid_article(article)
             ]
 

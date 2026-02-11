@@ -33,7 +33,6 @@ const mockNewsResponse = {
     },
   ],
   total: 2,
-  has_more: false,
   cached_at: "2026-02-09T10:35:00Z",
 };
 
@@ -98,7 +97,6 @@ describe("useNewsData", () => {
     expect(result.current.news).toHaveLength(2);
     expect(result.current.news[0].headline).toBe("Apple announces new product");
     expect(result.current.error).toBeNull();
-    expect(result.current.hasMore).toBe(false);
   });
 
   it("should return error message on failure", async () => {
@@ -117,22 +115,18 @@ describe("useNewsData", () => {
     expect(result.current.news).toEqual([]);
   });
 
-  it("should set hasMore from response", async () => {
-    vi.mocked(newsApi.fetchNews).mockResolvedValue({
-      ...mockNewsResponse,
-      has_more: true,
-    });
+  it("should call fetchNews with symbol only", async () => {
+    const fetchNewsSpy = vi
+      .mocked(newsApi.fetchNews)
+      .mockResolvedValue(mockNewsResponse);
 
-    const { result } = renderHook(
-      () => useNewsData({ symbol: "AAPL", enabled: true }),
-      { wrapper: createWrapper() },
-    );
+    renderHook(() => useNewsData({ symbol: "AAPL", enabled: true }), {
+      wrapper: createWrapper(),
+    });
 
     await waitFor(() => {
-      expect(result.current.isLoading).toBe(false);
+      expect(fetchNewsSpy).toHaveBeenCalledWith("AAPL");
     });
-
-    expect(result.current.hasMore).toBe(true);
   });
 
   it("should not fetch when symbol is empty", () => {
