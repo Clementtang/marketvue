@@ -5,6 +5,48 @@ All notable changes to MarketVue will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.16.0] - 2026-02-25
+
+### Changed
+
+- **Dependency Updates** (2026-02-03)
+  - Updated React ecosystem: react/react-dom 19.2.0 → 19.2.4
+  - Updated data fetching: @tanstack/react-query 5.90.10 → 5.90.20
+  - Updated HTTP client: axios 1.12.2 → 1.13.4
+  - Updated charting: recharts 3.3.0 → 3.7.0
+  - Updated icons: lucide-react 0.546.0 → 0.563.0
+  - Updated build tools: vite 7.1.11 → 7.3.1
+  - Updated testing: jsdom 27.2.0 → 28.0.0, vitest 4.0.13 → 4.0.18
+  - Updated types: @types/node 24.9.1 → 25.2.0
+  - Updated linting: eslint-plugin-react-hooks 5.2.0 → 7.0.1
+  - Updated ESLint config for react-hooks v7 flat config format
+  - Note: react-grid-layout kept at 1.5.x (v2 requires significant refactoring)
+
+- **Project Rebranding: stock-dashboard → marketvue**
+  - Renamed local project folder from `stock-dashboard` to `marketvue` (matches GitHub repo name)
+  - Updated API service name from `stock-dashboard-api` to `marketvue-api`
+  - Updated all path references in documentation and configuration files
+  - Files updated:
+    - `backend/routes/health_routes.py`: Service identifier in health check responses
+    - `backend/tests/test_health_routes.py`: Updated test assertions
+    - `.claude/instructions.md`: Local path references
+    - `.claude-public/CLAUDE.md`: Directory structure documentation
+    - `docs/API.md`: API response examples
+    - `docs/DEPLOYMENT_CONFIG.md`: Deployment verification examples
+    - `docs/security/guides/implementation-guide.md`: Code examples
+    - `docs/workflows/branch-management-sop.md`: Path references
+    - `.scripts/README.md`: Script documentation
+    - `TEST_INSTRUCTIONS.md`: Test file paths
+    - `CLAUDE.md`: Project structure
+  - Note: `docs/project-history/` files preserved with original names for historical accuracy
+
+### Fixed
+
+- **Documentation Sync**: Updated README news feature description to include 72h time window (v1.15.0)
+- **CHANGELOG Structure**: Moved misplaced [Unreleased] section to correct position (top of file)
+
 ## [1.15.0] - 2026-02-11
 
 ### Improved
@@ -70,41 +112,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 10 new i18n keys for news UI strings
   - 56 new backend tests (277 total, 88.79% coverage)
   - 6 new frontend tests (165 total)
-
-## [Unreleased]
-
-### Changed
-
-- **Dependency Updates** (2026-02-03)
-  - Updated React ecosystem: react/react-dom 19.2.0 → 19.2.4
-  - Updated data fetching: @tanstack/react-query 5.90.10 → 5.90.20
-  - Updated HTTP client: axios 1.12.2 → 1.13.4
-  - Updated charting: recharts 3.3.0 → 3.7.0
-  - Updated icons: lucide-react 0.546.0 → 0.563.0
-  - Updated build tools: vite 7.1.11 → 7.3.1
-  - Updated testing: jsdom 27.2.0 → 28.0.0, vitest 4.0.13 → 4.0.18
-  - Updated types: @types/node 24.9.1 → 25.2.0
-  - Updated linting: eslint-plugin-react-hooks 5.2.0 → 7.0.1
-  - Updated ESLint config for react-hooks v7 flat config format
-  - Note: react-grid-layout kept at 1.5.x (v2 requires significant refactoring)
-
-- **Project Rebranding: stock-dashboard → marketvue**
-  - Renamed local project folder from `stock-dashboard` to `marketvue` (matches GitHub repo name)
-  - Updated API service name from `stock-dashboard-api` to `marketvue-api`
-  - Updated all path references in documentation and configuration files
-  - Files updated:
-    - `backend/routes/health_routes.py`: Service identifier in health check responses
-    - `backend/tests/test_health_routes.py`: Updated test assertions
-    - `.claude/instructions.md`: Local path references
-    - `.claude-public/CLAUDE.md`: Directory structure documentation
-    - `docs/API.md`: API response examples
-    - `docs/DEPLOYMENT_CONFIG.md`: Deployment verification examples
-    - `docs/security/guides/implementation-guide.md`: Code examples
-    - `docs/workflows/branch-management-sop.md`: Path references
-    - `.scripts/README.md`: Script documentation
-    - `TEST_INSTRUCTIONS.md`: Test file paths
-    - `CLAUDE.md`: Project structure
-  - Note: `docs/project-history/` files preserved with original names for historical accuracy
 
 ## [1.13.0] - 2025-12-19
 

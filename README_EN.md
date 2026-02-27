@@ -101,6 +101,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 - 📰 **Stock News Integration**
   - Built-in news button on each stock card for quick access to stock news
   - Mixed news sources: Finnhub Company News (US stocks), Google News RSS (TW/HK/JP stocks)
+  - 72-hour time window, displaying all recent articles at once
   - Responsive news panel: right-side slide panel (desktop), full-screen modal (mobile)
   - Bilingual news: English for US stocks, Traditional Chinese for TW/HK stocks
   - 15-minute cache to minimize API calls
