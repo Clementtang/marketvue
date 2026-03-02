@@ -11,7 +11,7 @@ import logging
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 
-from constants import NEWS_TIME_WINDOW_HOURS
+from constants import NEWS_DATE_FORMAT, NEWS_TIME_WINDOW_HOURS
 
 from .company_name_service import CompanyNameService
 from .finnhub_news_fetcher import FinnhubNewsFetcher
@@ -65,14 +65,13 @@ class NewsService:
 
         try:
             articles = self._fetch_from_source(symbol)
-            articles = self._sort_by_date(articles)
-            articles = self._filter_by_time_window(articles)
+            articles = self._sort_and_filter(articles)
 
             return {
                 'symbol': symbol,
                 'news': articles,
                 'total': len(articles),
-                'cached_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+                'cached_at': datetime.now().strftime(NEWS_DATE_FORMAT)
             }
 
         except Exception as e:
@@ -81,18 +80,16 @@ class NewsService:
                 'symbol': symbol,
                 'news': [],
                 'total': 0,
-                'cached_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
+                'cached_at': datetime.now().strftime(NEWS_DATE_FORMAT)
             }
 
     def _fetch_from_source(self, symbol: str) -> list:
         """Route to the correct fetcher based on symbol suffix."""
-        upper_symbol = symbol.upper()
-
-        if upper_symbol.endswith('.TW') or upper_symbol.endswith('.TWO'):
+        if symbol.endswith('.TW') or symbol.endswith('.TWO'):
             return self._fetch_google_news(symbol, hl='zh-TW', gl='TW', lang_key='zh-TW')
-        elif upper_symbol.endswith('.HK'):
+        elif symbol.endswith('.HK'):
             return self._fetch_google_news(symbol, hl='zh-TW', gl='HK', lang_key='zh-TW')
-        elif upper_symbol.endswith('.T'):
+        elif symbol.endswith('.T'):
             return self._fetch_google_news(symbol, hl='en', gl='JP', lang_key='en-US')
         else:
             return self._finnhub_fetcher.fetch(symbol)
@@ -133,30 +130,27 @@ class NewsService:
         return company_name
 
     @staticmethod
-    def _sort_by_date(articles: list) -> list:
-        """Sort articles by published_at descending (newest first)."""
-        def parse_date(article):
-            try:
-                return datetime.strptime(article.get('published_at', ''), '%Y-%m-%dT%H:%M:%SZ')
-            except (ValueError, TypeError):
-                return datetime.min
-        return sorted(articles, key=parse_date, reverse=True)
+    def _sort_and_filter(articles: list) -> list:
+        """Sort by date descending and filter to 72h window in a single pass.
 
-    @staticmethod
-    def _filter_by_time_window(articles: list) -> list:
-        """Filter articles to only include those within the 72h time window."""
+        Parses each article's published_at once, keeps articles within the
+        time window (plus any with unparseable dates), then returns sorted.
+        """
         cutoff = datetime.now(timezone.utc) - timedelta(hours=NEWS_TIME_WINDOW_HOURS)
-        filtered = []
+        dated_articles = []
+
         for article in articles:
             try:
-                published = datetime.strptime(
-                    article.get('published_at', ''), '%Y-%m-%dT%H:%M:%SZ'
+                dt = datetime.strptime(
+                    article.get('published_at', ''), NEWS_DATE_FORMAT
                 ).replace(tzinfo=timezone.utc)
-                if published >= cutoff:
-                    filtered.append(article)
+                if dt >= cutoff:
+                    dated_articles.append((dt, article))
             except (ValueError, TypeError):
-                filtered.append(article)
-        return filtered
+                dated_articles.append((datetime.min.replace(tzinfo=timezone.utc), article))
+
+        dated_articles.sort(key=lambda x: x[0], reverse=True)
+        return [article for _, article in dated_articles]
 
     @staticmethod
     def is_us_stock(symbol: str) -> bool:

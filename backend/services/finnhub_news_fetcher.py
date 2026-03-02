@@ -12,7 +12,7 @@ from typing import Dict, List, Optional
 
 import requests
 
-from constants import NEWS_REQUEST_TIMEOUT, NEWS_TIME_WINDOW_HOURS
+from constants import NEWS_DATE_FORMAT, NEWS_REQUEST_TIMEOUT, NEWS_TIME_WINDOW_HOURS
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +25,7 @@ class FinnhubNewsFetcher:
 
     Examples:
         >>> fetcher = FinnhubNewsFetcher()
-        >>> articles = fetcher.fetch('AAPL', limit=10)
+        >>> articles = fetcher.fetch('AAPL')
     """
 
     BASE_URL = "https://finnhub.io/api/v1"
@@ -103,7 +103,7 @@ class FinnhubNewsFetcher:
             try:
                 published_at = datetime.fromtimestamp(
                     article['datetime']
-                ).strftime('%Y-%m-%dT%H:%M:%SZ')
+                ).strftime(NEWS_DATE_FORMAT)
             except (ValueError, OSError):
                 published_at = ""
 

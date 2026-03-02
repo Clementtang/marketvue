@@ -13,6 +13,7 @@ Tests cover:
 """
 
 import pytest
+from datetime import datetime
 from unittest.mock import MagicMock, patch
 
 from services.news_service import NewsService
@@ -33,7 +34,7 @@ class TestNewsServiceRouting:
                 'source': 'Reuters',
                 'url': 'https://example.com/us',
                 'image': 'https://example.com/img.jpg',
-                'published_at': '2026-02-09T10:00:00Z',
+                'published_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'language': 'en-US'
             }
         ]
@@ -51,7 +52,7 @@ class TestNewsServiceRouting:
                 'source': '經濟日報',
                 'url': 'https://example.com/tw',
                 'image': None,
-                'published_at': '2026-02-09T10:00:00Z',
+                'published_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ'),
                 'language': 'zh-TW'
             }
         ]
@@ -208,6 +209,7 @@ class TestNewsServiceResponseFormat:
     @pytest.fixture
     def service_with_articles(self):
         """Create a service that returns articles."""
+        recent_date = datetime.now().strftime('%Y-%m-%dT%H:%M:%SZ')
         mock_finnhub = MagicMock()
         mock_finnhub.fetch.return_value = [
             {
@@ -217,7 +219,7 @@ class TestNewsServiceResponseFormat:
                 'source': 'Test',
                 'url': f'https://example.com/{i}',
                 'image': None,
-                'published_at': '2026-02-09T10:00:00Z',
+                'published_at': recent_date,
                 'language': 'en-US'
             }
             for i in range(25)

@@ -33,6 +33,7 @@ HTTP_INTERNAL_ERROR = 500  # Server error
 NEWS_CACHE_TIMEOUT = 900  # 15 minutes - How long to cache news responses
 NEWS_TIME_WINDOW_HOURS = 72  # Only show news from the past 72 hours
 NEWS_REQUEST_TIMEOUT = 10  # Seconds - timeout for external news API requests
+NEWS_DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'  # ISO 8601 UTC format for news timestamps
 
 # Logging configuration
 LOG_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'  # Standard log format

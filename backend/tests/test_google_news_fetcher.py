@@ -147,24 +147,6 @@ class TestGoogleNewsFetcher:
 
         assert articles == []
 
-    def test_filter_by_time_window_removes_old_articles(self, fetcher):
-        """should filter out articles older than 72 hours"""
-        articles = [
-            {'published_at': '2020-01-01T00:00:00Z', 'headline': 'Old article'},
-            {'published_at': '2099-01-01T00:00:00Z', 'headline': 'Future article'},
-        ]
-        result = fetcher._filter_by_time_window(articles)
-        assert len(result) == 1
-        assert result[0]['headline'] == 'Future article'
-
-    def test_filter_by_time_window_keeps_unparseable(self, fetcher):
-        """should keep articles with unparseable dates"""
-        articles = [
-            {'published_at': 'not-a-date', 'headline': 'Bad date article'},
-        ]
-        result = fetcher._filter_by_time_window(articles)
-        assert len(result) == 1
-
     def test_language_determination_zh_tw(self, fetcher):
         """should determine zh-TW language correctly"""
         result = fetcher._determine_language('zh-TW')

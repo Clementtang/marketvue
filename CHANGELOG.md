@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.1] - 2026-03-02
+
+### Technical
+
+- **News Backend Code Simplification**
+  - Removed duplicate `_filter_by_time_window()` from `GoogleNewsFetcher` — filtering now handled solely by `NewsService` orchestrator, eliminating double-filtering of Google News articles
+  - Merged `_sort_by_date()` and `_filter_by_time_window()` into single `_sort_and_filter()` method in `NewsService`, parsing each article's timestamp once instead of twice per request
+  - Extracted `NEWS_DATE_FORMAT` constant in `constants.py` — replaced ~10 hardcoded `'%Y-%m-%dT%H:%M:%SZ'` magic strings across 3 service files
+  - Removed redundant `symbol.upper()` call in `_fetch_from_source()` (already uppercased in caller)
+  - Fixed stale docstring in `FinnhubNewsFetcher` referencing removed `limit` parameter
+  - Fixed time-sensitive test fixture using hardcoded dates outside 72h window
+
 ## [1.16.0] - 2026-02-25
 
 ### Changed
