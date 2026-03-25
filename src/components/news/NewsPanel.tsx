@@ -42,7 +42,7 @@ const NewsPanel = memo(function NewsPanel({
   const isMobile = useIsMobile();
   const immediate = shouldReduceMotion();
 
-  const { news, isLoading, error } = useNewsData({
+  const { news, isLoading, error, refetch } = useNewsData({
     symbol,
     enabled: isOpen,
   });
@@ -145,7 +145,7 @@ const NewsPanel = memo(function NewsPanel({
                     {t.newsLoadError}
                   </p>
                   <button
-                    onClick={() => window.location.reload()}
+                    onClick={() => refetch()}
                     className={`mt-3 px-4 py-2 text-sm font-medium text-white transition-colors ${
                       visualTheme === "warm"
                         ? "bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl"

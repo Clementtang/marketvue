@@ -7,7 +7,7 @@ Single responsibility: Retrieve and transform Finnhub news data.
 
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional
 
 import requests
@@ -57,8 +57,8 @@ class FinnhubNewsFetcher:
             return []
 
         try:
-            today = datetime.now().strftime('%Y-%m-%d')
-            start_date = (datetime.now() - timedelta(hours=NEWS_TIME_WINDOW_HOURS)).strftime('%Y-%m-%d')
+            today = datetime.now(timezone.utc).strftime('%Y-%m-%d')
+            start_date = (datetime.now(timezone.utc) - timedelta(hours=NEWS_TIME_WINDOW_HOURS)).strftime('%Y-%m-%d')
 
             url = f"{self._base_url}/company-news"
             params = {
@@ -102,7 +102,7 @@ class FinnhubNewsFetcher:
         if article.get('datetime'):
             try:
                 published_at = datetime.fromtimestamp(
-                    article['datetime']
+                    article['datetime'], tz=timezone.utc
                 ).strftime(NEWS_DATE_FORMAT)
             except (ValueError, OSError):
                 published_at = ""

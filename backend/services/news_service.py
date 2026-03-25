@@ -147,7 +147,7 @@ class NewsService:
                 if dt >= cutoff:
                     dated_articles.append((dt, article))
             except (ValueError, TypeError):
-                dated_articles.append((datetime.min.replace(tzinfo=timezone.utc), article))
+                continue
 
         dated_articles.sort(key=lambda x: x[0], reverse=True)
         return [article for _, article in dated_articles]

@@ -13,13 +13,14 @@ interface UseNewsDataReturn {
   news: NewsArticle[];
   isLoading: boolean;
   error: string | null;
+  refetch: () => void;
 }
 
 export function useNewsData({
   symbol,
   enabled,
 }: UseNewsDataOptions): UseNewsDataReturn {
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["news", symbol],
     queryFn: () => fetchNews(symbol),
     enabled: enabled && !!symbol,
@@ -38,5 +39,6 @@ export function useNewsData({
     news: data?.news ?? [],
     isLoading,
     error: errorMessage,
+    refetch: () => void refetch(),
   };
 }
