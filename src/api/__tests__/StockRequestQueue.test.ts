@@ -26,6 +26,9 @@ function makeStockData(symbol: string): StockData {
   return {
     symbol,
     data: [],
+    current_price: 100,
+    change: 1.5,
+    change_percent: 1.52,
   };
 }
 

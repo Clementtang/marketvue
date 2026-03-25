@@ -2,7 +2,7 @@
  * Error handling utilities for API requests
  */
 
-import type { Language } from "../i18n/translations";
+import type { Language, Translations } from "../i18n/translations";
 import type { AxiosError } from "axios";
 
 /**
@@ -15,7 +15,7 @@ import type { AxiosError } from "axios";
 export function getErrorMessage(
   err: unknown,
   language: Language,
-  t: Record<string, string>,
+  t: Pick<Translations, "rateLimitExceeded" | "failedToFetch">,
 ): string {
   const axiosErr = err as AxiosError<{ error?: string }>;
   const statusCode = axiosErr?.response?.status;
