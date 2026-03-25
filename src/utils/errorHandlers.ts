@@ -2,8 +2,8 @@
  * Error handling utilities for API requests
  */
 
-import type { Language } from '../i18n/translations';
-import type { AxiosError } from 'axios';
+import type { Language } from "../i18n/translations";
+import type { AxiosError } from "axios";
 
 /**
  * Get user-friendly error message based on error type
@@ -13,50 +13,54 @@ import type { AxiosError } from 'axios';
  * @returns User-friendly error message
  */
 export function getErrorMessage(
-  err: any,
+  err: unknown,
   language: Language,
-  t: any
+  t: Record<string, string>,
 ): string {
-  const statusCode = (err as AxiosError)?.response?.status;
-  const errorData = (err as AxiosError)?.response?.data as any;
+  const axiosErr = err as AxiosError<{ error?: string }>;
+  const statusCode = axiosErr?.response?.status;
+  const errorData = axiosErr?.response?.data;
 
   // Timeout errors
-  if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
-    return language === 'zh-TW'
-      ? '請求逾時，請稍後再試'
-      : 'Request timeout, please try again later';
+  if (
+    axiosErr?.code === "ECONNABORTED" ||
+    axiosErr?.message?.includes("timeout")
+  ) {
+    return language === "zh-TW"
+      ? "請求逾時，請稍後再試"
+      : "Request timeout, please try again later";
   }
 
   // HTTP status code specific errors
   switch (statusCode) {
     case 503:
       // Free tier cold start
-      return language === 'zh-TW'
-        ? '服務可能正在啟動中（首次訪問需要 30-60 秒），請稍候...'
-        : 'Service may be starting up (first visit takes 30-60 seconds), please wait...';
+      return language === "zh-TW"
+        ? "服務可能正在啟動中（首次訪問需要 30-60 秒），請稍候..."
+        : "Service may be starting up (first visit takes 30-60 seconds), please wait...";
 
     case 429:
       return t.rateLimitExceeded;
 
     case 404:
       // Extract symbol from error or context if available
-      return language === 'zh-TW'
-        ? '找不到股票代號，請檢查代號是否正確'
-        : 'Stock symbol not found, please check the symbol';
+      return language === "zh-TW"
+        ? "找不到股票代號，請檢查代號是否正確"
+        : "Stock symbol not found, please check the symbol";
 
     case 500:
-      return language === 'zh-TW'
-        ? '伺服器錯誤，請稍後再試'
-        : 'Server error, please try again later';
+      return language === "zh-TW"
+        ? "伺服器錯誤，請稍後再試"
+        : "Server error, please try again later";
 
     case 400:
       // Bad request - may have specific error message from server
       if (errorData?.error) {
         return errorData.error;
       }
-      return language === 'zh-TW'
-        ? '請求參數錯誤'
-        : 'Invalid request parameters';
+      return language === "zh-TW"
+        ? "請求參數錯誤"
+        : "Invalid request parameters";
   }
 
   // Server provided error message
@@ -65,10 +69,10 @@ export function getErrorMessage(
   }
 
   // Network offline
-  if (typeof navigator !== 'undefined' && !navigator.onLine) {
-    return language === 'zh-TW'
-      ? '網路連線中斷，請檢查網路連線'
-      : 'Network connection lost, please check your connection';
+  if (typeof navigator !== "undefined" && !navigator.onLine) {
+    return language === "zh-TW"
+      ? "網路連線中斷，請檢查網路連線"
+      : "Network connection lost, please check your connection";
   }
 
   // Default fallback
@@ -85,7 +89,7 @@ export function getErrorMessage(
 export function shouldRetry(
   error: any,
   retryCount: number,
-  maxRetries: number = 3
+  maxRetries: number = 3,
 ): boolean {
   const statusCode = (error as AxiosError)?.response?.status;
 
@@ -111,7 +115,7 @@ export function shouldRetry(
  */
 export function calculateRetryDelay(
   retryCount: number,
-  statusCode?: number
+  statusCode?: number,
 ): number {
   // Cold start (503) needs longer delays
   if (statusCode === 503) {
@@ -131,9 +135,9 @@ export function calculateRetryDelay(
  */
 export function getSymbolErrorMessage(
   symbol: string,
-  language: Language
+  language: Language,
 ): string {
-  return language === 'zh-TW'
+  return language === "zh-TW"
     ? `找不到股票代號 ${symbol}，請檢查代號是否正確`
     : `Stock symbol ${symbol} not found, please check the symbol`;
 }
@@ -145,11 +149,11 @@ export function getSymbolErrorMessage(
  */
 export function isNetworkError(error: any): boolean {
   return (
-    error.code === 'ECONNABORTED' ||
-    error.code === 'ETIMEDOUT' ||
-    error.message?.includes('network') ||
-    error.message?.includes('timeout') ||
-    (typeof navigator !== 'undefined' && !navigator.onLine)
+    error.code === "ECONNABORTED" ||
+    error.code === "ETIMEDOUT" ||
+    error.message?.includes("network") ||
+    error.message?.includes("timeout") ||
+    (typeof navigator !== "undefined" && !navigator.onLine)
   );
 }
 

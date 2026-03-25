@@ -2,7 +2,7 @@
 News Schemas - Marshmallow validation for news API requests and responses.
 """
 
-from marshmallow import Schema, fields, validate, validates, ValidationError
+from marshmallow import Schema, fields
 
 
 class NewsArticleSchema(Schema):
@@ -22,23 +22,4 @@ class NewsResponseSchema(Schema):
     symbol = fields.Str(required=True)
     news = fields.List(fields.Nested(NewsArticleSchema), required=True)
     total = fields.Int(required=True)
-    has_more = fields.Bool(required=True)
     cached_at = fields.Str(allow_none=True, load_default=None)
-
-
-class NewsRequestParamsSchema(Schema):
-    """Schema for news API query parameters"""
-    limit = fields.Int(
-        load_default=10,
-        validate=validate.Range(min=1, max=50)
-    )
-    page = fields.Int(
-        load_default=1,
-        validate=validate.Range(min=1)
-    )
-
-    @validates('limit')
-    def validate_limit(self, value):
-        if value < 1 or value > 50:
-            raise ValidationError('Limit must be between 1 and 50')
-        return value

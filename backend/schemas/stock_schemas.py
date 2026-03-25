@@ -1,6 +1,8 @@
 from marshmallow import Schema, fields, validate, validates, ValidationError, validates_schema
 from datetime import datetime, timedelta
 
+from constants import MAX_BATCH_SYMBOLS
+
 
 class StockDataRequestSchema(Schema):
     """Schema for stock data request validation"""
@@ -81,10 +83,10 @@ class BatchStocksRequestSchema(Schema):
     symbols = fields.List(
         fields.Str(validate=validate.Length(min=1, max=10)),
         required=True,
-        validate=validate.Length(min=1, max=9),
+        validate=validate.Length(min=1, max=MAX_BATCH_SYMBOLS),
         error_messages={
             'required': 'Symbols list is required',
-            'max': 'Maximum 9 stocks allowed in batch request'
+            'max': f'Maximum {MAX_BATCH_SYMBOLS} stocks allowed in batch request'
         }
     )
     start_date = fields.Date(

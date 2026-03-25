@@ -7,7 +7,7 @@
  * API Configuration
  */
 export const API_CONFIG = {
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:5001',
+  BASE_URL: import.meta.env.VITE_API_URL || "http://localhost:5001",
   TIMEOUT: 30000, // 30 seconds
   RETRY_COUNT: 3,
   RETRY_DELAY_BASE: 2000, // 2 seconds base delay for exponential backoff
@@ -25,10 +25,10 @@ export const CHART_CONFIG = {
 
   // Margins (for Recharts)
   MARGINS: {
-    top: 0,  // Reduced from 5 to 0 to maximize chart area
+    top: 0, // Reduced from 5 to 0 to maximize chart area
     right: 5,
-    left: 0,  // Changed from -20 to 0 to prevent Y-axis labels from extending beyond card left edge
-    bottom: 0,  // Reduced from 5 to 0 to eliminate whitespace below X-axis
+    left: 0, // Changed from -20 to 0 to prevent Y-axis labels from extending beyond card left edge
+    bottom: 0, // Reduced from 5 to 0 to eliminate whitespace below X-axis
   },
 
   // Chart display settings
@@ -41,14 +41,14 @@ export const CHART_CONFIG = {
  */
 export const COLOR_THEMES = {
   WESTERN: {
-    name: 'Western',
-    up: '#16a34a', // Green for price increase
-    down: '#dc2626', // Red for price decrease
+    name: "Western",
+    up: "#16a34a", // Green for price increase
+    down: "#dc2626", // Red for price decrease
   },
   ASIAN: {
-    name: 'Asian',
-    up: '#dc2626', // Red for price increase
-    down: '#16a34a', // Green for price decrease
+    name: "Asian",
+    up: "#dc2626", // Red for price increase
+    down: "#16a34a", // Green for price decrease
   },
 } as const;
 
@@ -56,46 +56,46 @@ export const COLOR_THEMES = {
  * Time Range Configurations
  */
 export const TIME_RANGES = {
-  '5d': {
+  "5d": {
     days: 5,
     label: {
-      'en-US': '5 Days',
-      'zh-TW': '5 天',
+      "en-US": "5 Days",
+      "zh-TW": "5 天",
     },
   },
-  '1mo': {
+  "1mo": {
     days: 30,
     label: {
-      'en-US': '1 Month',
-      'zh-TW': '1 個月',
+      "en-US": "1 Month",
+      "zh-TW": "1 個月",
     },
   },
-  '3mo': {
+  "3mo": {
     days: 90,
     label: {
-      'en-US': '3 Months',
-      'zh-TW': '3 個月',
+      "en-US": "3 Months",
+      "zh-TW": "3 個月",
     },
   },
-  '6mo': {
+  "6mo": {
     days: 180,
     label: {
-      'en-US': '6 Months',
-      'zh-TW': '6 個月',
+      "en-US": "6 Months",
+      "zh-TW": "6 個月",
     },
   },
-  '1y': {
+  "1y": {
     days: 365,
     label: {
-      'en-US': '1 Year',
-      'zh-TW': '1 年',
+      "en-US": "1 Year",
+      "zh-TW": "1 年",
     },
   },
-  'ytd': {
+  ytd: {
     days: -1, // Special value for "year to date"
     label: {
-      'en-US': 'YTD',
-      'zh-TW': '今年至今',
+      "en-US": "YTD",
+      "zh-TW": "今年至今",
     },
   },
 } as const;
@@ -112,10 +112,10 @@ export const MA_PERIODS = {
  * LocalStorage Keys
  */
 export const STORAGE_KEYS = {
-  STOCKS: 'stocks',
-  LAYOUT: 'dashboard-layout',
-  LANGUAGE: 'language',
-  COLOR_THEME: 'colorTheme',
+  STOCKS: "stocks",
+  LAYOUT: "dashboard-layout",
+  LANGUAGE: "language",
+  COLOR_THEME: "colorTheme",
 } as const;
 
 /**
@@ -124,7 +124,7 @@ export const STORAGE_KEYS = {
 export const GRID_CONFIG = {
   COLS: 12,
   ROW_HEIGHT: 30,
-  COMPACT_TYPE: 'vertical' as const,
+  COMPACT_TYPE: "vertical" as const,
   PREVENT_COLLISION: false,
   MARGIN: [10, 10] as [number, number],
   CONTAINER_PADDING: [10, 10] as [number, number],
@@ -134,19 +134,19 @@ export const GRID_CONFIG = {
  * Default Stock Symbols
  */
 export const DEFAULT_STOCKS = [
-  { symbol: 'AAPL', name: 'Apple Inc.' },
-  { symbol: 'GOOGL', name: 'Alphabet Inc.' },
-  { symbol: 'MSFT', name: 'Microsoft Corporation' },
-  { symbol: 'TSLA', name: 'Tesla, Inc.' },
+  { symbol: "AAPL", name: "Apple Inc." },
+  { symbol: "GOOGL", name: "Alphabet Inc." },
+  { symbol: "MSFT", name: "Microsoft Corporation" },
+  { symbol: "TSLA", name: "Tesla, Inc." },
 ] as const;
 
 /**
  * Application Metadata
  */
 export const APP_METADATA = {
-  NAME: 'MarketVue',
-  VERSION: '1.3.4',
-  DESCRIPTION: 'Real-time multi-market stock dashboard',
+  NAME: "MarketVue",
+  VERSION: "1.16.2",
+  DESCRIPTION: "Real-time multi-market stock dashboard",
 } as const;
 
 /**
@@ -172,13 +172,13 @@ export const STOCK_LIST_CONFIG = {
   MAX_LIST_NAME_LENGTH: 30,
 
   /** Default list ID (cannot be deleted) */
-  DEFAULT_LIST_ID: 'default',
+  DEFAULT_LIST_ID: "default",
 
   /** localStorage key for stock lists */
-  STORAGE_KEY: 'marketvue-stock-lists',
+  STORAGE_KEY: "marketvue-stock-lists",
 
   /** Legacy localStorage key (for migration) */
-  LEGACY_STORAGE_KEY: 'tracked-stocks',
+  LEGACY_STORAGE_KEY: "tracked-stocks",
 
   /** Current schema version */
   SCHEMA_VERSION: 1,
