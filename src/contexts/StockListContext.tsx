@@ -10,20 +10,25 @@ import {
   useState,
   useEffect,
   type ReactNode,
-} from 'react';
+} from "react";
 import type {
   StockListState,
   StockListContextType,
   StockList,
   StockListAction,
   StoredStockListData,
-} from '../types/stockList';
-import { stockListReducer, createInitialState } from '../hooks/useStockListReducer';
-import { STOCK_LIST_CONFIG } from '../config/constants';
-import { migrateFromLegacyStorage } from '../utils/migration';
-import { useApp } from './AppContext';
+} from "../types/stockList";
+import {
+  stockListReducer,
+  createInitialState,
+} from "../hooks/useStockListReducer";
+import { STOCK_LIST_CONFIG } from "../config/constants";
+import { migrateFromLegacyStorage } from "../utils/migration";
+import { useApp } from "./AppContext";
 
-const StockListContext = createContext<StockListContextType | undefined>(undefined);
+const StockListContext = createContext<StockListContextType | undefined>(
+  undefined,
+);
 
 /**
  * Hook to access stock list context
@@ -31,7 +36,7 @@ const StockListContext = createContext<StockListContextType | undefined>(undefin
 export function useStockList() {
   const context = useContext(StockListContext);
   if (context === undefined) {
-    throw new Error('useStockList must be used within a StockListProvider');
+    throw new Error("useStockList must be used within a StockListProvider");
   }
   return context;
 }
@@ -65,7 +70,7 @@ function loadStoredState(defaultListName: string): StockListState {
     // No existing data, return initial state
     return createInitialState(defaultListName);
   } catch (error) {
-    console.error('Failed to load stock list state:', error);
+    console.error("Failed to load stock list state:", error);
     return createInitialState(defaultListName);
   }
 }
@@ -81,7 +86,7 @@ function saveState(state: StockListState): void {
     };
     localStorage.setItem(STOCK_LIST_CONFIG.STORAGE_KEY, JSON.stringify(data));
   } catch (error) {
-    console.error('Failed to save stock list state:', error);
+    console.error("Failed to save stock list state:", error);
   }
 }
 
@@ -89,19 +94,15 @@ export function StockListProvider({ children }: StockListProviderProps) {
   const { language } = useApp();
 
   // Get default list name based on language
-  const defaultListName = language === 'zh-TW' ? '我的觀察清單' : 'My Watchlist';
+  const defaultListName =
+    language === "zh-TW" ? "我的觀察清單" : "My Watchlist";
 
-  const [state, setState] = useState<StockListState>(() => loadStoredState(defaultListName));
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [state, setState] = useState<StockListState>(() =>
+    loadStoredState(defaultListName),
+  );
+  const isInitialized = true;
 
-  // Initialize state from localStorage
-  useEffect(() => {
-    const loadedState = loadStoredState(defaultListName);
-    setState(loadedState);
-    setIsInitialized(true);
-  }, [defaultListName]);
-
-  // Save state to localStorage whenever it changes (after initialization)
+  // Save state to localStorage whenever it changes
   useEffect(() => {
     if (isInitialized) {
       saveState(state);
@@ -122,7 +123,8 @@ export function StockListProvider({ children }: StockListProviderProps) {
   const stocks = useMemo(() => activeList.stocks, [activeList.stocks]);
 
   const isListLimitReached = state.lists.length >= STOCK_LIST_CONFIG.MAX_LISTS;
-  const isStockLimitReached = stocks.length >= STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST;
+  const isStockLimitReached =
+    stocks.length >= STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST;
 
   // Actions
   const actions = useMemo(
@@ -131,7 +133,10 @@ export function StockListProvider({ children }: StockListProviderProps) {
         if (isListLimitReached || !name.trim()) {
           return false;
         }
-        dispatch({ type: 'CREATE_LIST', payload: { name: name.trim(), stocks: initialStocks } });
+        dispatch({
+          type: "CREATE_LIST",
+          payload: { name: name.trim(), stocks: initialStocks },
+        });
         return true;
       },
 
@@ -140,7 +145,7 @@ export function StockListProvider({ children }: StockListProviderProps) {
         if (!list || list.isDefault) {
           return false;
         }
-        dispatch({ type: 'DELETE_LIST', payload: { id } });
+        dispatch({ type: "DELETE_LIST", payload: { id } });
         return true;
       },
 
@@ -148,35 +153,38 @@ export function StockListProvider({ children }: StockListProviderProps) {
         if (!name.trim()) {
           return false;
         }
-        dispatch({ type: 'RENAME_LIST', payload: { id, name: name.trim() } });
+        dispatch({ type: "RENAME_LIST", payload: { id, name: name.trim() } });
         return true;
       },
 
       switchList: (id: string): void => {
-        dispatch({ type: 'SWITCH_LIST', payload: { id } });
+        dispatch({ type: "SWITCH_LIST", payload: { id } });
       },
 
       addStock: (symbol: string): boolean => {
         if (isStockLimitReached || stocks.includes(symbol)) {
           return false;
         }
-        dispatch({ type: 'ADD_STOCK', payload: { stock: symbol } });
+        dispatch({ type: "ADD_STOCK", payload: { stock: symbol } });
         return true;
       },
 
       removeStock: (symbol: string): void => {
-        dispatch({ type: 'REMOVE_STOCK', payload: { stock: symbol } });
+        dispatch({ type: "REMOVE_STOCK", payload: { stock: symbol } });
       },
 
       reorderStocks: (newStocks: string[]): void => {
-        dispatch({ type: 'REORDER_STOCKS', payload: { stocks: newStocks } });
+        dispatch({ type: "REORDER_STOCKS", payload: { stocks: newStocks } });
       },
 
       saveCurrentAsNew: (name: string): boolean => {
         if (isListLimitReached || !name.trim()) {
           return false;
         }
-        dispatch({ type: 'SAVE_CURRENT_AS_NEW', payload: { name: name.trim() } });
+        dispatch({
+          type: "SAVE_CURRENT_AS_NEW",
+          payload: { name: name.trim() },
+        });
         return true;
       },
 
@@ -184,12 +192,12 @@ export function StockListProvider({ children }: StockListProviderProps) {
         let added = 0;
         let skipped = 0;
 
-        for (const symbol of symbols) {
-          const upperSymbol = symbol.toUpperCase().trim();
+        for (let i = 0; i < symbols.length; i++) {
+          const upperSymbol = symbols[i].toUpperCase().trim();
           if (!upperSymbol) continue;
 
           if (stocks.length + added >= STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST) {
-            skipped += symbols.length - symbols.indexOf(symbol);
+            skipped += symbols.length - i;
             break;
           }
 
@@ -198,7 +206,7 @@ export function StockListProvider({ children }: StockListProviderProps) {
             continue;
           }
 
-          dispatch({ type: 'ADD_STOCK', payload: { stock: upperSymbol } });
+          dispatch({ type: "ADD_STOCK", payload: { stock: upperSymbol } });
           added++;
         }
 
@@ -207,10 +215,12 @@ export function StockListProvider({ children }: StockListProviderProps) {
 
       exportStocks: (): string[] => {
         // Convert .T back to .JP for display
-        return stocks.map((s) => (s.endsWith('.T') ? s.replace(/\.T$/, '.JP') : s));
+        return stocks.map((s) =>
+          s.endsWith(".T") ? s.replace(/\.T$/, ".JP") : s,
+        );
       },
     }),
-    [dispatch, state.lists, stocks, isListLimitReached, isStockLimitReached]
+    [dispatch, state.lists, stocks, isListLimitReached, isStockLimitReached],
   );
 
   const value: StockListContextType = {
@@ -222,5 +232,9 @@ export function StockListProvider({ children }: StockListProviderProps) {
     actions,
   };
 
-  return <StockListContext.Provider value={value}>{children}</StockListContext.Provider>;
+  return (
+    <StockListContext.Provider value={value}>
+      {children}
+    </StockListContext.Provider>
+  );
 }
