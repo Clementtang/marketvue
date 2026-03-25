@@ -228,9 +228,6 @@ describe("usePersistedState Hook", () => {
     });
 
     it("should handle localStorage.getItem errors gracefully", () => {
-      const consoleErrorSpy = vi
-        .spyOn(console, "error")
-        .mockImplementation(() => {});
       vi.mocked(localStorage.getItem).mockImplementation(() => {
         throw new Error("Storage unavailable");
       });
@@ -239,37 +236,26 @@ describe("usePersistedState Hook", () => {
         usePersistedState<string>("error-key", "default-value"),
       );
 
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
-        'Failed to load "error-key" from localStorage:',
-        expect.any(Error),
-      );
+      // Falls back to default value silently when localStorage is unavailable
       expect(result.current[0]).toBe("default-value");
-
-      consoleErrorSpy.mockRestore();
     });
   });
 
   describe("Initialization Behavior", () => {
-    it("should not save to localStorage before initialization completes", async () => {
+    it("should persist updates to localStorage immediately", async () => {
       const { result } = renderHook(() =>
         usePersistedState<string>("init-key", "default-value"),
       );
 
-      // Before useEffect runs, setItem should not be called
-      expect(localStorage.setItem).not.toHaveBeenCalled();
-
-      // Wait for initialization
-      await act(async () => {
-        await new Promise((resolve) => setTimeout(resolve, 0));
-      });
-
-      // Now updates should persist
+      // Synchronous init means no useEffect needed - updates persist immediately
       await act(async () => {
         result.current[1]("new-value");
-        await new Promise((resolve) => setTimeout(resolve, 0));
       });
 
-      expect(localStorage.setItem).toHaveBeenCalled();
+      expect(localStorage.setItem).toHaveBeenCalledWith(
+        "init-key",
+        JSON.stringify("new-value"),
+      );
     });
 
     it("should only call localStorage.getItem once on mount", () => {
