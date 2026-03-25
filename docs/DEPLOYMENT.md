@@ -125,6 +125,19 @@ Then redeploy the backend service.
 - First request after sleep takes 30-60 seconds
 - Consider upgrading to paid plan for production use
 
+### Render deploy fails with "health check timeout" but build succeeds
+
+- Render free tier instances may fail health check on auto-deploy if the instance has been spun down for too long
+- Symptoms: build succeeds, gunicorn starts and binds port, but Render reports "Port scan timeout reached, no open ports detected"
+- Fix: go to Render Dashboard → Manual Deploy → "Clear build cache & deploy"
+- This is a Render infrastructure issue, not a code bug
+
+### Vercel build fails but local `tsc --noEmit` passes
+
+- Vercel runs `tsc -b` (project references mode), which is stricter than `tsc --noEmit`
+- Test files in `tsconfig.app.json` include paths are type-checked by `tsc -b` but skipped by `tsc --noEmit`
+- Always verify with `npx tsc -b` locally before pushing to match Vercel's build behavior
+
 ---
 
 ## Custom Domain (Optional)
