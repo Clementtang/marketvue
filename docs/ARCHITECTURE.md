@@ -35,22 +35,25 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 │  │  │   Routes   │  │   Services   │  │   Data   │ │  │
 │  │  │ - Stock    │  │ - yfinance   │  │ - Company│ │  │
 │  │  │   Data API │  │   Integration│  │   Names  │ │  │
-│  │  │            │  │ - Caching    │  │   JSON   │ │  │
+│  │  │ - News API │  │ - News       │  │   JSON   │ │  │
+│  │  │            │  │   Service    │  │          │ │  │
+│  │  │            │  │ - Caching    │  │          │ │  │
 │  │  └────────────┘  └──────────────┘  └──────────┘ │  │
 │  └──────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────┘
                             │
-                    yfinance Library
+                    yfinance Library / News APIs
                             │
 ┌─────────────────────────────────────────────────────────┐
-│              External Data Source                        │
-│                  Yahoo Finance API                       │
+│              External Data Sources                       │
+│  Yahoo Finance API / Finnhub API / Google News RSS      │
 └─────────────────────────────────────────────────────────┘
 ```
 
 ## Technology Stack
 
 ### Frontend
+
 - **React 19**: Latest version with improved performance
 - **TypeScript**: Type-safe code
 - **Vite 7.1**: Fast build tool and dev server
@@ -62,13 +65,14 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 - **date-fns**: Modern date utility library
 - **Lucide Icons**: Beautiful SVG icon set
 - **modern-screenshot**: High-quality screenshots with modern CSS support
-- **Context API**: Global state management (AppContext, ChartContext, ToastContext, VisualThemeContext)
-- **Custom Hooks**: Reusable logic (useRetry, useStockData, useToast)
+- **Context API**: Global state management (AppContext, ChartContext, StockListContext, ToastContext, VisualThemeContext)
+- **Custom Hooks**: Reusable logic (useRetry, useStockData, useNewsData, usePersistedState, useStockListReducer, useStockSearch)
 - **Animation System**: Unified animation configuration (animations.ts)
 - **Batch API System**: Intelligent request queue and batch processing (batchStockApi)
 - **Google Fonts**: Playfair Display (serif), Inter (sans-serif), Noto Sans TC (Chinese)
 
 ### Backend
+
 - **Flask 3.0**: Lightweight Python web framework
 - **yfinance**: Yahoo Finance market data downloader
 - **Flask-CORS**: Handle cross-origin requests
@@ -108,10 +112,15 @@ src/
 ├── contexts/                    # React Context providers
 │   ├── AppContext.tsx           # i18n, theme, date range
 │   ├── ChartContext.tsx         # Chart type (candlestick/line)
+│   ├── StockListContext.tsx     # Multi-list stock management
 │   ├── ToastContext.tsx         # Toast notifications
 │   └── VisualThemeContext.tsx   # Visual theme (Classic/Warm Minimal)
 ├── hooks/                       # Custom hooks
 │   ├── useRetry.ts              # Retry logic for API calls
+│   ├── useNewsData.ts           # News data fetching
+│   ├── usePersistedState.ts     # localStorage-backed state
+│   ├── useStockListReducer.ts   # Stock list state management
+│   ├── useStockSearch.ts        # Stock symbol search
 │   └── index.ts                 # Hook exports
 ├── utils/
 │   ├── screenshot.ts            # Screenshot utility functions
@@ -135,6 +144,7 @@ backend/
 ├── constants.py                   # Magic numbers & constants
 ├── routes/
 │   ├── stock_routes.py            # /api/v1/stock-data, /api/v1/batch-stocks
+│   ├── news_routes.py             # /api/v1/news/<symbol>
 │   ├── health_routes.py           # /api/v1/health/* endpoints
 │   └── legacy_routes.py           # /api/* backward compatibility
 ├── services/                      # Single Responsibility Services
@@ -142,7 +152,10 @@ backend/
 │   ├── stock_data_fetcher.py      # yfinance API calls
 │   ├── stock_data_transformer.py  # DataFrame → Dict conversion
 │   ├── price_calculator.py        # Price metrics calculation
-│   └── company_name_service.py    # Multi-language name resolution
+│   ├── company_name_service.py    # Multi-language name resolution
+│   ├── news_service.py            # News orchestrator (routes by market)
+│   ├── finnhub_news_fetcher.py    # Finnhub API (US stocks)
+│   └── google_news_fetcher.py     # Google News RSS (TW/HK/JP)
 ├── schemas/
 │   └── stock_schemas.py           # Marshmallow request validation
 ├── utils/
@@ -245,16 +258,19 @@ Component Mount → react-spring hooks
 ## Key Features Implementation
 
 ### Multi-Market Support
+
 - Symbol format detection (`.TW`, `.TWO`, `.HK`, `.JP`)
 - Automatic handling of different exchanges
 - yfinance handles market-specific data fetching
 
 ### Technical Indicators
+
 - MA20/MA60 calculated client-side
 - Reduces server load
 - Real-time updates on chart
 
 ### Visual Theme System
+
 - **Dual Theme Architecture**: Classic & Warm Minimal themes
 - **Classic Theme**: Modern blue tones, sans-serif fonts, professional feel
 - **Warm Minimal Theme**: Warm colors (beige, terracotta), serif fonts (Playfair Display), elegant rounded corners
@@ -265,6 +281,7 @@ Component Mount → react-spring hooks
 - **Theme Guide**: Interactive design guide (Warm theme exclusive)
 
 ### Animation System
+
 - **react-spring**: Physics-based animations for natural feel
 - **Stagger Fade-in**: Stock cards appear sequentially (50ms delay)
 - **Number Counting**: Smooth price number animations with configurable duration
@@ -275,6 +292,7 @@ Component Mount → react-spring hooks
 - **Accessibility**: Respects `prefers-reduced-motion`
 
 ### Caching Strategy
+
 - **Backend**:
   - Flask-Caching: 5-minute cache for stock data
   - Cache backends: SimpleCache (default) or Redis (production)
@@ -285,15 +303,17 @@ Component Mount → react-spring hooks
   - Request deduplication (reduces 89% of API calls)
   - localStorage for user preferences and stock lists
 
-### Pagination System (v1.5.0)
-- **Capacity**: Support up to 18 stocks (2 pages × 9 stocks)
-- **Layout**: 3×3 grid per page
-- **Navigation**: Previous/Next page buttons with page indicator
-- **Smart Behavior**: Auto-jump to last page when adding new stock
-- **Persistence**: Current page saved in localStorage
-- **Screenshot Compatible**: Each page can be screenshot independently
+### Multi-List Stock Management
+
+- **Multiple Lists**: Users can create, rename, and delete custom stock lists
+- **Capacity**: Each list supports up to 9 stocks in a 3x3 grid
+- **List Selector**: Tab-based list switching with StockListContext
+- **State Management**: useStockListReducer for list CRUD operations
+- **Persistence**: All lists and active list saved in localStorage
+- **Screenshot Compatible**: Each list can be screenshot independently
 
 ### Screenshot Feature (v1.5.0)
+
 - **Library**: modern-screenshot (supports modern CSS)
 - **Aspect Ratio**: 16:9 optimized for presentations
 - **Output**: High-quality PNG to clipboard
@@ -301,6 +321,7 @@ Component Mount → react-spring hooks
 - **Page Support**: Screenshot current page only (9 stocks max)
 
 ### Clipboard Import/Export (v1.5.1)
+
 - **Export**: One-click export all stock symbols to clipboard (comma-separated)
 - **Import**: Batch import comma-separated stock symbols
 - **Smart Handling**: Automatic `.JP` ↔ `.T` symbol conversion for Japanese stocks
@@ -317,6 +338,7 @@ Component Mount → react-spring hooks
 ## Performance Optimizations
 
 ### Frontend
+
 - **Batch Request Queue**: Automatically merges multiple stock requests into single batch API call
   - 100ms collection window
   - Request deduplication
@@ -329,6 +351,7 @@ Component Mount → react-spring hooks
 - **Image Optimization**: Google Fonts with font-display: swap
 
 ### Backend
+
 - **Flask-Caching**: 5-minute cache for stock data (634x performance improvement)
 - **Parallel Batch Processing**: ThreadPoolExecutor for concurrent stock fetching (2-3x faster)
 - **Redis Support**: Optional Redis backend for distributed caching
@@ -338,11 +361,13 @@ Component Mount → react-spring hooks
 ## Deployment Considerations
 
 ### Frontend
+
 - Build with `npm run build`
 - Deploy to Vercel, Netlify, or static hosting
 - Environment variables for API URL
 
 ### Backend
+
 - Production WSGI server (Gunicorn recommended)
 - Environment-specific configuration
 - CORS update for production domain
@@ -350,6 +375,7 @@ Component Mount → react-spring hooks
 ## Future Architecture Enhancements
 
 ### Completed ✅
+
 - [x] Redis for distributed caching (v1.3.3 - Phase 3 Day 7)
 - [x] API versioning (v1.3.5 - Phase 3 Day 9)
 - [x] Kubernetes-ready health endpoints (v1.3.5 - Phase 3 Day 9)
@@ -360,14 +386,15 @@ Component Mount → react-spring hooks
 - [x] Clipboard import/export (v1.5.1)
 - [x] Batch request queue optimization (v1.4.1)
 - [x] React Query integration (v1.4.1)
+- [x] Multi-language news integration (v1.15.0) - Finnhub (US) + Google News RSS (TW/HK/JP)
 
-### Planned 🎯
+### Planned
+
 - [ ] Real-time WebSocket updates
 - [ ] PostgreSQL for user data
 - [ ] Microservices for scaling
 - [ ] GraphQL API option
 - [ ] Server-side rendering (SSR)
-- [ ] Multi-language news integration (Q2 2025)
 
 ---
 

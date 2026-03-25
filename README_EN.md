@@ -300,7 +300,7 @@ marketvue/
 │   ├── utils/
 │   │   ├── decorators.py        # Error handling decorators
 │   │   └── error_handlers.py    # Error handlers
-│   └── tests/                    # Backend tests (73 tests)
+│   └── tests/                    # Backend tests (286 tests)
 ├── src/                          # React frontend
 │   ├── components/
 │   │   ├── stock-card/          # Stock card module
@@ -437,15 +437,15 @@ This is normal behavior, not an error. Subsequent visits will respond quickly.
 ## 🧪 Testing
 
 ```bash
-# Frontend tests (145 tests)
+# Frontend tests (201 tests)
 npm test
 
-# Backend tests (215 tests)
+# Backend tests (286 tests)
 cd backend && source venv/bin/activate
 python -m pytest tests/ -v
 ```
 
-Test coverage: Frontend 85%+ / Backend 89.87%
+Test coverage: Frontend 85%+ / Backend 95.72%
 
 ## 🤝 Contributing
 

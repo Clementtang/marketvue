@@ -16,12 +16,13 @@ http://localhost:5001/api
 
 MarketVue uses URL-based API versioning. The current version is **v1**.
 
-| Version | Status | Base Path |
-|---------|--------|-----------|
-| v1 | Current | `/api/v1` |
-| (none) | Deprecated | `/api` |
+| Version | Status     | Base Path |
+| ------- | ---------- | --------- |
+| v1      | Current    | `/api/v1` |
+| (none)  | Deprecated | `/api`    |
 
 **Deprecation Notice:** The legacy `/api/*` endpoints still work but return deprecation headers:
+
 - `X-API-Deprecated: true`
 - `X-API-Deprecation-Notice: This endpoint is deprecated. Please use /api/v1/* instead.`
 
@@ -36,6 +37,7 @@ Fetch historical stock data for a specific symbol.
 **Endpoint:** `POST /api/v1/stock-data`
 
 **Request Body:**
+
 ```json
 {
   "symbol": "AAPL",
@@ -52,6 +54,7 @@ Fetch historical stock data for a specific symbol.
 | end_date | string | Yes | End date in YYYY-MM-DD format |
 
 **Response:** `200 OK`
+
 ```json
 {
   "symbol": "AAPL",
@@ -79,6 +82,7 @@ Fetch historical stock data for a specific symbol.
 **Error Responses:**
 
 - `400 Bad Request` - Invalid parameters
+
 ```json
 {
   "error": "Missing required field: symbol"
@@ -86,6 +90,7 @@ Fetch historical stock data for a specific symbol.
 ```
 
 - `404 Not Found` - Symbol not found
+
 ```json
 {
   "error": "No data found for symbol INVALID. Please verify the symbol is correct."
@@ -101,6 +106,7 @@ Fetch data for multiple stocks in a single request (sequential processing).
 **Endpoint:** `POST /api/v1/batch-stocks`
 
 **Request Body:**
+
 ```json
 {
   "symbols": ["AAPL", "GOOGL", "MSFT"],
@@ -117,6 +123,7 @@ Fetch data for multiple stocks in a single request (sequential processing).
 | end_date | string | No | End date (defaults to today) |
 
 **Response:** `200 OK`
+
 ```json
 {
   "stocks": [
@@ -139,6 +146,7 @@ Fetch data for multiple stocks in a single request (sequential processing).
 ```
 
 **With Errors:**
+
 ```json
 {
   "stocks": [...],
@@ -161,6 +169,7 @@ Fetch data for multiple stocks in a single request (sequential processing).
 **Endpoint:** `POST /api/v1/batch-stocks-parallel`
 
 **Request Body:**
+
 ```json
 {
   "symbols": ["AAPL", "GOOGL", "MSFT", "TSLA", "AMZN"],
@@ -171,12 +180,14 @@ Fetch data for multiple stocks in a single request (sequential processing).
 ```
 
 **Parameters:**
+
 - `symbols` (array, required): List of stock ticker symbols (max 18)
 - `start_date` (string, optional): Start date in YYYY-MM-DD format
 - `end_date` (string, optional): End date in YYYY-MM-DD format
 - `max_workers` (integer, optional): Number of parallel workers (1-10, default: 5)
 
 **Response:** `200 OK`
+
 ```json
 {
   "stocks": [
@@ -199,35 +210,107 @@ Fetch data for multiple stocks in a single request (sequential processing).
 ```
 
 **Performance Comparison:**
+
 - Sequential (`/batch-stocks`): ~3-5 seconds for 5 stocks
 - Parallel (`/batch-stocks-parallel`): ~1-2 seconds for 5 stocks
 - **Improvement:** Up to 3x faster
 
 **When to Use:**
+
 - ✅ Recommended for 3+ stocks
 - ✅ Better for high-latency networks
 - ✅ Ideal for batch imports
 - ⚠️ Use sequential for 1-2 stocks (no benefit from parallelization)
 
 **Cache:**
+
 - Same as `/batch-stocks` endpoint (5 minutes)
 - Cached by symbols + date range combination
 
 **Error Handling:**
+
 - Supports partial success (some stocks succeed, others fail)
 - Failed stocks returned in `errors` array
 - Processing time included for performance monitoring
 
 ---
 
-### 4. Health Check Endpoints
+### 4. Get Stock News
+
+Fetch news articles from the past 72 hours for a given stock symbol. Routes to different news sources based on market:
+
+- US stocks: Finnhub API
+- Taiwan stocks (.TW, .TWO): Google News RSS (zh-TW)
+- Hong Kong stocks (.HK): Google News RSS (zh-TW)
+- Japan stocks (.T): Google News RSS (en)
+
+**Endpoint:** `GET /api/v1/news/<symbol>`
+
+**Path Parameters:**
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| symbol | string | Yes | Stock ticker symbol (e.g., "AAPL", "2330.TW") |
+
+**Response:** `200 OK`
+
+```json
+{
+  "symbol": "AAPL",
+  "news": [
+    {
+      "id": "finnhub_12345",
+      "headline": "Apple Reports Record Revenue",
+      "summary": "Apple Inc. reported record quarterly revenue...",
+      "source": "Reuters",
+      "url": "https://example.com/article",
+      "image": "https://example.com/image.jpg",
+      "published_at": "2026-03-25 10:30:00",
+      "language": "en-US"
+    }
+  ],
+  "total": 15,
+  "cached_at": "2026-03-25 12:00:00"
+}
+```
+
+**News Article Fields:**
+| Field | Type | Description |
+|-------|------|-------------|
+| id | string | Unique article ID (prefixed with source: `finnhub_` or `google_`) |
+| headline | string | Article title |
+| summary | string/null | Article summary (Finnhub only) |
+| source | string/null | News source name |
+| url | string | Article URL |
+| image | string/null | Article image URL (Finnhub only) |
+| published_at | string | Publication date (`YYYY-MM-DD HH:MM:SS`) |
+| language | string | Article language (`en-US` or `zh-TW`) |
+
+**Error Responses:**
+
+- `400 Bad Request` - Invalid symbol format
+
+```json
+{
+  "error": "Invalid stock symbol format. Only letters, numbers, dots, hyphens, and carets allowed (max 10 chars)."
+}
+```
+
+**Cache:**
+
+- Cached for 15 minutes (900 seconds) per symbol
+
+---
+
+### 5. Health Check Endpoints
 
 Monitor service health and readiness.
 
 #### Basic Health Check
+
 **Endpoint:** `GET /api/v1/health`
 
 **Response:** `200 OK`
+
 ```json
 {
   "status": "healthy",
@@ -237,9 +320,11 @@ Monitor service health and readiness.
 ```
 
 #### Detailed Health Check
+
 **Endpoint:** `GET /api/v1/health/detailed`
 
 **Response:** `200 OK`
+
 ```json
 {
   "status": "healthy",
@@ -257,7 +342,7 @@ Monitor service health and readiness.
     "python_version": "3.9.6"
   },
   "dependencies": {
-    "cache": {"status": "healthy", "backend": "SimpleCache"}
+    "cache": { "status": "healthy", "backend": "SimpleCache" }
   },
   "config": {
     "rate_limit": "1000 per hour",
@@ -267,9 +352,11 @@ Monitor service health and readiness.
 ```
 
 #### Kubernetes Readiness Probe
+
 **Endpoint:** `GET /api/v1/health/ready`
 
 **Response:** `200 OK` (ready) or `503 Service Unavailable` (not ready)
+
 ```json
 {
   "ready": true,
@@ -280,9 +367,11 @@ Monitor service health and readiness.
 ```
 
 #### Kubernetes Liveness Probe
+
 **Endpoint:** `GET /api/v1/health/live`
 
 **Response:** `200 OK`
+
 ```json
 {
   "alive": true,
@@ -296,13 +385,13 @@ Monitor service health and readiness.
 
 MarketVue supports various stock exchanges with specific ticker formats:
 
-| Exchange | Format | Example | Description |
-|----------|--------|---------|-------------|
-| Taiwan Listed | `XXXX.TW` | `2330.TW` | Taiwan Stock Exchange (TWSE) |
-| Taiwan OTC | `XXXX.TWO` | `5904.TWO` | Taipei Exchange (TPEx) |
-| US Stocks | `SYMBOL` | `AAPL` | NYSE, NASDAQ |
-| Hong Kong | `XXXX.HK` | `0700.HK` | Hong Kong Stock Exchange |
-| Japan | `XXXX.JP` | `9983.JP` | Tokyo Stock Exchange |
+| Exchange      | Format     | Example    | Description                  |
+| ------------- | ---------- | ---------- | ---------------------------- |
+| Taiwan Listed | `XXXX.TW`  | `2330.TW`  | Taiwan Stock Exchange (TWSE) |
+| Taiwan OTC    | `XXXX.TWO` | `5904.TWO` | Taipei Exchange (TPEx)       |
+| US Stocks     | `SYMBOL`   | `AAPL`     | NYSE, NASDAQ                 |
+| Hong Kong     | `XXXX.HK`  | `0700.HK`  | Hong Kong Stock Exchange     |
+| Japan         | `XXXX.JP`  | `9983.JP`  | Tokyo Stock Exchange         |
 
 **Note:** Japanese stocks use `.JP` format in the frontend. The system automatically converts `.JP` to `.T` for yfinance API compatibility.
 
@@ -311,20 +400,22 @@ MarketVue supports various stock exchanges with specific ticker formats:
 ## Data Fields
 
 ### Stock Data Point
-| Field | Type | Description |
-|-------|------|-------------|
-| date | string | Trading date (YYYY-MM-DD) |
-| open | float | Opening price |
-| high | float | Highest price of the day |
-| low | float | Lowest price of the day |
-| close | float | Closing price |
-| volume | integer | Trading volume |
+
+| Field  | Type    | Description               |
+| ------ | ------- | ------------------------- |
+| date   | string  | Trading date (YYYY-MM-DD) |
+| open   | float   | Opening price             |
+| high   | float   | Highest price of the day  |
+| low    | float   | Lowest price of the day   |
+| close  | float   | Closing price             |
+| volume | integer | Trading volume            |
 
 ### Company Name
-| Field | Type | Description |
-|-------|------|-------------|
+
+| Field | Type        | Description                      |
+| ----- | ----------- | -------------------------------- |
 | zh-TW | string/null | Traditional Chinese company name |
-| en-US | string/null | English company name |
+| en-US | string/null | English company name             |
 
 ---
 
@@ -337,6 +428,7 @@ MarketVue supports various stock exchanges with specific ticker formats:
   - `X-RateLimit-Reset`: Time when limit resets (Unix timestamp)
 
 **Rate Limit Exceeded Response:** `429 Too Many Requests`
+
 ```json
 {
   "error": "Rate limit exceeded. Please try again later."
@@ -366,19 +458,20 @@ All error responses follow this format:
 
 ### Common HTTP Status Codes
 
-| Code | Description |
-|------|-------------|
-| 200 | Success |
-| 400 | Bad Request - Invalid parameters |
-| 404 | Not Found - Resource doesn't exist |
-| 429 | Too Many Requests - Rate limit exceeded |
-| 500 | Internal Server Error - Something went wrong on the server |
+| Code | Description                                                |
+| ---- | ---------------------------------------------------------- |
+| 200  | Success                                                    |
+| 400  | Bad Request - Invalid parameters                           |
+| 404  | Not Found - Resource doesn't exist                         |
+| 429  | Too Many Requests - Rate limit exceeded                    |
+| 500  | Internal Server Error - Something went wrong on the server |
 
 ---
 
 ## Examples
 
 ### Fetch Taiwan Stock (TSMC)
+
 ```bash
 curl -X POST http://localhost:5001/api/v1/stock-data \
   -H "Content-Type: application/json" \
@@ -390,6 +483,7 @@ curl -X POST http://localhost:5001/api/v1/stock-data \
 ```
 
 ### Fetch Multiple Stocks
+
 ```bash
 curl -X POST http://localhost:5001/api/v1/batch-stocks \
   -H "Content-Type: application/json" \
@@ -401,6 +495,7 @@ curl -X POST http://localhost:5001/api/v1/batch-stocks \
 ```
 
 ### Check Service Health
+
 ```bash
 curl http://localhost:5001/api/v1/health
 curl http://localhost:5001/api/v1/health/detailed
@@ -413,70 +508,84 @@ curl http://localhost:5001/api/v1/health/detailed
 ### Fetch Single Stock Data
 
 ```javascript
-import axios from 'axios';
+import axios from "axios";
 
 async function getStockData(symbol, startDate, endDate) {
   try {
-    const response = await axios.post('http://localhost:5001/api/v1/stock-data', {
-      symbol,
-      start_date: startDate,
-      end_date: endDate
-    });
+    const response = await axios.post(
+      "http://localhost:5001/api/v1/stock-data",
+      {
+        symbol,
+        start_date: startDate,
+        end_date: endDate,
+      },
+    );
 
-    console.log('Stock Data:', response.data);
+    console.log("Stock Data:", response.data);
     return response.data;
   } catch (error) {
     if (error.response) {
       // Server responded with error status
-      console.error('Error:', error.response.data.error);
-      console.error('Status:', error.response.status);
+      console.error("Error:", error.response.data.error);
+      console.error("Status:", error.response.status);
     } else if (error.request) {
       // Request made but no response
-      console.error('No response from server');
+      console.error("No response from server");
     } else {
       // Error in request setup
-      console.error('Request error:', error.message);
+      console.error("Request error:", error.message);
     }
     throw error;
   }
 }
 
 // Usage
-getStockData('2330.TW', '2024-10-01', '2024-10-31');
+getStockData("2330.TW", "2024-10-01", "2024-10-31");
 ```
 
 ### Fetch Multiple Stocks (Parallel)
 
 ```javascript
-async function getBatchStocksParallel(symbols, startDate, endDate, maxWorkers = 5) {
+async function getBatchStocksParallel(
+  symbols,
+  startDate,
+  endDate,
+  maxWorkers = 5,
+) {
   try {
-    const response = await axios.post('http://localhost:5001/api/v1/batch-stocks-parallel', {
-      symbols,
-      start_date: startDate,
-      end_date: endDate,
-      max_workers: maxWorkers
-    });
+    const response = await axios.post(
+      "http://localhost:5001/api/v1/batch-stocks-parallel",
+      {
+        symbols,
+        start_date: startDate,
+        end_date: endDate,
+        max_workers: maxWorkers,
+      },
+    );
 
     const { stocks, errors, processing_time_ms } = response.data;
 
     console.log(`Fetched ${stocks.length} stocks in ${processing_time_ms}ms`);
 
     if (errors && errors.length > 0) {
-      console.warn('Some stocks failed:', errors);
+      console.warn("Some stocks failed:", errors);
     }
 
     return response.data;
   } catch (error) {
-    console.error('Batch request failed:', error.response?.data || error.message);
+    console.error(
+      "Batch request failed:",
+      error.response?.data || error.message,
+    );
     throw error;
   }
 }
 
 // Usage
 getBatchStocksParallel(
-  ['AAPL', '2330.TW', 'GOOGL', '0700.HK'],
-  '2024-10-01',
-  '2024-10-31'
+  ["AAPL", "2330.TW", "GOOGL", "0700.HK"],
+  "2024-10-01",
+  "2024-10-31",
 );
 ```
 
@@ -487,15 +596,15 @@ async function fetchWithRetry(symbol, startDate, endDate, maxRetries = 3) {
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const response = await axios.post(
-        'http://localhost:5001/api/v1/stock-data',
+        "http://localhost:5001/api/v1/stock-data",
         {
           symbol,
           start_date: startDate,
-          end_date: endDate
+          end_date: endDate,
         },
         {
           timeout: 30000, // 30 second timeout
-        }
+        },
       );
 
       return response.data;
@@ -511,7 +620,7 @@ async function fetchWithRetry(symbol, startDate, endDate, maxRetries = 3) {
       if (attempt < maxRetries) {
         const delay = Math.min(1000 * Math.pow(2, attempt), 10000);
         console.log(`Attempt ${attempt} failed, retrying in ${delay}ms...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
+        await new Promise((resolve) => setTimeout(resolve, delay));
       } else {
         throw error;
       }
@@ -520,9 +629,9 @@ async function fetchWithRetry(symbol, startDate, endDate, maxRetries = 3) {
 }
 
 // Usage
-fetchWithRetry('2330.TW', '2024-10-01', '2024-10-31')
-  .then(data => console.log('Success:', data))
-  .catch(error => console.error('Failed after retries:', error));
+fetchWithRetry("2330.TW", "2024-10-01", "2024-10-31")
+  .then((data) => console.log("Success:", data))
+  .catch((error) => console.error("Failed after retries:", error));
 ```
 
 ### Health Check Monitoring
@@ -530,16 +639,18 @@ fetchWithRetry('2330.TW', '2024-10-01', '2024-10-31')
 ```javascript
 async function checkServiceHealth() {
   try {
-    const response = await axios.get('http://localhost:5001/api/v1/health/detailed');
+    const response = await axios.get(
+      "http://localhost:5001/api/v1/health/detailed",
+    );
     const health = response.data;
 
-    console.log('Service Status:', health.status);
-    console.log('Uptime:', health.uptime.formatted);
-    console.log('Cache Status:', health.dependencies.cache.status);
+    console.log("Service Status:", health.status);
+    console.log("Uptime:", health.uptime.formatted);
+    console.log("Cache Status:", health.dependencies.cache.status);
 
-    return health.status === 'healthy';
+    return health.status === "healthy";
   } catch (error) {
-    console.error('Health check failed:', error.message);
+    console.error("Health check failed:", error.message);
     return false;
   }
 }

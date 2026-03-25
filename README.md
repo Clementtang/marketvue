@@ -300,7 +300,7 @@ marketvue/
 │   ├── utils/
 │   │   ├── decorators.py        # 錯誤處理裝飾器
 │   │   └── error_handlers.py    # 錯誤處理器
-│   └── tests/                    # 後端測試 (73 tests)
+│   └── tests/                    # 後端測試 (286 tests)
 ├── src/                          # React 前端
 │   ├── components/
 │   │   ├── stock-card/          # 股票卡片模組
@@ -437,15 +437,15 @@ marketvue/
 ## 🧪 測試
 
 ```bash
-# 前端測試 (145 tests)
+# 前端測試 (201 tests)
 npm test
 
-# 後端測試 (215 tests)
+# 後端測試 (286 tests)
 cd backend && source venv/bin/activate
 python -m pytest tests/ -v
 ```
 
-測試覆蓋率：前端 85%+ / 後端 89.87%
+測試覆蓋率：前端 85%+ / 後端 95.72%
 
 ## 🤝 貢獻
 

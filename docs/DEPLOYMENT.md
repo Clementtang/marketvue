@@ -42,11 +42,12 @@ marketvue.vercel.app  →   marketvue-api.onrender.com
 
 In Render dashboard, add these environment variables:
 
-| Key | Value |
-|-----|-------|
-| `PYTHON_VERSION` | `3.11.0` |
-| `FLASK_ENV` | `production` |
-| `CORS_ORIGINS` | `https://marketvue.vercel.app` (update after deploying frontend) |
+| Key               | Value                                                            |
+| ----------------- | ---------------------------------------------------------------- |
+| `PYTHON_VERSION`  | `3.11.0`                                                         |
+| `FLASK_ENV`       | `production`                                                     |
+| `CORS_ORIGINS`    | `https://marketvue.vercel.app` (update after deploying frontend) |
+| `FINNHUB_API_KEY` | Your Finnhub API key (required for US stock news)                |
 
 ### Step 3: Deploy
 
@@ -73,8 +74,8 @@ Your backend URL will be: `https://marketvue-api.onrender.com`
 
 In Vercel project settings → Environment Variables:
 
-| Key | Value |
-|-----|-------|
+| Key            | Value                                                          |
+| -------------- | -------------------------------------------------------------- |
 | `VITE_API_URL` | `https://marketvue-api.onrender.com/api` (use your Render URL) |
 
 ### Step 3: Deploy
@@ -107,16 +108,19 @@ Then redeploy the backend service.
 ## Troubleshooting
 
 ### Backend shows "Application Error"
+
 - Check Render logs for errors
 - Verify all environment variables are set
 - Ensure `gunicorn` is in requirements.txt
 
 ### Frontend can't load stock data
+
 - Check browser console for CORS errors
 - Verify `VITE_API_URL` points to correct Render URL
 - Ensure backend `CORS_ORIGINS` includes Vercel URL
 
 ### Backend sleeps (Free Plan)
+
 - Render free plan sleeps after 15 minutes of inactivity
 - First request after sleep takes 30-60 seconds
 - Consider upgrading to paid plan for production use
@@ -126,11 +130,13 @@ Then redeploy the backend service.
 ## Custom Domain (Optional)
 
 ### Vercel
+
 1. Go to Project Settings → Domains
 2. Add your custom domain
 3. Follow DNS configuration instructions
 
 ### Render
+
 1. Go to Service Settings → Custom Domain
 2. Add your custom domain
 3. Update DNS records as instructed
@@ -185,11 +191,12 @@ marketvue.vercel.app  →   marketvue-api.onrender.com
 
 在 Render 控制台中，添加以下環境變數：
 
-| Key | Value |
-|-----|-------|
-| `PYTHON_VERSION` | `3.11.0` |
-| `FLASK_ENV` | `production` |
-| `CORS_ORIGINS` | `https://marketvue.vercel.app`（部署前端後更新） |
+| Key               | Value                                            |
+| ----------------- | ------------------------------------------------ |
+| `PYTHON_VERSION`  | `3.11.0`                                         |
+| `FLASK_ENV`       | `production`                                     |
+| `CORS_ORIGINS`    | `https://marketvue.vercel.app`（部署前端後更新） |
+| `FINNHUB_API_KEY` | 你的 Finnhub API key（美股新聞功能必要）         |
 
 ### 步驟 3：部署
 
@@ -216,8 +223,8 @@ marketvue.vercel.app  →   marketvue-api.onrender.com
 
 在 Vercel 專案設定 → Environment Variables：
 
-| Key | Value |
-|-----|-------|
+| Key            | Value                                                           |
+| -------------- | --------------------------------------------------------------- |
 | `VITE_API_URL` | `https://marketvue-api.onrender.com/api`（使用你的 Render URL） |
 
 ### 步驟 3：部署
@@ -250,16 +257,19 @@ CORS_ORIGINS=https://marketvue.vercel.app
 ## 疑難排解
 
 ### 後端顯示 "Application Error"
+
 - 檢查 Render logs 查看錯誤
 - 驗證所有環境變數都已設定
 - 確保 `gunicorn` 在 requirements.txt 中
 
 ### 前端無法載入股票資料
+
 - 檢查瀏覽器 console 是否有 CORS 錯誤
 - 驗證 `VITE_API_URL` 指向正確的 Render URL
 - 確保後端 `CORS_ORIGINS` 包含 Vercel URL
 
 ### 後端休眠（免費方案）
+
 - Render 免費方案在 15 分鐘無活動後會休眠
 - 休眠後首次請求需要 30-60 秒喚醒
 - 正式環境建議升級到付費方案
@@ -269,11 +279,13 @@ CORS_ORIGINS=https://marketvue.vercel.app
 ## 自訂網域（選擇性）
 
 ### Vercel
+
 1. 前往 Project Settings → Domains
 2. 添加你的自訂網域
 3. 依照 DNS 配置指示操作
 
 ### Render
+
 1. 前往 Service Settings → Custom Domain
 2. 添加你的自訂網域
 3. 依照指示更新 DNS 記錄
@@ -292,17 +304,19 @@ Vercel 和 Render 都已配置自動部署：
 
 ## 成本估算
 
-| 服務 | 方案 | 成本 |
-|------|------|------|
-| Vercel | Hobby (免費) | $0/月 |
-| Render | Free | $0/月 |
-| **總計** | | **$0/月** |
+| 服務     | 方案         | 成本      |
+| -------- | ------------ | --------- |
+| Vercel   | Hobby (免費) | $0/月     |
+| Render   | Free         | $0/月     |
+| **總計** |              | **$0/月** |
 
 ### 免費方案限制
+
 - **Render Free**: 15 分鐘無活動後休眠，每月 750 小時免費
 - **Vercel Hobby**: 100GB 流量/月，無商業使用
 
 ### 升級選項（如需要）
+
 - **Render Starter**: $7/月（無休眠，512MB RAM）
 - **Vercel Pro**: $20/月（更多流量，優先支援）
 
@@ -314,12 +328,12 @@ MarketVue supports Redis cache for improved performance in production environmen
 
 ### Environment Variables for Redis
 
-| Key | Value | Description |
-|-----|-------|-------------|
-| `CACHE_TYPE` | `redis` | Enable Redis cache |
-| `REDIS_URL` | `redis://localhost:6379/0` | Redis connection URL |
-| `CACHE_KEY_PREFIX` | `marketvue:` | Cache key prefix |
-| `CACHE_DEFAULT_TIMEOUT` | `300` | Default cache timeout (seconds) |
+| Key                     | Value                      | Description                     |
+| ----------------------- | -------------------------- | ------------------------------- |
+| `CACHE_TYPE`            | `redis`                    | Enable Redis cache              |
+| `REDIS_URL`             | `redis://localhost:6379/0` | Redis connection URL            |
+| `CACHE_KEY_PREFIX`      | `marketvue:`               | Cache key prefix                |
+| `CACHE_DEFAULT_TIMEOUT` | `300`                      | Default cache timeout (seconds) |
 
 ### Using Render Redis Add-on
 
@@ -358,10 +372,10 @@ docker-compose down
 
 ### Available Services
 
-| Service | Port | Description |
-|---------|------|-------------|
-| `redis` | 6379 | Redis cache server |
-| `backend` | 5001 | Flask API server |
+| Service    | Port | Description                |
+| ---------- | ---- | -------------------------- |
+| `redis`    | 6379 | Redis cache server         |
+| `backend`  | 5001 | Flask API server           |
 | `frontend` | 5173 | Vite dev server (optional) |
 
 ### Environment Configuration
@@ -409,12 +423,12 @@ MarketVue 支援 Redis 快取以提升生產環境效能。
 
 ### Redis 環境變數
 
-| Key | Value | 描述 |
-|-----|-------|------|
-| `CACHE_TYPE` | `redis` | 啟用 Redis 快取 |
-| `REDIS_URL` | `redis://localhost:6379/0` | Redis 連接 URL |
-| `CACHE_KEY_PREFIX` | `marketvue:` | 快取鍵前綴 |
-| `CACHE_DEFAULT_TIMEOUT` | `300` | 預設快取時間（秒） |
+| Key                     | Value                      | 描述               |
+| ----------------------- | -------------------------- | ------------------ |
+| `CACHE_TYPE`            | `redis`                    | 啟用 Redis 快取    |
+| `REDIS_URL`             | `redis://localhost:6379/0` | Redis 連接 URL     |
+| `CACHE_KEY_PREFIX`      | `marketvue:`               | 快取鍵前綴         |
+| `CACHE_DEFAULT_TIMEOUT` | `300`                      | 預設快取時間（秒） |
 
 ### 使用 Render Redis 附加服務
 
@@ -453,10 +467,10 @@ docker-compose down
 
 ### 可用服務
 
-| 服務 | 端口 | 描述 |
-|------|------|------|
-| `redis` | 6379 | Redis 快取伺服器 |
-| `backend` | 5001 | Flask API 伺服器 |
+| 服務       | 端口 | 描述                      |
+| ---------- | ---- | ------------------------- |
+| `redis`    | 6379 | Redis 快取伺服器          |
+| `backend`  | 5001 | Flask API 伺服器          |
 | `frontend` | 5173 | Vite 開發伺服器（選擇性） |
 
 ### 環境配置

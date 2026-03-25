@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.16.2] - 2026-03-25
+
+### Security
+
+- **Backend 500 error no longer leaks `str(e)` to client** — `decorators.py` now returns generic `'Internal server error'` message (OWASP A05)
+- **Backend dev secret key randomized** — `config.py` fallback changed from predictable string to `secrets.token_hex(32)`
+- **npm audit fix** — resolved 6 vulnerabilities (5 high, 1 moderate) in axios, rollup, undici, minimatch, flatted, ajv
+
+### Fixed
+
+- **`usePersistedState` rewritten with synchronous lazy initializer** — eliminates UI flicker, double API requests on page load, and stale `dateRange.endDate` from localStorage (all preset users affected daily)
+- **`batchStockApi` duplicate request Promise leak** — second caller for same symbol now correctly shares the pending Promise instead of hanging forever
+- **`StockListContext` double initialization removed** — `useEffect` no longer re-calls `loadStoredState` after `useState` lazy init, preventing data loss on language switch
+- **`REORDER_STOCKS` reducer boundary protection** — added dedup (`new Set`) and `slice(0, MAX)` to prevent localStorage pollution from drag-and-drop
+- **`NewsPanel` error recovery uses `refetch()` instead of `window.location.reload()`** — no longer clears all React Query cache and app state
+- **News `_sort_and_filter` skips unparseable dates** — articles with invalid `published_at` are now excluded instead of bypassing the 72h time window
+- **Finnhub/news_service timezone unified to UTC** — `datetime.now()` and `datetime.fromtimestamp()` now use `timezone.utc` consistently
+- **`importStocks` skipped count corrected** — uses index-based calculation instead of `indexOf` which miscounted with duplicates and case differences
+- **Batch limit constant synchronized** — backend schema now references `MAX_BATCH_SYMBOLS` (18) instead of hardcoded 9; frontend `MAX_BATCH_SIZE` updated to match
+- **`NewsResponseSchema` cleaned up** — removed `has_more`, `limit`, `page` fields and `NewsRequestParamsSchema` class left over from v1.15 pagination removal
+- **`APP_METADATA.VERSION` corrected** — was stuck at `'1.3.4'`, now `'1.16.2'`
+- **`StockCardFooter` removed misleading `cursor-pointer`** — wrapper div had pointer cursor without click handler
+- **Toast container responsive** — `max-w-sm` replaced with `max-w-[calc(100vw-2rem)] sm:max-w-sm` to prevent overflow on 375px screens
+- **`getErrorMessage` type safety** — parameters changed from `any` to `unknown` and `Record<string, string>`
+
+### Tests
+
+- Added `StockRequestQueue` unit tests (10 tests) — covers enqueue, batch merging, duplicate requests, error handling
+- Added `StockListContext` integration tests (26 tests) — covers initialization, import counting, reorder protection, CRUD operations
+- Added `news_service._sort_and_filter` unit tests (16 tests) — covers sorting, 72h filtering, date parse failures, boundary conditions
+- Frontend: 165 → 201 tests | Backend: 270 → 286 tests (coverage 95.72%)
+
+### Docs
+
+- Updated README.md / README_EN.md test counts (145/215 → 201/286)
+- Added News API endpoint documentation to `docs/API.md`
+- Updated `docs/ARCHITECTURE.md` with news modules, current hooks/contexts, multi-list architecture
+- Added `FINNHUB_API_KEY` to `docs/DEPLOYMENT.md` environment variables
+- Updated `ROADMAP.md` timeline from expired 2025 dates to milestone-based format
+
 ## [1.16.1] - 2026-03-02
 
 ### Technical
