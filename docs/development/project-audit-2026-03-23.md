@@ -937,3 +937,83 @@ Phase 5 — 長期規劃（附觸發條件）：
 | ❌ 不同意   | 0    | 0    | 0            |
 
 三次審閱共識：**可以開始實作。**
+
+---
+
+## 實作紀錄
+
+**執行者**：芙莉蓮（Claude Opus 4.6）| **日期**：2026-03-25
+**版本**：v1.16.2 | **Commits**：`ca9a03a`..`d8fb771`（10 commits，已 push 至 main）
+
+---
+
+### Phase 1 — 即刻修復 ✅
+
+| 項目                               | Commit    | 做法                                                                                                                                  |
+| ---------------------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `usePersistedState` 同步 lazy init | `c5433a4` | 改寫為 `useState(() => { localStorage.getItem... })`，移除 `useEffect` 和 `isInitialized`。根治閃爍、雙重 API、dateRange 過期三個問題 |
+| `str(e)` 洩漏                      | `ca9a03a` | `decorators.py` 移除 `'message': str(e)`                                                                                              |
+| `npm audit fix`                    | `9724b5b` | 6 漏洞歸零（axios, rollup, undici, minimatch, flatted, ajv）                                                                          |
+| `StockCardFooter` cursor           | `1148b8d` | 移除無 handler 的 `cursor-pointer`                                                                                                    |
+| `APP_METADATA.VERSION`             | `1148b8d` | `'1.3.4'` → `'1.16.2'`                                                                                                                |
+| `NewsResponseSchema` 清理          | `1148b8d` | 移除 `has_more`、`NewsRequestParamsSchema`（v1.15 殘留）                                                                              |
+| Toast 響應式                       | `1148b8d` | `max-w-sm` → `max-w-[calc(100vw-2rem)] sm:max-w-sm`                                                                                   |
+| Backend secret key                 | `ca9a03a` | fallback 改為 `secrets.token_hex(32)`                                                                                                 |
+| branch protection                  | —         | 需手動在 GitHub Settings 操作（未執行）                                                                                               |
+
+### Phase 2 — 測試先行 ✅
+
+| 測試組                 | Commit    | 數量 | 覆蓋場景                                                              |
+| ---------------------- | --------- | ---- | --------------------------------------------------------------------- |
+| StockRequestQueue      | `f2d32ef` | 10   | enqueue、batch merge、重複請求 bug baseline、錯誤處理                 |
+| StockListContext       | `f2d32ef` | 26   | 雙重初始化 baseline、importStocks 計數、REORDER 無保護 baseline、CRUD |
+| news \_sort_and_filter | `f2d32ef` | 16   | 排序、72h 過濾、日期解析失敗 bug baseline、邊界條件                   |
+
+前端 165 → 201 tests | 後端 270 → 286 tests（coverage 95.72%）
+
+### Phase 3 — 有測試保護的修復 ✅
+
+| 項目                        | Commit    | 做法                                                                              | 測試依賴         |
+| --------------------------- | --------- | --------------------------------------------------------------------------------- | ---------------- |
+| batchStockApi Promise 洩漏  | `407de17` | 新增 `pendingPromises: Map`，重複 key 直接 return 已有 Promise，`.finally()` 清理 | Phase 2 測試     |
+| StockListContext 雙重初始化 | `d608a30` | 移除 `useEffect` 中 `loadStoredState`，`isInitialized` 改為常數 `true`            | Phase 2 測試     |
+| REORDER_STOCKS 邊界保護     | `ec35062` | 加 `[...new Set()]` 去重 + `.slice(0, MAX)` 上限                                  | Phase 2 測試     |
+| NewsPanel refetch           | `9d2482e` | `window.location.reload()` → `refetch()`，`useNewsData` 新增 refetch 回傳         | 不需測試         |
+| 新聞日期解析                | `9d2482e` | except 區塊改為 `continue`（跳過而非保留）                                        | Phase 2 測試     |
+| 時區統一                    | `9d2482e` | `finnhub_news_fetcher.py` 三處改 `timezone.utc`                                   | Phase 2 測試     |
+| 批次上限常數化              | `1148b8d` | 後端 schema 引用 `MAX_BATCH_SYMBOLS`（18），前端同步                              | 確認切塊邏輯安全 |
+| importStocks 計數           | `d608a30` | 改 index-based 迴圈，`skipped += symbols.length - i`                              | Phase 2 測試     |
+| getErrorMessage 型別        | `1148b8d` | `any` → `unknown` + `Record<string, string>`                                      | 不需測試         |
+
+### 文件軌道（與 Phase 1-3 平行）✅
+
+| 項目               | Commit    | 內容                                          |
+| ------------------ | --------- | --------------------------------------------- |
+| README / README_EN | `d8fb771` | 測試數量 201/286、覆蓋率 95.72%               |
+| API.md             | `d8fb771` | 新增 News API 端點文件                        |
+| ARCHITECTURE.md    | `d8fb771` | 補 news 模組、更新 hooks/contexts、多清單架構 |
+| DEPLOYMENT.md      | `d8fb771` | 補 FINNHUB_API_KEY 環境變數                   |
+| ROADMAP.md         | `d8fb771` | 過期 2025 時間軸改為里程碑格式                |
+| CHANGELOG.md       | `d8fb771` | v1.16.2 完整 release notes                    |
+
+### 未完成項目
+
+以下項目屬於 Phase 4（中期改善）和 Phase 5（長期規劃），本階段未執行：
+
+**Phase 4 — 中期改善（待後續排程）：**
+
+- 行動裝置響應式（GridLayout 單欄、Header padding、hover→touch）
+- Focus trap（CreateListModal 優先）
+- ThemeSettings ARIA + ESC
+- CI 修復（ESLint strict + 前端測試步驟 + Python 矩陣更新）
+- `.env.production` 從 git 移除
+- VisualThemeContext 改用 usePersistedState
+- branch protection（GitHub Settings 手動操作）
+
+**Phase 5 — 長期規劃（附觸發條件）：**
+
+- Backend lock file（pip-compile / uv）
+- Dependency 分批升級（每季或 audit 報 high 時）
+- 更多測試覆蓋（目標：前端 70%、後端 80%）
+- npm audit / pip-audit 月度檢查
+- Google News RSS 格式監控（每次部署後）
