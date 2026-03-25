@@ -5,6 +5,7 @@ Loads environment variables and provides configuration classes for different
 deployment environments (development, production).
 """
 import os
+import secrets
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -32,7 +33,7 @@ class Config:
     """
     # Flask settings
     DEBUG = os.getenv('FLASK_DEBUG', 'False').lower() == 'true'
-    SECRET_KEY = os.getenv('SECRET_KEY', 'dev-secret-key-change-in-production')
+    SECRET_KEY = os.getenv('SECRET_KEY') or secrets.token_hex(32)
 
     # CORS settings
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:5173').split(',')
