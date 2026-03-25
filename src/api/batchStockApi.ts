@@ -1,7 +1,7 @@
-import axios from 'axios';
-import type { StockData, StockDataPoint } from '../types/stock';
-import { API_CONFIG, MA_PERIODS } from '../config/constants';
-import { logger } from '../utils/logger';
+import axios from "axios";
+import type { StockData, StockDataPoint } from "../types/stock";
+import { API_CONFIG, MA_PERIODS } from "../config/constants";
+import { logger } from "../utils/logger";
 
 /**
  * Batch Stock API Service
@@ -22,7 +22,10 @@ interface BatchStockResponse {
 /**
  * Calculate moving averages for stock data
  */
-const calculateMA = (data: StockDataPoint[], period: number): StockDataPoint[] => {
+const calculateMA = (
+  data: StockDataPoint[],
+  period: number,
+): StockDataPoint[] => {
   return data.map((point, index) => {
     if (index < period - 1) {
       return { ...point };
@@ -58,7 +61,7 @@ const processStockData = (stockData: StockData): StockData => {
 export async function fetchBatchStocks(
   symbols: string[],
   startDate: string,
-  endDate: string
+  endDate: string,
 ): Promise<Map<string, StockData | Error>> {
   const result = new Map<string, StockData | Error>();
 
@@ -67,14 +70,16 @@ export async function fetchBatchStocks(
     return result;
   }
 
-  // Split into chunks of 9 (MAX_BATCH_STOCKS)
-  const MAX_BATCH_SIZE = 9;
+  // Split into chunks matching backend MAX_BATCH_SYMBOLS (18)
+  const MAX_BATCH_SIZE = 18;
   const chunks = [];
   for (let i = 0; i < symbols.length; i += MAX_BATCH_SIZE) {
     chunks.push(symbols.slice(i, i + MAX_BATCH_SIZE));
   }
 
-  logger.debug(`[BatchAPI] Processing ${symbols.length} stocks in ${chunks.length} batch(es)`);
+  logger.debug(
+    `[BatchAPI] Processing ${symbols.length} stocks in ${chunks.length} batch(es)`,
+  );
 
   // Process each chunk
   const promises = chunks.map(async (chunk) => {
@@ -88,7 +93,7 @@ export async function fetchBatchStocks(
         },
         {
           timeout: API_CONFIG.TIMEOUT,
-        }
+        },
       );
 
       // Process successful responses
@@ -104,14 +109,14 @@ export async function fetchBatchStocks(
 
       logger.debug(
         `[BatchAPI] Batch completed: ${response.data.stocks?.length || 0} success, ` +
-        `${response.data.errors?.length || 0} errors (${response.data.processing_time_ms}ms)`
+          `${response.data.errors?.length || 0} errors (${response.data.processing_time_ms}ms)`,
       );
     } catch (error) {
       // If entire batch fails, mark all symbols as errors
       chunk.forEach((symbol) => {
         const errorMessage = axios.isAxiosError(error)
           ? error.response?.data?.message || error.message
-          : 'Unknown error';
+          : "Unknown error";
         result.set(symbol, new Error(errorMessage));
       });
       logger.error(`[BatchAPI] Batch request failed:`, error);
@@ -128,13 +133,18 @@ export async function fetchBatchStocks(
  * Request queue to manage and batch individual stock requests
  */
 class StockRequestQueue {
-  private queue: Map<string, {
-    symbol: string;
-    startDate: string;
-    endDate: string;
-    resolve: (data: StockData) => void;
-    reject: (error: Error) => void;
-  }> = new Map();
+  private queue: Map<
+    string,
+    {
+      symbol: string;
+      startDate: string;
+      endDate: string;
+      resolve: (data: StockData) => void;
+      reject: (error: Error) => void;
+    }
+  > = new Map();
+
+  private pendingPromises: Map<string, Promise<StockData>> = new Map();
 
   private timer: ReturnType<typeof setTimeout> | null = null;
   private readonly BATCH_DELAY = 100; // 100ms delay to collect requests
@@ -145,29 +155,17 @@ class StockRequestQueue {
   public enqueue(
     symbol: string,
     startDate: string,
-    endDate: string
+    endDate: string,
   ): Promise<StockData> {
-    return new Promise((resolve, reject) => {
-      const key = `${symbol}:${startDate}:${endDate}`;
+    const key = `${symbol}:${startDate}:${endDate}`;
 
-      // Check if already queued
-      if (this.queue.has(key)) {
-        const existing = this.queue.get(key)!;
-        // Chain the promise
-        return new Promise<StockData>((res, rej) => {
-          const originalResolve = existing.resolve;
-          existing.resolve = (data) => {
-            originalResolve(data);
-            res(data);
-          };
-          const originalReject = existing.reject;
-          existing.reject = (error) => {
-            originalReject(error);
-            rej(error);
-          };
-        });
-      }
+    // Return existing pending promise if key is already queued
+    const existing = this.pendingPromises.get(key);
+    if (existing) {
+      return existing;
+    }
 
+    const promise = new Promise<StockData>((resolve, reject) => {
       // Add to queue
       this.queue.set(key, { symbol, startDate, endDate, resolve, reject });
 
@@ -178,7 +176,12 @@ class StockRequestQueue {
 
       // Set new timer to process batch
       this.timer = setTimeout(() => this.processBatch(), this.BATCH_DELAY);
-    });
+    }).finally(() => {
+      this.pendingPromises.delete(key);
+    }) as Promise<StockData>;
+
+    this.pendingPromises.set(key, promise);
+    return promise;
   }
 
   /**
@@ -206,8 +209,8 @@ class StockRequestQueue {
 
     // Process each group
     for (const [dateKey, groupItems] of groups) {
-      const [startDate, endDate] = dateKey.split(':');
-      const symbols = groupItems.map(item => item.symbol);
+      const [startDate, endDate] = dateKey.split(":");
+      const symbols = groupItems.map((item) => item.symbol);
 
       try {
         const results = await fetchBatchStocks(symbols, startDate, endDate);
@@ -220,13 +223,15 @@ class StockRequestQueue {
           } else if (result) {
             item.resolve(result);
           } else {
-            item.reject(new Error('No data returned'));
+            item.reject(new Error("No data returned"));
           }
         });
       } catch (error) {
         // Reject all items in this group
         groupItems.forEach((item) => {
-          item.reject(error instanceof Error ? error : new Error('Batch request failed'));
+          item.reject(
+            error instanceof Error ? error : new Error("Batch request failed"),
+          );
         });
       }
     }
