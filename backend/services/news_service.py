@@ -71,7 +71,7 @@ class NewsService:
                 'symbol': symbol,
                 'news': articles,
                 'total': len(articles),
-                'cached_at': datetime.now().strftime(NEWS_DATE_FORMAT)
+                'cached_at': datetime.now(timezone.utc).strftime(NEWS_DATE_FORMAT)
             }
 
         except Exception as e:
@@ -80,7 +80,7 @@ class NewsService:
                 'symbol': symbol,
                 'news': [],
                 'total': 0,
-                'cached_at': datetime.now().strftime(NEWS_DATE_FORMAT)
+                'cached_at': datetime.now(timezone.utc).strftime(NEWS_DATE_FORMAT)
             }
 
     def _fetch_from_source(self, symbol: str) -> list:

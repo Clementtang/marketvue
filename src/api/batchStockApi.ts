@@ -70,7 +70,8 @@ export async function fetchBatchStocks(
     return result;
   }
 
-  // Split into chunks matching backend MAX_BATCH_SYMBOLS (18)
+  // Split into chunks matching backend constants.py MAX_BATCH_SYMBOLS
+  // Keep in sync with: backend/constants.py:21
   const MAX_BATCH_SIZE = 18;
   const chunks = [];
   for (let i = 0; i < symbols.length; i += MAX_BATCH_SIZE) {

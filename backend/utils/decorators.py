@@ -37,7 +37,7 @@ def handle_errors(f):
         except ValueError as e:
             logger.warning(f"ValueError in {f.__name__}: {str(e)}")
             return jsonify({
-                'error': str(e)
+                'error': 'Invalid request parameters'
             }), 400
         except Exception as e:
             logger.error(f"Unexpected error in {f.__name__}: {str(e)}", exc_info=True)

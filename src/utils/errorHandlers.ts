@@ -87,7 +87,7 @@ export function getErrorMessage(
  * @returns True if should retry
  */
 export function shouldRetry(
-  error: any,
+  error: unknown,
   retryCount: number,
   maxRetries: number = 3,
 ): boolean {
@@ -147,12 +147,13 @@ export function getSymbolErrorMessage(
  * @param error - The error object
  * @returns True if network error
  */
-export function isNetworkError(error: any): boolean {
+export function isNetworkError(error: unknown): boolean {
+  const axiosErr = error as AxiosError;
   return (
-    error.code === "ECONNABORTED" ||
-    error.code === "ETIMEDOUT" ||
-    error.message?.includes("network") ||
-    error.message?.includes("timeout") ||
+    axiosErr?.code === "ECONNABORTED" ||
+    axiosErr?.code === "ETIMEDOUT" ||
+    axiosErr?.message?.includes("network") ||
+    axiosErr?.message?.includes("timeout") ||
     (typeof navigator !== "undefined" && !navigator.onLine)
   );
 }
@@ -162,7 +163,7 @@ export function isNetworkError(error: any): boolean {
  * @param error - The error object
  * @returns True if server error
  */
-export function isServerError(error: any): boolean {
+export function isServerError(error: unknown): boolean {
   const statusCode = (error as AxiosError)?.response?.status;
   return statusCode !== undefined && statusCode >= 500 && statusCode < 600;
 }
