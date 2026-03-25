@@ -2,8 +2,12 @@
  * Stock list state reducer for managing multiple watchlists
  */
 
-import type { StockListState, StockListAction, StockList } from '../types/stockList';
-import { STOCK_LIST_CONFIG } from '../config/constants';
+import type {
+  StockListState,
+  StockListAction,
+  StockList,
+} from "../types/stockList";
+import { STOCK_LIST_CONFIG } from "../config/constants";
 
 /**
  * Generate a unique list ID
@@ -22,7 +26,9 @@ function getCurrentTimestamp(): string {
 /**
  * Create initial state with default list
  */
-export function createInitialState(defaultListName = 'My Watchlist'): StockListState {
+export function createInitialState(
+  defaultListName = "My Watchlist",
+): StockListState {
   const now = getCurrentTimestamp();
 
   return {
@@ -46,10 +52,10 @@ export function createInitialState(defaultListName = 'My Watchlist'): StockListS
  */
 export function stockListReducer(
   state: StockListState,
-  action: StockListAction
+  action: StockListAction,
 ): StockListState {
   switch (action.type) {
-    case 'CREATE_LIST': {
+    case "CREATE_LIST": {
       // Check list limit
       if (state.lists.length >= STOCK_LIST_CONFIG.MAX_LISTS) {
         return state;
@@ -58,8 +64,14 @@ export function stockListReducer(
       const now = getCurrentTimestamp();
       const newList: StockList = {
         id: generateListId(),
-        name: action.payload.name.slice(0, STOCK_LIST_CONFIG.MAX_LIST_NAME_LENGTH),
-        stocks: (action.payload.stocks || []).slice(0, STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST),
+        name: action.payload.name.slice(
+          0,
+          STOCK_LIST_CONFIG.MAX_LIST_NAME_LENGTH,
+        ),
+        stocks: (action.payload.stocks || []).slice(
+          0,
+          STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST,
+        ),
         createdAt: now,
         updatedAt: now,
       };
@@ -72,7 +84,7 @@ export function stockListReducer(
       };
     }
 
-    case 'DELETE_LIST': {
+    case "DELETE_LIST": {
       const listToDelete = state.lists.find((l) => l.id === action.payload.id);
 
       // Cannot delete default list or non-existent list
@@ -96,7 +108,7 @@ export function stockListReducer(
       };
     }
 
-    case 'RENAME_LIST': {
+    case "RENAME_LIST": {
       const listExists = state.lists.some((l) => l.id === action.payload.id);
       if (!listExists) {
         return state;
@@ -108,16 +120,19 @@ export function stockListReducer(
           list.id === action.payload.id
             ? {
                 ...list,
-                name: action.payload.name.slice(0, STOCK_LIST_CONFIG.MAX_LIST_NAME_LENGTH),
+                name: action.payload.name.slice(
+                  0,
+                  STOCK_LIST_CONFIG.MAX_LIST_NAME_LENGTH,
+                ),
                 updatedAt: getCurrentTimestamp(),
               }
-            : list
+            : list,
         ),
         version: state.version + 1,
       };
     }
 
-    case 'SWITCH_LIST': {
+    case "SWITCH_LIST": {
       const listExists = state.lists.some((l) => l.id === action.payload.id);
       if (!listExists) {
         return state;
@@ -129,7 +144,7 @@ export function stockListReducer(
       };
     }
 
-    case 'ADD_STOCK': {
+    case "ADD_STOCK": {
       const activeList = state.lists.find((l) => l.id === state.activeListId);
       if (!activeList) {
         return state;
@@ -152,13 +167,13 @@ export function stockListReducer(
                 stocks: [...list.stocks, action.payload.stock],
                 updatedAt: getCurrentTimestamp(),
               }
-            : list
+            : list,
         ),
         version: state.version + 1,
       };
     }
 
-    case 'REMOVE_STOCK': {
+    case "REMOVE_STOCK": {
       return {
         ...state,
         lists: state.lists.map((list) =>
@@ -168,45 +183,50 @@ export function stockListReducer(
                 stocks: list.stocks.filter((s) => s !== action.payload.stock),
                 updatedAt: getCurrentTimestamp(),
               }
-            : list
+            : list,
         ),
         version: state.version + 1,
       };
     }
 
-    case 'SET_STOCKS': {
+    case "SET_STOCKS": {
       return {
         ...state,
         lists: state.lists.map((list) =>
           list.id === state.activeListId
             ? {
                 ...list,
-                stocks: action.payload.stocks.slice(0, STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST),
+                stocks: action.payload.stocks.slice(
+                  0,
+                  STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST,
+                ),
                 updatedAt: getCurrentTimestamp(),
               }
-            : list
+            : list,
         ),
         version: state.version + 1,
       };
     }
 
-    case 'REORDER_STOCKS': {
+    case "REORDER_STOCKS": {
+      const deduped = [...new Set(action.payload.stocks)];
+      const capped = deduped.slice(0, STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST);
       return {
         ...state,
         lists: state.lists.map((list) =>
           list.id === state.activeListId
             ? {
                 ...list,
-                stocks: action.payload.stocks,
+                stocks: capped,
                 updatedAt: getCurrentTimestamp(),
               }
-            : list
+            : list,
         ),
         version: state.version + 1,
       };
     }
 
-    case 'SAVE_CURRENT_AS_NEW': {
+    case "SAVE_CURRENT_AS_NEW": {
       // Check list limit
       if (state.lists.length >= STOCK_LIST_CONFIG.MAX_LISTS) {
         return state;
@@ -220,7 +240,10 @@ export function stockListReducer(
       const now = getCurrentTimestamp();
       const newList: StockList = {
         id: generateListId(),
-        name: action.payload.name.slice(0, STOCK_LIST_CONFIG.MAX_LIST_NAME_LENGTH),
+        name: action.payload.name.slice(
+          0,
+          STOCK_LIST_CONFIG.MAX_LIST_NAME_LENGTH,
+        ),
         stocks: [...activeList.stocks],
         createdAt: now,
         updatedAt: now,
@@ -234,7 +257,7 @@ export function stockListReducer(
       };
     }
 
-    case 'IMPORT_STATE': {
+    case "IMPORT_STATE": {
       // Used for data migration or cloud sync
       return action.payload;
     }
