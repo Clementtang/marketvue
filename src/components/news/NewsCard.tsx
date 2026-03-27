@@ -26,21 +26,18 @@ function formatRelativeTime(publishedAt: string, t: Translations): string {
 const NewsCard = memo(function NewsCard({ article, t }: NewsCardProps) {
   const { visualTheme } = useVisualTheme();
 
-  const handleClick = () => {
-    window.open(article.url, "_blank", "noopener,noreferrer");
-  };
-
   const relativeTime = formatRelativeTime(article.published_at, t);
 
   return (
-    <div
-      className={`p-3 transition-colors cursor-pointer ${
+    <a
+      href={article.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className={`block p-3 transition-colors cursor-pointer ${
         visualTheme === "warm"
           ? "hover:bg-warm-100 dark:hover:bg-warm-700/50 border-b border-warm-200/50 dark:border-warm-700/50"
           : "hover:bg-gray-50 dark:hover:bg-gray-700/50 border-b border-gray-100 dark:border-gray-700"
       }`}
-      onClick={handleClick}
-      role="article"
       aria-label={article.headline}
     >
       <div className="flex gap-3">
@@ -91,7 +88,7 @@ const NewsCard = memo(function NewsCard({ article, t }: NewsCardProps) {
           )}
         </div>
       </div>
-    </div>
+    </a>
   );
 });
 
