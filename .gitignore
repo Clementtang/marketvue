@@ -49,6 +49,7 @@ coverage/
 # Environment variables
 .env
 .env.local
+.env.production
 .env.*.local
 *.local
 
@@ -82,3 +83,4 @@ Thumbs.db
 
 # Claude Code settings (personal development configuration)
 .claude/
+.vercel
