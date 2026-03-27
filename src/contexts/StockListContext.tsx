@@ -101,14 +101,11 @@ export function StockListProvider({ children }: StockListProviderProps) {
   const [state, setState] = useState<StockListState>(() =>
     loadStoredState(defaultListName),
   );
-  const isInitialized = true;
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
-    if (isInitialized) {
-      saveState(state);
-    }
-  }, [state, isInitialized]);
+    saveState(state);
+  }, [state]);
 
   // Dispatch wrapper
   const dispatch = useCallback((action: StockListAction) => {
