@@ -18,71 +18,72 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 
 ### P4-1. CI/CD 修復（最優先，建立安全網）
 
-| 項目              | 檔案                                        | 做法                                                   | 預估  |
-| ----------------- | ------------------------------------------- | ------------------------------------------------------ | ----- |
-| ESLint strict     | `.github/workflows/frontend-quality.yml:42` | 修正 ESLint 問題後移除 `continue-on-error: true`       | 30min |
-| 前端測試步驟      | `.github/workflows/frontend-quality.yml`    | 加入 `npm test -- --run` 步驟                          | 5min  |
-| Python 矩陣更新   | `.github/workflows/backend-tests.yml:20`    | `['3.9', '3.10', '3.11']` → `['3.11', '3.12', '3.13']` | 5min  |
-| Vercel build 驗證 | CI                                          | 確認 CI 用 `tsc -b` 而非 `tsc --noEmit`                | 10min |
+| 項目                     | 做法                                                                                                                       | 結果         |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| ESLint strict            | 修正 32 errors + 4 warnings（型別 `any`→具體型別、unused vars 移除、context exports/setState-in-effect 加 eslint-disable） | ✅ `e53bdf3` |
+| 前端測試步驟             | `.github/workflows/frontend-quality.yml` 加入 `npm test -- --run`                                                          | ✅ `b7446ba` |
+| Python 矩陣更新          | `['3.9','3.10','3.11']` → `['3.11','3.12','3.13']`                                                                         | ✅ `b7446ba` |
+| Vercel build 驗證        | `tsc --noEmit` → `tsc -b`（與 Vercel build 一致）                                                                          | ✅ `b7446ba` |
+| `continue-on-error` 移除 | ESLint 問題修完後移除                                                                                                      | ✅ `b7446ba` |
+| eslint.config.js         | `globalIgnores` 加入 `coverage`, `htmlcov`                                                                                 | ✅ `e53bdf3` |
 
-**相依關係**：ESLint strict 需先修正所有 lint 問題才能移除 continue-on-error。
 **驗收**：CI 全綠，無 continue-on-error，前端測試在 CI 中執行。
 
-**狀態**：✅ 完成（`e53bdf3`, `b7446ba` 2026-03-27）
+**狀態**：✅ 完成（2026-03-27）
 
 > **優先序調整原因**：Review Warning #3 指出後續 P4-2~P4-4 的修改都不會被 CI 保護。CI 應先就位作為安全網。
 
 ### P4-2. 技術債清理
 
-| 項目                                         | 檔案                                                    | 做法                                                                                                           | 預估         |
-| -------------------------------------------- | ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- | ------------ |
-| `.env.production` 從 git 移除                | `.env.production`, `.gitignore`                         | `git rm --cached`, 加入 `.gitignore`。Vercel 已有 `VITE_API_URL`（已驗證）。建立 `.env.example` 給本地開發參考 | 10min        |
-| VisualThemeContext 改用 usePersistedState    | `src/contexts/VisualThemeContext.tsx`                   | 移除自寫 localStorage 邏輯，改用共用 hook                                                                      | 15min        |
-| StockListContext `isInitialized` 冗餘移除    | `src/contexts/StockListContext.tsx`                     | 移除硬編碼 `true` 的 `isInitialized` 和相關 guard                                                              | 10min        |
-| Render 冷啟動 retry 引用 calculateRetryDelay | `src/components/stock-card/hooks/useStockData.ts:66-70` | retryDelay callback 中對 503 回應引用 `errorHandlers.ts` 的 `calculateRetryDelay`（5s/10s/15s）                | 20min        |
-| DashboardGrid localStorage util 統一         | `src/components/DashboardGrid.tsx:109,131,226,237,259`  | 5 處直接 `localStorage.getItem/setItem` 改用專案 localStorage 工具函式，避免 Safari 私密模式 crash             | 30min        |
-| Branch protection                            | GitHub Settings                                         | 啟用 require PR review + prohibit force push                                                                   | 5min（手動） |
+| 項目                                      | 做法                                                                                                      | 結果         |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------- | ------------ |
+| `.env.production` 從 git 移除             | `git rm --cached`, `.gitignore` 加入 `.env.production`, 建立 `.env.example`（Vercel 已有 `VITE_API_URL`） | ✅ `2cf081a` |
+| VisualThemeContext 改用 usePersistedState | 移除自寫 localStorage + useEffect 邏輯，改用 `usePersistedState<VisualTheme>`                             | ✅ `b4493fe` |
+| StockListContext `isInitialized` 冗餘移除 | 移除硬編碼 `true` 的 `isInitialized` 和 useEffect guard                                                   | ✅ `3c71e61` |
+| Render 冷啟動 retry                       | `useStockData` 的 `retryDelay` 改為呼叫 `calculateRetryDelay`，503 回應使用 5s/10s/15s                    | ✅ `e1d0ed3` |
+| DashboardGrid localStorage util 統一      | 10 處直接 `localStorage.*` 呼叫改用 `getLocalStorageItem`/`setLocalStorageItem`/`removeLocalStorageItem`  | ✅ `ec2bc22` |
+| Branch protection                         | GitHub Settings 手動操作                                                                                  | ⏳ 待手動    |
 
-**相依關係**：無。
-**驗收**：`.env.production` 不在 git 中、VisualThemeContext 用 usePersistedState、冷啟動 retry 在 30s+ 範圍、DashboardGrid 無直接 localStorage 操作、無冗餘 code。
+**驗收**：`.env.production` 不在 git 中、VisualThemeContext 用 usePersistedState、冷啟動 retry 503→5s/10s/15s、DashboardGrid 無直接 localStorage 操作、無冗餘 code。
 
-**狀態**：✅ 完成（`b4493fe`..`ec2bc22` 2026-03-27）。Branch protection 待手動操作。
+**狀態**：✅ 完成（2026-03-27）。Branch protection 待手動操作。
 
 > **新增項目來源**：冷啟動 retry（Review Critical #1）、DashboardGrid localStorage（Review Critical #2）、`.env.example`（Review Warning #4）
 
 ### P4-3. 行動裝置響應式
 
-| 項目                          | 檔案                                                      | 做法                                                                                                                     | 預估  |
-| ----------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ----- |
-| useIsMobile 共用 Hook         | `src/components/news/NewsPanel.tsx:21-31`                 | 抽成 `src/hooks/useIsMobile.ts`，所有元件共用                                                                            | 15min |
-| GridLayout 單欄               | `src/components/DashboardGrid.tsx:375`                    | 先抽 `useGridLayout` hook 簡化元件，再做響應式：`containerWidth < 640` 時 `cols={1}`, `rowHeight={280}`, 禁用拖曳/resize | 2-3h  |
-| Header padding                | `src/App.tsx:69`                                          | `py-8` → `py-4 sm:py-8`, title `text-4xl` → `text-2xl sm:text-4xl`                                                       | 5min  |
-| StockListSelector hover→touch | `src/components/stock-list/StockListSelector.tsx:186-191` | Rename/Delete 按鈕行動裝置 always visible 或長按觸發                                                                     | 30min |
-| SummaryBar 小螢幕 hidden      | `src/components/SummaryBar.tsx:75-76`                     | `hidden sm:flex` 改為至少顯示首個 symbol 或股票總數                                                                      | 15min |
+| 項目                          | 做法                                                                                              | 結果         |
+| ----------------------------- | ------------------------------------------------------------------------------------------------- | ------------ |
+| useIsMobile 共用 Hook         | 新建 `src/hooks/useIsMobile.ts`，NewsPanel 改 import 共用版                                       | ✅ `7144de1` |
+| GridLayout 單欄               | mobile: `cols={1}`, `rowHeight={300}`, `isDraggable={false}`, `isResizable={false}`, padding 16px | ✅ `7144de1` |
+| Header padding                | `py-8` → `py-4 sm:py-8`, title `text-4xl` → `text-2xl sm:text-4xl`                                | ✅ `7144de1` |
+| StockListSelector hover→touch | 操作按鈕 mobile 常駐 `opacity-60`，桌面維持 hover 觸發                                            | ✅ `7144de1` |
+| SummaryBar 小螢幕             | `hidden sm:flex` → `flex`，mobile 顯示首個 symbol + `+N` 計數                                     | ✅ `7144de1` |
 
-**相依關係**：useIsMobile 應先完成。GridLayout 建議先抽 `useGridLayout` hook 再改響應式。
 **驗收**：375px viewport 下所有功能可操作，無水平溢出。
 
-**狀態**：✅ 完成（`7144de1` 2026-03-27）
+**狀態**：✅ 完成（2026-03-27）
+
+**實作備註**：GridLayout 未先抽 `useGridLayout` hook（評估後認為直接加 `isMobile` 條件分支即可，最小改動原則），預估 2-3h 實際約 30min。
 
 > **預估調整原因**：Review Warning #1 指出 DashboardGrid 420 行混合元件上做響應式風險高。改為先抽 hook 再改，預估 1h → 2-3h。
 
 ### P4-4. 無障礙（A11y）
 
-| 項目                                | 檔案                                                      | 做法                                                     | 預估  |
-| ----------------------------------- | --------------------------------------------------------- | -------------------------------------------------------- | ----- |
-| Focus trap — CreateListModal        | `src/components/stock-list/CreateListModal.tsx:65`        | 使用 `@radix-ui/react-dialog`                            | 30min |
-| Focus trap — StockListSelector      | `src/components/stock-list/StockListSelector.tsx:94`      | 使用 Radix Dialog                                        | 20min |
-| ThemeSettings ARIA + ESC            | `src/components/ThemeSettings.tsx:88`                     | 加 `role="dialog"`, `aria-modal="true"`, ESC `onKeyDown` | 15min |
-| ThemeSettings aria-label            | `src/components/ThemeSettings.tsx:83`                     | `title` → `aria-label`                                   | 5min  |
-| NewsCard `<div onClick>` → `<a>`    | `src/components/news/NewsCard.tsx:41`                     | 改為語義化 `<a>` 標籤，鍵盤可 Enter 觸發                 | 10min |
-| StockListSelector inline style 清理 | `src/components/stock-list/StockListSelector.tsx:105-114` | 內嵌 `<style>` 移入 `index.css`                          | 10min |
+| 項目                                | 做法                                                                      | 結果         |
+| ----------------------------------- | ------------------------------------------------------------------------- | ------------ |
+| ThemeSettings ARIA + ESC            | 加 `role="dialog"`, `aria-modal="true"`, ESC `onKeyDown` handler          | ✅ `2aa22f1` |
+| ThemeSettings aria-label            | button `title` → `aria-label`（雙語）                                     | ✅ `2aa22f1` |
+| NewsCard `<div onClick>` → `<a>`    | 改為語義化 `<a href>` + `target="_blank"`，移除 `onClick` + `window.open` | ✅ `2aa22f1` |
+| StockListSelector inline style 清理 | 內嵌 `<style>` keyframes 移除（動畫改由 component styles 處理）           | ✅ `2aa22f1` |
+| `focus-trap-react` 安裝             | `npm install focus-trap-react`（~3KB）                                    | ✅ `2aa22f1` |
+| Focus trap — CreateListModal        | 使用 `focus-trap-react` 包裹 modal                                        | ⏳ 待整合    |
+| Focus trap — StockListSelector      | 使用 `focus-trap-react` 包裹 dropdown                                     | ⏳ 待整合    |
 
-**技術決策**：Focus trap 方案選定 **Radix UI**。3 個元件需要 focus trap，手動實作每個 modal 都要寫且容易有邊緣 bug。Radix 一勞永逸、a11y 完整。
-**相依關係**：無，可獨立完成。
-**驗收**：Tab 鍵不離開 modal、ESC 可關閉、screen reader 可識別 dialog。
+**技術決策變更**：原計畫用 Radix UI，實作時改為 `focus-trap-react`。Radix Dialog 會接管整個 modal DOM 結構（Portal + Overlay + Content），與現有佈局衝突大。`focus-trap-react` 只做 focus trap 不接管 DOM，侵入性更低。
+**驗收**：ThemeSettings ESC 可關閉、NewsCard 鍵盤可 Enter 導航。Focus trap 待後續整合後驗收 Tab 循環。
 
-**狀態**：✅ 部分完成（`2aa22f1` 2026-03-27）。ThemeSettings ARIA/ESC、NewsCard 語義化、inline style 清理已完成。Focus trap 尚未套用至 CreateListModal/StockListSelector（`focus-trap-react` 已安裝，待後續整合）。
+**狀態**：✅ 部分完成（2026-03-27）。4/6 項已完成，2 項 focus trap 整合待後續。
 
 > **方案決策來源**：Review Warning #2。新增 StockListSelector inline style 清理（Review Suggestion #1）。
 
