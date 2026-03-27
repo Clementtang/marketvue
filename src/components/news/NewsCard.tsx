@@ -23,11 +23,7 @@ function formatRelativeTime(publishedAt: string, t: Translations): string {
   return t.daysAgo.replace("{n}", String(diffDays));
 }
 
-const NewsCard = memo(function NewsCard({
-  article,
-  language: _language,
-  t,
-}: NewsCardProps) {
+const NewsCard = memo(function NewsCard({ article, t }: NewsCardProps) {
   const { visualTheme } = useVisualTheme();
 
   const handleClick = () => {

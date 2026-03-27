@@ -33,6 +33,7 @@ const StockListContext = createContext<StockListContextType | undefined>(
 /**
  * Hook to access stock list context
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useStockList() {
   const context = useContext(StockListContext);
   if (context === undefined) {

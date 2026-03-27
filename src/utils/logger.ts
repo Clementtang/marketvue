@@ -28,28 +28,28 @@
  * ```
  */
 
-type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+type LogLevel = "debug" | "info" | "warn" | "error";
 
 class Logger {
   private isDevelopment = import.meta.env.DEV;
 
-  private log(level: LogLevel, message: string, ...args: any[]) {
+  private log(level: LogLevel, message: string, ...args: unknown[]) {
     const timestamp = new Date().toISOString();
     const prefix = `[${timestamp}] [${level.toUpperCase()}]`;
 
     switch (level) {
-      case 'debug':
+      case "debug":
         if (this.isDevelopment) {
           console.log(prefix, message, ...args);
         }
         break;
-      case 'info':
+      case "info":
         console.log(prefix, message, ...args);
         break;
-      case 'warn':
+      case "warn":
         console.warn(prefix, message, ...args);
         break;
-      case 'error':
+      case "error":
         console.error(prefix, message, ...args);
         // Future: integrate with error tracking service (e.g., Sentry)
         // if (typeof window !== 'undefined' && window.Sentry) {
@@ -63,32 +63,32 @@ class Logger {
    * Debug level logging - only shown in development environment
    * Use for detailed debugging information not needed in production
    */
-  debug(message: string, ...args: any[]) {
-    this.log('debug', message, ...args);
+  debug(message: string, ...args: unknown[]) {
+    this.log("debug", message, ...args);
   }
 
   /**
    * Info level logging - shown in all environments
    * Use for general informational messages
    */
-  info(message: string, ...args: any[]) {
-    this.log('info', message, ...args);
+  info(message: string, ...args: unknown[]) {
+    this.log("info", message, ...args);
   }
 
   /**
    * Warning level logging - shown in all environments
    * Use for potentially harmful situations that don't prevent operation
    */
-  warn(message: string, ...args: any[]) {
-    this.log('warn', message, ...args);
+  warn(message: string, ...args: unknown[]) {
+    this.log("warn", message, ...args);
   }
 
   /**
    * Error level logging - shown in all environments
    * Use for error conditions that should be investigated
    */
-  error(message: string, ...args: any[]) {
-    this.log('error', message, ...args);
+  error(message: string, ...args: unknown[]) {
+    this.log("error", message, ...args);
   }
 }
 

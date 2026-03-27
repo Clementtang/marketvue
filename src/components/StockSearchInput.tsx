@@ -5,13 +5,19 @@
  * Supports keyboard navigation and displays market badges.
  */
 
-import { useState, useRef, useEffect, useCallback, type KeyboardEvent } from 'react';
-import { Search, Check, X } from 'lucide-react';
-import { useStockSearch } from '../hooks/useStockSearch';
-import { useApp } from '../contexts/AppContext';
-import { useVisualTheme } from '../contexts/VisualThemeContext';
-import { useTranslation } from '../i18n/translations';
-import { MARKET_INFO, type SearchResult } from '../types/stockSearch';
+import {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  type KeyboardEvent,
+} from "react";
+import { Search, Check, X } from "lucide-react";
+import { useStockSearch } from "../hooks/useStockSearch";
+import { useApp } from "../contexts/AppContext";
+import { useVisualTheme } from "../contexts/VisualThemeContext";
+import { useTranslation } from "../i18n/translations";
+import { MARKET_INFO, type SearchResult } from "../types/stockSearch";
 
 interface StockSearchInputProps {
   /** Currently tracked stock symbols */
@@ -34,11 +40,13 @@ export function StockSearchInput({
   const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
 
-  const { query, setQuery, results, clearSearch, isSearching } = useStockSearch({
-    language,
-    trackedSymbols,
-    maxResults: 10,
-  });
+  const { query, setQuery, results, clearSearch, isSearching } = useStockSearch(
+    {
+      language,
+      trackedSymbols,
+      maxResults: 10,
+    },
+  );
 
   const [isOpen, setIsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
@@ -49,12 +57,14 @@ export function StockSearchInput({
   // Open dropdown when searching
   useEffect(() => {
     if (isSearching && results.length > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsOpen(true);
     }
   }, [isSearching, results.length]);
 
   // Reset highlighted index when results change
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setHighlightedIndex(-1);
   }, [results]);
 
@@ -71,8 +81,8 @@ export function StockSearchInput({
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Handle stock selection
@@ -86,14 +96,14 @@ export function StockSearchInput({
       setIsOpen(false);
       inputRef.current?.focus();
     },
-    [onSelectStock, clearSearch, disabled]
+    [onSelectStock, clearSearch, disabled],
   );
 
   // Handle keyboard navigation
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (!isOpen || results.length === 0) {
       // Allow Enter to submit the raw input if no dropdown
-      if (e.key === 'Enter' && query.trim()) {
+      if (e.key === "Enter" && query.trim()) {
         e.preventDefault();
         // Submit raw input as uppercase
         onSelectStock(query.trim().toUpperCase());
@@ -103,17 +113,17 @@ export function StockSearchInput({
     }
 
     switch (e.key) {
-      case 'ArrowDown':
+      case "ArrowDown":
         e.preventDefault();
         setHighlightedIndex((prev) =>
-          prev < results.length - 1 ? prev + 1 : prev
+          prev < results.length - 1 ? prev + 1 : prev,
         );
         break;
-      case 'ArrowUp':
+      case "ArrowUp":
         e.preventDefault();
         setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
         break;
-      case 'Enter':
+      case "Enter":
         e.preventDefault();
         if (highlightedIndex >= 0 && highlightedIndex < results.length) {
           handleSelect(results[highlightedIndex]);
@@ -124,12 +134,12 @@ export function StockSearchInput({
           setIsOpen(false);
         }
         break;
-      case 'Escape':
+      case "Escape":
         e.preventDefault();
         setIsOpen(false);
         setHighlightedIndex(-1);
         break;
-      case 'Tab':
+      case "Tab":
         setIsOpen(false);
         break;
     }
@@ -145,7 +155,7 @@ export function StockSearchInput({
 
   // Get display name based on language
   const getDisplayName = (result: SearchResult): string => {
-    return result.stock.name[language] || result.stock.name['en-US'];
+    return result.stock.name[language] || result.stock.name["en-US"];
   };
 
   // Get market badge info
@@ -153,12 +163,13 @@ export function StockSearchInput({
     const info = MARKET_INFO[market as keyof typeof MARKET_INFO];
     if (!info) return null;
     return {
-      label: info.label[language] || info.label['en-US'],
+      label: info.label[language] || info.label["en-US"],
       color: info.color,
     };
   };
 
-  const defaultPlaceholder = t.searchPlaceholder || 'Search stock symbol or name...';
+  const defaultPlaceholder =
+    t.searchPlaceholder || "Search stock symbol or name...";
 
   return (
     <div className="relative">
@@ -167,9 +178,9 @@ export function StockSearchInput({
         <Search
           size={18}
           className={`absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none ${
-            visualTheme === 'warm'
-              ? 'text-warm-400 dark:text-warm-500'
-              : 'text-gray-400 dark:text-gray-500'
+            visualTheme === "warm"
+              ? "text-warm-400 dark:text-warm-500"
+              : "text-gray-400 dark:text-gray-500"
           }`}
         />
         <input
@@ -186,9 +197,9 @@ export function StockSearchInput({
           placeholder={placeholder || defaultPlaceholder}
           disabled={disabled}
           className={`w-full pl-10 pr-10 py-2 border bg-white dark:bg-gray-700 text-gray-900 dark:text-white outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-            visualTheme === 'warm'
-              ? 'border-warm-300 dark:border-warm-600 rounded-2xl focus:ring-2 focus:ring-warm-accent-500 focus:border-transparent'
-              : 'border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent'
+            visualTheme === "warm"
+              ? "border-warm-300 dark:border-warm-600 rounded-2xl focus:ring-2 focus:ring-warm-accent-500 focus:border-transparent"
+              : "border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           }`}
         />
         {query && (
@@ -200,9 +211,9 @@ export function StockSearchInput({
               inputRef.current?.focus();
             }}
             className={`absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full transition-colors ${
-              visualTheme === 'warm'
-                ? 'text-warm-400 hover:text-warm-600 hover:bg-warm-100 dark:text-warm-500 dark:hover:text-warm-300 dark:hover:bg-warm-700'
-                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-600'
+              visualTheme === "warm"
+                ? "text-warm-400 hover:text-warm-600 hover:bg-warm-100 dark:text-warm-500 dark:hover:text-warm-300 dark:hover:bg-warm-700"
+                : "text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:text-gray-500 dark:hover:text-gray-300 dark:hover:bg-gray-600"
             }`}
           >
             <X size={16} />
@@ -215,9 +226,9 @@ export function StockSearchInput({
         <div
           ref={dropdownRef}
           className={`absolute z-50 w-full mt-1 max-h-80 overflow-y-auto shadow-lg border ${
-            visualTheme === 'warm'
-              ? 'bg-warm-50 dark:bg-warm-800 border-warm-200 dark:border-warm-700 rounded-2xl'
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg'
+            visualTheme === "warm"
+              ? "bg-warm-50 dark:bg-warm-800 border-warm-200 dark:border-warm-700 rounded-2xl"
+              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg"
           }`}
         >
           {results.map((result, index) => {
@@ -233,32 +244,32 @@ export function StockSearchInput({
                 disabled={isDisabled}
                 className={`w-full px-4 py-3 flex items-center gap-3 text-left transition-colors ${
                   isDisabled
-                    ? 'opacity-50 cursor-not-allowed'
-                    : 'cursor-pointer'
+                    ? "opacity-50 cursor-not-allowed"
+                    : "cursor-pointer"
                 } ${
                   isHighlighted && !isDisabled
-                    ? visualTheme === 'warm'
-                      ? 'bg-warm-accent-50 dark:bg-warm-accent-900/30'
-                      : 'bg-blue-50 dark:bg-blue-900/30'
-                    : ''
+                    ? visualTheme === "warm"
+                      ? "bg-warm-accent-50 dark:bg-warm-accent-900/30"
+                      : "bg-blue-50 dark:bg-blue-900/30"
+                    : ""
                 } ${
                   !isDisabled && !isHighlighted
-                    ? visualTheme === 'warm'
-                      ? 'hover:bg-warm-100 dark:hover:bg-warm-700'
-                      : 'hover:bg-gray-50 dark:hover:bg-gray-700'
-                    : ''
+                    ? visualTheme === "warm"
+                      ? "hover:bg-warm-100 dark:hover:bg-warm-700"
+                      : "hover:bg-gray-50 dark:hover:bg-gray-700"
+                    : ""
                 } ${
                   index === 0
-                    ? visualTheme === 'warm'
-                      ? 'rounded-t-2xl'
-                      : 'rounded-t-lg'
-                    : ''
+                    ? visualTheme === "warm"
+                      ? "rounded-t-2xl"
+                      : "rounded-t-lg"
+                    : ""
                 } ${
                   index === results.length - 1
-                    ? visualTheme === 'warm'
-                      ? 'rounded-b-2xl'
-                      : 'rounded-b-lg'
-                    : ''
+                    ? visualTheme === "warm"
+                      ? "rounded-b-2xl"
+                      : "rounded-b-lg"
+                    : ""
                 }`}
                 onMouseEnter={() => setHighlightedIndex(index)}
               >
@@ -266,9 +277,9 @@ export function StockSearchInput({
                 <div className="flex-shrink-0 w-24">
                   <span
                     className={`font-mono font-semibold ${
-                      visualTheme === 'warm'
-                        ? 'text-warm-800 dark:text-warm-100'
-                        : 'text-gray-900 dark:text-white'
+                      visualTheme === "warm"
+                        ? "text-warm-800 dark:text-warm-100"
+                        : "text-gray-900 dark:text-white"
                     }`}
                   >
                     {result.stock.symbol}
@@ -279,9 +290,9 @@ export function StockSearchInput({
                 <div className="flex-1 min-w-0">
                   <span
                     className={`block truncate ${
-                      visualTheme === 'warm'
-                        ? 'text-warm-600 dark:text-warm-300'
-                        : 'text-gray-600 dark:text-gray-300'
+                      visualTheme === "warm"
+                        ? "text-warm-600 dark:text-warm-300"
+                        : "text-gray-600 dark:text-gray-300"
                     }`}
                   >
                     {getDisplayName(result)}
@@ -302,9 +313,9 @@ export function StockSearchInput({
                   <Check
                     size={18}
                     className={`flex-shrink-0 ${
-                      visualTheme === 'warm'
-                        ? 'text-warm-accent-500'
-                        : 'text-green-500'
+                      visualTheme === "warm"
+                        ? "text-warm-accent-500"
+                        : "text-green-500"
                     }`}
                   />
                 )}
@@ -319,16 +330,16 @@ export function StockSearchInput({
         <div
           ref={dropdownRef}
           className={`absolute z-50 w-full mt-1 px-4 py-3 shadow-lg border ${
-            visualTheme === 'warm'
-              ? 'bg-warm-50 dark:bg-warm-800 border-warm-200 dark:border-warm-700 rounded-2xl text-warm-500 dark:text-warm-400'
-              : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg text-gray-500 dark:text-gray-400'
+            visualTheme === "warm"
+              ? "bg-warm-50 dark:bg-warm-800 border-warm-200 dark:border-warm-700 rounded-2xl text-warm-500 dark:text-warm-400"
+              : "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 rounded-lg text-gray-500 dark:text-gray-400"
           }`}
         >
           <p className="text-sm text-center">
-            {t.noSearchResults || 'No matching stocks found'}
+            {t.noSearchResults || "No matching stocks found"}
           </p>
           <p className="text-xs text-center mt-1 opacity-70">
-            {t.tryEnterSymbol || 'Press Enter to add manually'}
+            {t.tryEnterSymbol || "Press Enter to add manually"}
           </p>
         </div>
       )}

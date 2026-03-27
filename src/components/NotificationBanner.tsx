@@ -1,24 +1,25 @@
-import { useState, useEffect } from 'react';
-import { Info, X } from 'lucide-react';
-import type { Translations } from '../i18n/translations';
+import { useState, useEffect } from "react";
+import { Info, X } from "lucide-react";
+import type { Translations } from "../i18n/translations";
 
 interface NotificationBannerProps {
   t: Translations;
 }
 
-const BANNER_DISMISS_KEY = 'marketvue_banner_dismissed';
+const BANNER_DISMISS_KEY = "marketvue_banner_dismissed";
 
 const NotificationBanner = ({ t }: NotificationBannerProps) => {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     // Check if user has previously dismissed the banner
-    const isDismissed = localStorage.getItem(BANNER_DISMISS_KEY) === 'true';
+    const isDismissed = localStorage.getItem(BANNER_DISMISS_KEY) === "true";
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsVisible(!isDismissed);
   }, []);
 
   const handleDismiss = () => {
-    localStorage.setItem(BANNER_DISMISS_KEY, 'true');
+    localStorage.setItem(BANNER_DISMISS_KEY, "true");
     setIsVisible(false);
   };
 
@@ -31,7 +32,10 @@ const NotificationBanner = ({ t }: NotificationBannerProps) => {
       <div className="max-w-7xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-3 flex-1 min-w-0">
-            <Info size={20} className="text-yellow-600 dark:text-yellow-400 flex-shrink-0" />
+            <Info
+              size={20}
+              className="text-yellow-600 dark:text-yellow-400 flex-shrink-0"
+            />
             <p className="text-sm text-yellow-800 dark:text-yellow-100 truncate md:whitespace-normal">
               {t.freeHostingNotice}
             </p>

@@ -1,4 +1,4 @@
-import { Palette } from 'lucide-react';
+import { Palette } from "lucide-react";
 
 export interface ColorTheme {
   up: string;
@@ -6,9 +6,10 @@ export interface ColorTheme {
   name: string;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const COLOR_THEMES: ColorTheme[] = [
-  { name: 'Asian (Red Up / Green Down)', up: '#dc2626', down: '#16a34a' },
-  { name: 'Western (Green Up / Red Down)', up: '#16a34a', down: '#dc2626' },
+  { name: "Asian (Red Up / Green Down)", up: "#dc2626", down: "#16a34a" },
+  { name: "Western (Green Up / Red Down)", up: "#16a34a", down: "#dc2626" },
 ];
 
 interface ColorThemeSelectorProps {
@@ -16,7 +17,10 @@ interface ColorThemeSelectorProps {
   onThemeChange: (theme: ColorTheme) => void;
 }
 
-const ColorThemeSelector = ({ currentTheme, onThemeChange }: ColorThemeSelectorProps) => {
+const ColorThemeSelector = ({
+  currentTheme,
+  onThemeChange,
+}: ColorThemeSelectorProps) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
       <div className="flex items-center gap-2 mb-3">
@@ -31,11 +35,13 @@ const ColorThemeSelector = ({ currentTheme, onThemeChange }: ColorThemeSelectorP
             onClick={() => onThemeChange(theme)}
             className={`flex-1 px-4 py-3 rounded-lg border-2 transition-all ${
               currentTheme.name === theme.name
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-200 hover:border-gray-300 bg-white'
+                ? "border-blue-500 bg-blue-50"
+                : "border-gray-200 hover:border-gray-300 bg-white"
             }`}
           >
-            <div className="text-sm font-medium text-gray-800 mb-2">{theme.name}</div>
+            <div className="text-sm font-medium text-gray-800 mb-2">
+              {theme.name}
+            </div>
             <div className="flex gap-2 justify-center">
               <div className="flex items-center gap-1">
                 <div

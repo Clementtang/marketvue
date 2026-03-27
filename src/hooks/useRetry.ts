@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from "react";
 
 /**
  * Options for the useRetry hook
@@ -44,31 +44,58 @@ export interface UseRetryReturn<T> {
   cancel: () => void;
 }
 
+/** Extract HTTP status code from an unknown error shape */
+function getStatusCode(error: unknown): number | undefined {
+  if (error && typeof error === "object" && "response" in error) {
+    const response = (error as { response?: { status?: unknown } }).response;
+    if (response && typeof response.status === "number") {
+      return response.status;
+    }
+  }
+  return undefined;
+}
+
 /**
  * Default function to determine if an error should trigger a retry
  */
-export function defaultShouldRetry(error: any, _attemptCount: number): boolean {
+export function defaultShouldRetry(
+  error: unknown,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  _attemptCount?: number,
+): boolean {
   // Handle null/undefined errors - retry by default
   if (!error) {
     return true;
   }
 
   // Don't retry for client errors (4xx except 408 timeout, 429 rate limit)
-  const statusCode = error?.response?.status;
+  const statusCode = getStatusCode(error);
 
   // Non-retryable client errors
-  if (statusCode === 400 || statusCode === 401 || statusCode === 403 || statusCode === 404) {
+  if (
+    statusCode === 400 ||
+    statusCode === 401 ||
+    statusCode === 403 ||
+    statusCode === 404
+  ) {
     return false;
   }
 
-  // Always retry for network errors
-  if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT' || error.code === 'ENETUNREACH') {
-    return true;
-  }
+  if (error instanceof Error) {
+    // Always retry for network errors
+    const code = (error as Error & { code?: string }).code;
+    if (
+      code === "ECONNABORTED" ||
+      code === "ETIMEDOUT" ||
+      code === "ENETUNREACH"
+    ) {
+      return true;
+    }
 
-  // Retry for timeout errors
-  if (error.message?.includes('timeout')) {
-    return true;
+    // Retry for timeout errors
+    if (error.message?.includes("timeout")) {
+      return true;
+    }
   }
 
   // Retry for server errors (5xx)
@@ -84,13 +111,13 @@ export function defaultShouldRetry(error: any, _attemptCount: number): boolean {
  * Default function to calculate retry delay with exponential backoff
  */
 export function defaultCalculateDelay(
-  error: any,
+  error: unknown,
   attemptCount: number,
   initialDelay: number,
   backoffMultiplier: number,
-  maxDelay: number
+  maxDelay: number,
 ): number {
-  const statusCode = error?.response?.status;
+  const statusCode = getStatusCode(error);
 
   // Cold start (503) needs longer delays - service starting up
   if (statusCode === 503) {
@@ -100,8 +127,12 @@ export function defaultCalculateDelay(
 
   // Rate limiting (429) - wait longer
   if (statusCode === 429) {
-    const retryAfter = error?.response?.headers?.['retry-after'];
-    if (retryAfter) {
+    const retryAfter =
+      error && typeof error === "object" && "response" in error
+        ? (error as { response?: { headers?: { "retry-after"?: string } } })
+            .response?.headers?.["retry-after"]
+        : undefined;
+    if (typeof retryAfter === "string") {
       return Math.min(parseInt(retryAfter, 10) * 1000, maxDelay);
     }
     return Math.min(10000, maxDelay);
@@ -141,7 +172,7 @@ export function defaultCalculateDelay(
  */
 export function useRetry<T>(
   asyncFn: () => Promise<T>,
-  options: UseRetryOptions = {}
+  options: UseRetryOptions = {},
 ): UseRetryReturn<T> {
   const {
     maxRetries = 3,
@@ -179,12 +210,21 @@ export function useRetry<T>(
   /**
    * Calculate delay for retry
    */
-  const getDelay = useCallback((err: Error, attempt: number): number => {
-    if (calculateDelay) {
-      return calculateDelay(err, attempt);
-    }
-    return defaultCalculateDelay(err, attempt, initialDelay, backoffMultiplier, maxDelay);
-  }, [calculateDelay, initialDelay, backoffMultiplier, maxDelay]);
+  const getDelay = useCallback(
+    (err: Error, attempt: number): number => {
+      if (calculateDelay) {
+        return calculateDelay(err, attempt);
+      }
+      return defaultCalculateDelay(
+        err,
+        attempt,
+        initialDelay,
+        backoffMultiplier,
+        maxDelay,
+      );
+    },
+    [calculateDelay, initialDelay, backoffMultiplier, maxDelay],
+  );
 
   /**
    * Execute the async function with retry logic
@@ -260,7 +300,14 @@ export function useRetry<T>(
     };
 
     return attemptExecution();
-  }, [asyncFn, maxRetries, shouldRetry, getDelay, onRetry, onMaxRetriesReached]);
+  }, [
+    asyncFn,
+    maxRetries,
+    shouldRetry,
+    getDelay,
+    onRetry,
+    onMaxRetriesReached,
+  ]);
 
   /**
    * Reset the hook state

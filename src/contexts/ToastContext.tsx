@@ -1,5 +1,12 @@
-import React, { createContext, useContext, useState, useCallback, useRef, useEffect } from 'react';
-import type { ToastType } from '../config/chartTheme';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+} from "react";
+import type { ToastType } from "../config/chartTheme";
 
 /**
  * Toast message interface
@@ -39,7 +46,9 @@ const MAX_TOASTS = 5;
  */
 export function ToastProvider({ children }: { children: React.ReactNode }) {
   const [toasts, setToasts] = useState<ToastMessage[]>([]);
-  const timeoutRefs = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const timeoutRefs = useRef<Map<string, ReturnType<typeof setTimeout>>>(
+    new Map(),
+  );
 
   /**
    * Generate unique ID for toast
@@ -94,7 +103,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         timeoutRefs.current.set(id, timeout);
       }
     },
-    [generateId, hideToast]
+    [generateId, hideToast],
   );
 
   /**
@@ -111,8 +120,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
    * Cleanup timeouts on unmount
    */
   useEffect(() => {
+    const refs = timeoutRefs.current;
     return () => {
-      timeoutRefs.current.forEach((timeout) => clearTimeout(timeout));
+      refs.forEach((timeout) => clearTimeout(timeout));
     };
   }, []);
 
@@ -126,10 +136,11 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
 /**
  * Hook to use toast functionality
  */
+// eslint-disable-next-line react-refresh/only-export-components
 export function useToast(): ToastContextType {
   const context = useContext(ToastContext);
   if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
+    throw new Error("useToast must be used within a ToastProvider");
   }
   return context;
 }

@@ -2,7 +2,7 @@
  * Formatting utilities for dates, numbers, and currency
  */
 
-export type Language = 'en-US' | 'zh-TW';
+export type Language = "en-US" | "zh-TW";
 
 /**
  * Format date for chart display based on language
@@ -10,18 +10,24 @@ export type Language = 'en-US' | 'zh-TW';
  * @param language - Language code
  * @returns Formatted date string
  */
-export function formatChartDate(date: string | Date, language: Language = 'en-US'): string {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+export function formatChartDate(
+  date: string | Date,
+  language: Language = "en-US",
+): string {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
 
   if (isNaN(dateObj.getTime())) {
-    return '';
+    return "";
   }
 
-  if (language === 'zh-TW') {
+  if (language === "zh-TW") {
     return `${dateObj.getMonth() + 1}/${dateObj.getDate()}`;
   }
 
-  return dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  return dateObj.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 /**
@@ -30,25 +36,28 @@ export function formatChartDate(date: string | Date, language: Language = 'en-US
  * @param language - Language code
  * @returns Formatted date string
  */
-export function formatTimestamp(timestamp: number, language: Language = 'en-US'): string {
+export function formatTimestamp(
+  timestamp: number,
+  language: Language = "en-US",
+): string {
   const date = new Date(timestamp);
 
   if (isNaN(date.getTime())) {
-    return '';
+    return "";
   }
 
-  if (language === 'zh-TW') {
-    return date.toLocaleDateString('zh-TW', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+  if (language === "zh-TW") {
+    return date.toLocaleDateString("zh-TW", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   }
 
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
   });
 }
 
@@ -61,21 +70,21 @@ export function formatTimestamp(timestamp: number, language: Language = 'en-US')
  */
 export function formatCurrency(
   value: number | null | undefined,
-  currency: string = 'USD',
-  decimals: number = 2
+  currency: string = "USD",
+  decimals: number = 2,
 ): string {
   if (value === null || value === undefined || isNaN(value)) {
-    return 'N/A';
+    return "N/A";
   }
 
   try {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
       currency: currency,
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
     }).format(value);
-  } catch (error) {
+  } catch {
     // Fallback if currency is invalid
     return `${value.toFixed(decimals)} ${currency}`;
   }
@@ -91,10 +100,10 @@ export function formatCurrency(
 export function formatPercentage(
   value: number | null | undefined,
   decimals: number = 2,
-  includeSign: boolean = true
+  includeSign: boolean = true,
 ): string {
   if (value === null || value === undefined || isNaN(value)) {
-    return 'N/A';
+    return "N/A";
   }
 
   const percentValue = value * 100;
@@ -115,14 +124,14 @@ export function formatPercentage(
  */
 export function formatLargeNumber(
   value: number | null | undefined,
-  decimals: number = 1
+  decimals: number = 1,
 ): string {
   if (value === null || value === undefined || isNaN(value)) {
-    return 'N/A';
+    return "N/A";
   }
 
   const absValue = Math.abs(value);
-  const sign = value < 0 ? '-' : '';
+  const sign = value < 0 ? "-" : "";
 
   if (absValue >= 1e9) {
     return `${sign}${(absValue / 1e9).toFixed(decimals)}B`;
@@ -143,13 +152,13 @@ export function formatLargeNumber(
  */
 export function formatNumber(
   value: number | null | undefined,
-  decimals: number = 0
+  decimals: number = 0,
 ): string {
   if (value === null || value === undefined || isNaN(value)) {
-    return 'N/A';
+    return "N/A";
   }
 
-  return value.toLocaleString('en-US', {
+  return value.toLocaleString("en-US", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });

@@ -1,20 +1,22 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import type { ReactNode } from 'react';
-import { logger } from '../utils/logger';
+import { createContext, useContext, useState, useEffect } from "react";
+import type { ReactNode } from "react";
+import { logger } from "../utils/logger";
 
 // Visual theme types (Classic vs Warm Minimal)
 // Note: This is different from ColorTheme in ColorThemeSelector (Eastern/Western price colors)
-export type VisualTheme = 'classic' | 'warm';
+export type VisualTheme = "classic" | "warm";
 
 interface VisualThemeContextType {
   visualTheme: VisualTheme;
   setVisualTheme: (theme: VisualTheme) => void;
 }
 
-const VisualThemeContext = createContext<VisualThemeContextType | undefined>(undefined);
+const VisualThemeContext = createContext<VisualThemeContextType | undefined>(
+  undefined,
+);
 
-const STORAGE_KEY = 'marketvue_visual_theme';
-const DEFAULT_THEME: VisualTheme = 'classic';
+const STORAGE_KEY = "marketvue_visual_theme";
+const DEFAULT_THEME: VisualTheme = "classic";
 
 interface VisualThemeProviderProps {
   children: ReactNode;
@@ -25,11 +27,11 @@ export function VisualThemeProvider({ children }: VisualThemeProviderProps) {
     // Initialize from localStorage
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === 'classic' || stored === 'warm') {
+      if (stored === "classic" || stored === "warm") {
         return stored;
       }
     } catch (error) {
-      logger.error('Failed to load visual theme from localStorage:', error);
+      logger.error("Failed to load visual theme from localStorage:", error);
     }
     return DEFAULT_THEME;
   });
@@ -39,7 +41,7 @@ export function VisualThemeProvider({ children }: VisualThemeProviderProps) {
     try {
       localStorage.setItem(STORAGE_KEY, visualTheme);
     } catch (error) {
-      logger.error('Failed to save visual theme to localStorage:', error);
+      logger.error("Failed to save visual theme to localStorage:", error);
     }
   }, [visualTheme]);
 
@@ -55,10 +57,11 @@ export function VisualThemeProvider({ children }: VisualThemeProviderProps) {
 }
 
 // Custom hook to use visual theme
+// eslint-disable-next-line react-refresh/only-export-components
 export function useVisualTheme() {
   const context = useContext(VisualThemeContext);
   if (context === undefined) {
-    throw new Error('useVisualTheme must be used within a VisualThemeProvider');
+    throw new Error("useVisualTheme must be used within a VisualThemeProvider");
   }
   return context;
 }

@@ -62,6 +62,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
 
       // Stock was added (array grew) - jump to last page to show the new stock
       if (stocks.length > previousStocks.length) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCurrentPage(totalPages);
       }
       // Stock was removed (array shrunk) - stay on current page if valid
@@ -173,6 +174,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         static: false, // Allow auto-repositioning for compaction
       };
     });
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLayout(newLayout);
   }, [paginatedStocks]);
 

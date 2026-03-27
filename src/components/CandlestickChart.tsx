@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo } from "react";
 import {
   ComposedChart,
   XAxis,
@@ -7,9 +7,9 @@ import {
   ResponsiveContainer,
   Line,
   Bar,
-} from 'recharts';
-import { CHART_CONFIG } from '../config/constants';
-import { useApp } from '../contexts/AppContext';
+} from "recharts";
+import { CHART_CONFIG } from "../config/constants";
+import { useApp } from "../contexts/AppContext";
 
 interface StockDataPoint {
   date: string;
@@ -27,14 +27,37 @@ interface CandlestickChartProps {
   showMA?: boolean;
 }
 
+interface ColorTheme {
+  up: string;
+  down: string;
+}
+
+interface CandlestickProps {
+  x?: number;
+  y?: number;
+  width?: number;
+  payload?: StockDataPoint;
+  colorTheme: ColorTheme;
+  domainMax: number;
+  priceRange: number;
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: Array<{ payload: StockDataPoint }>;
+  colorTheme: ColorTheme;
+  language: string;
+}
+
 /**
  * Custom candlestick shape component
  * Uses Recharts Bar's coordinate system to render OHLC data
  */
-const Candlestick = (props: any) => {
+const Candlestick = (props: CandlestickProps) => {
   const { x, y, width, payload, colorTheme, domainMax, priceRange } = props;
 
-  if (!payload) return null;
+  if (!payload || x === undefined || y === undefined || width === undefined)
+    return null;
 
   const { open, high, low, close } = payload;
   const isUp = close > open;
@@ -50,7 +73,9 @@ const Candlestick = (props: any) => {
   // because of margins: top + bottom
   // Actual chart area height = CANDLESTICK_HEIGHT - (MARGINS.top + MARGINS.bottom)
 
-  const chartHeight = CHART_CONFIG.CANDLESTICK_HEIGHT - (CHART_CONFIG.MARGINS.top + CHART_CONFIG.MARGINS.bottom);
+  const chartHeight =
+    CHART_CONFIG.CANDLESTICK_HEIGHT -
+    (CHART_CONFIG.MARGINS.top + CHART_CONFIG.MARGINS.bottom);
   const pixelsPerPrice = chartHeight / priceRange;
 
   // Calculate the Y position for each price point
@@ -112,7 +137,12 @@ const Candlestick = (props: any) => {
 /**
  * Custom Tooltip for Candlestick Chart
  */
-const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
+const CustomTooltip = ({
+  active,
+  payload,
+  colorTheme,
+  language,
+}: CustomTooltipProps) => {
   if (!active || !payload || !payload[0]) return null;
 
   const data = payload[0].payload;
@@ -120,9 +150,13 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
 
   // Convert hex color to Tailwind class based on the theme's up color
   // Asian theme: up=#dc2626 (red), Western theme: up=#16a34a (green)
-  const isAsianTheme = colorTheme.up === '#dc2626';
-  const upColor = isAsianTheme ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400';
-  const downColor = isAsianTheme ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+  const isAsianTheme = colorTheme.up === "#dc2626";
+  const upColor = isAsianTheme
+    ? "text-red-600 dark:text-red-400"
+    : "text-green-600 dark:text-green-400";
+  const downColor = isAsianTheme
+    ? "text-green-600 dark:text-green-400"
+    : "text-red-600 dark:text-red-400";
   const priceClass = isBullish ? upColor : downColor;
 
   return (
@@ -133,7 +167,7 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
       <div className="space-y-1 text-xs">
         <div className="flex justify-between gap-4">
           <span className="text-gray-600 dark:text-gray-400">
-            {language === 'zh-TW' ? '開盤' : 'Open'}:
+            {language === "zh-TW" ? "開盤" : "Open"}:
           </span>
           <span className="font-medium text-gray-900 dark:text-gray-100">
             ${data.open.toFixed(2)}
@@ -141,7 +175,7 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
         </div>
         <div className="flex justify-between gap-4">
           <span className="text-gray-600 dark:text-gray-400">
-            {language === 'zh-TW' ? '最高' : 'High'}:
+            {language === "zh-TW" ? "最高" : "High"}:
           </span>
           <span className="font-medium text-gray-900 dark:text-gray-100">
             ${data.high.toFixed(2)}
@@ -149,7 +183,7 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
         </div>
         <div className="flex justify-between gap-4">
           <span className="text-gray-600 dark:text-gray-400">
-            {language === 'zh-TW' ? '最低' : 'Low'}:
+            {language === "zh-TW" ? "最低" : "Low"}:
           </span>
           <span className="font-medium text-gray-900 dark:text-gray-100">
             ${data.low.toFixed(2)}
@@ -157,7 +191,7 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
         </div>
         <div className="flex justify-between gap-4">
           <span className="text-gray-600 dark:text-gray-400">
-            {language === 'zh-TW' ? '收盤' : 'Close'}:
+            {language === "zh-TW" ? "收盤" : "Close"}:
           </span>
           <span className={`font-medium ${priceClass}`}>
             ${data.close.toFixed(2)}
@@ -184,7 +218,6 @@ const CustomTooltip = ({ active, payload, colorTheme, language }: any) => {
   );
 };
 
-
 /**
  * Candlestick Chart Component
  *
@@ -207,8 +240,8 @@ const CandlestickChart = ({ data, showMA = true }: CandlestickChartProps) => {
 
   // Memoize price range calculation to prevent recalculation on every render
   const priceRangeInfo = useMemo(() => {
-    const minLow = Math.min(...data.map(d => d.low));
-    const maxHigh = Math.max(...data.map(d => d.high));
+    const minLow = Math.min(...data.map((d) => d.low));
+    const maxHigh = Math.max(...data.map((d) => d.high));
     const domainMin = minLow * 0.995; // 0.5% padding
     const domainMax = maxHigh * 1.005; // 0.5% padding
     const priceRange = domainMax - domainMin;
@@ -223,7 +256,7 @@ const CandlestickChart = ({ data, showMA = true }: CandlestickChartProps) => {
       <ComposedChart data={data} margin={CHART_CONFIG.MARGINS}>
         <XAxis
           dataKey="date"
-          tick={{ fontSize: 11, fill: 'currentColor' }}
+          tick={{ fontSize: 11, fill: "currentColor" }}
           stroke="currentColor"
           className="text-gray-500 dark:text-gray-400"
           tickFormatter={(value) => {
@@ -233,25 +266,31 @@ const CandlestickChart = ({ data, showMA = true }: CandlestickChartProps) => {
         />
         <YAxis
           domain={[domainMin, domainMax]}
-          tick={{ fontSize: 11, fill: 'currentColor' }}
+          tick={{ fontSize: 11, fill: "currentColor" }}
           stroke="currentColor"
           className="text-gray-500 dark:text-gray-400"
           tickFormatter={(value) => value.toFixed(2)}
         />
         <Tooltip
-          content={<CustomTooltip colorTheme={colorTheme} language={language} />}
-          cursor={{ stroke: 'currentColor', strokeWidth: 1, strokeDasharray: '3 3' }}
+          content={
+            <CustomTooltip colorTheme={colorTheme} language={language} />
+          }
+          cursor={{
+            stroke: "currentColor",
+            strokeWidth: 1,
+            strokeDasharray: "3 3",
+          }}
           wrapperStyle={{ zIndex: 50 }}
         />
 
         {/* Candlesticks - using Bar with custom shape */}
         <Bar
           dataKey="close"
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           shape={(props: any) => (
             <Candlestick
               {...props}
               colorTheme={colorTheme}
-              domainMin={domainMin}
               domainMax={domainMax}
               priceRange={priceRange}
             />

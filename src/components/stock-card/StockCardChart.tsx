@@ -1,4 +1,5 @@
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useMemo } from "react";
+import type { TooltipProps } from "recharts";
 import {
   LineChart,
   Line,
@@ -6,18 +7,18 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-} from 'recharts';
-import type { StockDataPoint } from '../../types/stock';
-import type { ColorTheme } from '../ColorThemeSelector';
-import type { Translations } from '../../i18n/translations';
-import { CHART_CONFIG } from '../../config/constants';
-import CandlestickChart from '../CandlestickChart';
-import ChartTooltip from '../common/ChartTooltip';
-import { smartAggregateStockData } from '../../utils/dateAggregation';
+} from "recharts";
+import type { StockDataPoint } from "../../types/stock";
+import type { ColorTheme } from "../ColorThemeSelector";
+import type { Translations } from "../../i18n/translations";
+import { CHART_CONFIG } from "../../config/constants";
+import CandlestickChart from "../CandlestickChart";
+import ChartTooltip from "../common/ChartTooltip";
+import { smartAggregateStockData } from "../../utils/dateAggregation";
 
 interface StockCardChartProps {
   data: StockDataPoint[];
-  chartType: 'line' | 'candlestick';
+  chartType: "line" | "candlestick";
   colorTheme: ColorTheme;
   t: Translations;
   isVisible: boolean;
@@ -38,7 +39,6 @@ const StockCardChart = memo(function StockCardChart({
   t,
   isVisible,
 }: StockCardChartProps) {
-
   // Smart aggregation based on data length
   const { data: aggregatedData, interval } = useMemo(() => {
     return smartAggregateStockData(data);
@@ -52,45 +52,67 @@ const StockCardChart = memo(function StockCardChart({
     return lastClose >= prevClose ? colorTheme.up : colorTheme.down;
   }, [aggregatedData, colorTheme]);
 
-  // Custom tooltip component
-  const CustomTooltip = useCallback(
-    (props: any) => <ChartTooltip {...props} t={t} showMovingAverages={true} />,
-    [t]
+  // Memoized tooltip render function (render prop, not a component)
+  const renderTooltip = useCallback(
+    (props: TooltipProps<number, string>) => (
+      <ChartTooltip {...props} t={t} showMovingAverages={true} />
+    ),
+    [t],
   );
 
   // Date formatter for X axis (adapts to time interval)
   // Different formats help users naturally understand the time scale
-  const formatDate = useCallback((value: string) => {
-    const date = new Date(value);
-    if (interval === 'monthly') {
-      // Monthly: Show "Jan'24" format for clarity
-      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-      return `${months[date.getMonth()]}'${date.getFullYear().toString().slice(2)}`;
-    } else if (interval === 'weekly') {
-      // Weekly: Show "1/15" (month/day) format
-      return `${date.getMonth() + 1}/${date.getDate()}`;
-    } else {
-      // Daily: Show "1/15" (month/day) format
-      return `${date.getMonth() + 1}/${date.getDate()}`;
-    }
-  }, [interval]);
+  const formatDate = useCallback(
+    (value: string) => {
+      const date = new Date(value);
+      if (interval === "monthly") {
+        // Monthly: Show "Jan'24" format for clarity
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ];
+        return `${months[date.getMonth()]}'${date.getFullYear().toString().slice(2)}`;
+      } else if (interval === "weekly") {
+        // Weekly: Show "1/15" (month/day) format
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      } else {
+        // Daily: Show "1/15" (month/day) format
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+      }
+    },
+    [interval],
+  );
 
   if (!isVisible) return null;
 
   return (
-    <div className="relative" style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}>
-      {chartType === 'line' && (
-        <ResponsiveContainer width="100%" height={CHART_CONFIG.CANDLESTICK_HEIGHT}>
-          <LineChart
-            data={aggregatedData}
-            margin={CHART_CONFIG.MARGINS}
-          >
-            <XAxis dataKey="date" tick={{ fontSize: 10 }} tickFormatter={formatDate} />
-            <YAxis tick={{ fontSize: 10 }} domain={['auto', 'auto']} />
-            <Tooltip
-              content={<CustomTooltip />}
-              wrapperStyle={{ zIndex: 50 }}
+    <div
+      className="relative"
+      style={{ height: `${CHART_CONFIG.CANDLESTICK_HEIGHT}px` }}
+    >
+      {chartType === "line" && (
+        <ResponsiveContainer
+          width="100%"
+          height={CHART_CONFIG.CANDLESTICK_HEIGHT}
+        >
+          <LineChart data={aggregatedData} margin={CHART_CONFIG.MARGINS}>
+            <XAxis
+              dataKey="date"
+              tick={{ fontSize: 10 }}
+              tickFormatter={formatDate}
             />
+            <YAxis tick={{ fontSize: 10 }} domain={["auto", "auto"]} />
+            <Tooltip content={renderTooltip} wrapperStyle={{ zIndex: 50 }} />
             {/* Legend removed - now shown in footer */}
             <Line
               type="monotone"
@@ -117,7 +139,7 @@ const StockCardChart = memo(function StockCardChart({
               animationBegin={200}
               animationDuration={1000}
               animationEasing="ease-in-out"
-              activeDot={{ r: 4, strokeWidth: 2, stroke: '#3b82f6' }}
+              activeDot={{ r: 4, strokeWidth: 2, stroke: "#3b82f6" }}
             />
             <Line
               type="monotone"
@@ -131,12 +153,14 @@ const StockCardChart = memo(function StockCardChart({
               animationBegin={400}
               animationDuration={1000}
               animationEasing="ease-in-out"
-              activeDot={{ r: 4, strokeWidth: 2, stroke: '#a855f7' }}
+              activeDot={{ r: 4, strokeWidth: 2, stroke: "#a855f7" }}
             />
           </LineChart>
         </ResponsiveContainer>
       )}
-      {chartType === 'candlestick' && <CandlestickChart data={aggregatedData} showMA={true} />}
+      {chartType === "candlestick" && (
+        <CandlestickChart data={aggregatedData} showMA={true} />
+      )}
     </div>
   );
 });

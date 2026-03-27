@@ -62,7 +62,7 @@ export function clearLocalStorage(): boolean {
     localStorage.clear();
     return true;
   } catch (error) {
-    console.error('Failed to clear localStorage:', error);
+    console.error("Failed to clear localStorage:", error);
     return false;
   }
 }
@@ -73,11 +73,11 @@ export function clearLocalStorage(): boolean {
  */
 export function isLocalStorageAvailable(): boolean {
   try {
-    const testKey = '__localStorage_test__';
-    localStorage.setItem(testKey, 'test');
+    const testKey = "__localStorage_test__";
+    localStorage.setItem(testKey, "test");
     localStorage.removeItem(testKey);
     return true;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
