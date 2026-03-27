@@ -1051,15 +1051,15 @@ Phase 5 — 長期規劃（附觸發條件）：
 | docs/DEPLOYMENT.md FINNHUB_API_KEY 補充           | 文件  |
 | ROADMAP.md 時間軸更新                             | 文件  |
 
-### FAIL（5 項，需補修）
+### FAIL（4 項，需補修）
 
-| #   | 嚴重度   | 問題                                            | 檔案:行號                                          | 說明                                                                                                                                          |
-| --- | -------- | ----------------------------------------------- | -------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Critical | **`decorators.py` ValueError 仍洩漏 `str(e)`**  | `backend/utils/decorators.py:40`                   | `Exception` handler 已修（回傳 generic message），但 `ValueError` handler 仍直接回傳 `str(e)` 給客戶端。應改為 `'Invalid request parameters'` |
-| 2   | Warning  | **`batchStockApi.ts` MAX_BATCH_SIZE 仍硬寫 18** | `src/api/batchStockApi.ts:74`                      | 已從 9 改為 18（數值正確），但未引用 `STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST` 常數，違反 single source of truth                                |
-| 3   | Warning  | **`news_service.py` cached_at 仍用本地時間**    | `backend/services/news_service.py:74, 83`          | `_sort_and_filter` 已改 UTC，但 `cached_at` 兩處仍是 `datetime.now()` 未加 `timezone.utc`                                                     |
-| 4   | Warning  | **`errorHandlers.ts` 三處殘留 `any`**           | `src/utils/errorHandlers.ts:90, 150, 165`          | `shouldRetry`、`isNetworkError`、`isServerError` 的 error 參數仍是 `any`                                                                      |
-| 5   | Minor    | **`StockCardFooter` cursor-pointer 未移除**     | `src/components/stock-card/StockCardFooter.tsx:74` | button 上的 `cursor-pointer` 原封未動                                                                                                         |
+| #     | 嚴重度    | 問題                                            | 檔案:行號                                 | 說明                                                                                                                                          |
+| ----- | --------- | ----------------------------------------------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1     | Critical  | **`decorators.py` ValueError 仍洩漏 `str(e)`**  | `backend/utils/decorators.py:40`          | `Exception` handler 已修（回傳 generic message），但 `ValueError` handler 仍直接回傳 `str(e)` 給客戶端。應改為 `'Invalid request parameters'` |
+| 2     | Warning   | **`batchStockApi.ts` MAX_BATCH_SIZE 仍硬寫 18** | `src/api/batchStockApi.ts:74`             | 已從 9 改為 18（數值正確），但未引用 `STOCK_LIST_CONFIG.MAX_STOCKS_PER_LIST` 常數，違反 single source of truth                                |
+| 3     | Warning   | **`news_service.py` cached_at 仍用本地時間**    | `backend/services/news_service.py:74, 83` | `_sort_and_filter` 已改 UTC，但 `cached_at` 兩處仍是 `datetime.now()` 未加 `timezone.utc`                                                     |
+| 4     | Warning   | **`errorHandlers.ts` 三處殘留 `any`**           | `src/utils/errorHandlers.ts:90, 150, 165` | `shouldRetry`、`isNetworkError`、`isServerError` 的 error 參數仍是 `any`                                                                      |
+| ~~5~~ | ~~Minor~~ | ~~**`StockCardFooter` cursor-pointer 未移除**~~ |                                           | **撤銷**：Review agent 誤將 wrapper div 問題對準 button。button 有 onClick handler，cursor-pointer 正確。wrapper div 已在 Phase 1 修復。      |
 
 ### 殘餘觀察（非阻塞，記錄備查）
 
@@ -1071,9 +1071,21 @@ Phase 5 — 長期規劃（附觸發條件）：
 
 ### Review 結論
 
-19/24 項 PASS，完成度良好。但 FAIL #1（`decorators.py` ValueError 洩漏）是 Top 5 #1 的修復目標且為安全性問題，修了一半不算完成。
+20/24 項 PASS，完成度良好。但 FAIL #1（`decorators.py` ValueError 洩漏）是 Top 5 #1 的修復目標且為安全性問題，修了一半不算完成。
 
-**建議：補修 5 個 FAIL 項目（預估 15 分鐘），再進入 Phase 4。**
+**建議：補修 4 個 FAIL 項目（預估 15 分鐘），再進入 Phase 4。**
+
+### Reviewer 回應 FAIL #5 反駁
+
+> Coding Agent 主張：button（line 68-79）有 `onClick` handler 觸發 `onNewsClick(symbol)`，`cursor-pointer` 在有 click handler 的 button 上是正確 UX。Reviewer 可能將此與 wrapper div 混淆。
+
+**經驗證，Coding Agent 是對的。** 接受此反駁。
+
+原始稽核指出的問題是「`StockCardFooter` wrapper div 有 `cursor-pointer` 但無 click handler」（line 38 的外層 `<div>`）。Review agent 誤將修復目標對準了 line 74 的 `<button>` — 但那個 button 確實有 `onClick`（line 69-72），`cursor-pointer` 完全合理。
+
+檢查 line 38 的 wrapper div：當前程式碼已無 `cursor-pointer`，表示 Phase 1 已正確修復原始問題。
+
+**結論：FAIL #5 撤銷，改為 PASS。最終成績 20/24 PASS，4 項需補修（#1-4）。**
 
 ---
 

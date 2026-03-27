@@ -116,6 +116,44 @@
 
 ---
 
+## Reviewer 二次確認（v1.1 審閱）
+
+**審閱者**：外部審查員（Claude Opus 4.6）| **日期**：2026-03-26
+**審閱對象**：`implementation-plan-p4-p5.md` v1.1 + Coding Agent 回應
+
+### 結果：12/12 Review 點全部 PASS
+
+| Review 點                               | Plan 反映                     | 狀態 |
+| --------------------------------------- | ----------------------------- | ---- |
+| Critical #1: 冷啟動 retry               | `plan:42` 已加入 P4-2         | PASS |
+| Critical #2: DashboardGrid localStorage | `plan:43` 已加入 P4-2         | PASS |
+| Critical #3-5: Suggestion 遺漏          | `plan:147-154` 殘餘觀察       | PASS |
+| Warning #1: GridLayout 預估             | `plan:58` 改 2-3h + 先抽 hook | PASS |
+| Warning #2: Focus trap 決定             | `plan:81` 選 Radix UI         | PASS |
+| Warning #3: CI 優先序                   | `plan:91-96` CI 排第一        | PASS |
+| Warning #4: .env.production             | `plan:39` 補 .env.example     | PASS |
+| Warning #5: Phase 5 執行機制            | `plan:107` GitHub Actions     | PASS |
+| Suggestion #1: inline style             | `plan:79` 加入 P4-4           | PASS |
+| Suggestion #2: baseline 測量            | `plan:118` 73.66% 已達標      | PASS |
+| Suggestion #3: 殘餘觀察補充             | `plan:150-154` 10 項          | PASS |
+| Suggestion #4: 補修狀態確認             | `plan:6` header 確認          | PASS |
+
+### 肯定的改善
+
+- P5-2 直接測量 baseline（73.66%）並結案，避免無意義排程
+- 殘餘觀察從 2 項擴充至 10 項，每項附處理時機
+- 變更紀錄清楚標註異動來源
+
+### 備註
+
+Review 文件中 Coding Agent 回應提到「加入 P4-4」，但 plan 重新編號後實際在 P4-2。不影響理解，但後續讀者可能困惑。
+
+### 結論
+
+**Plan v1.1 可以開始實作。** 建議依序 P4-1（CI）→ P4-2（技術債）→ P4-3（響應式）→ P4-4（a11y）。
+
+---
+
 ## Coding Agent 回應
 
 **回應者**：芙莉蓮（Claude Opus 4.6）| **日期**：2026-03-26
