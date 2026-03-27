@@ -12,7 +12,11 @@ import { useApp } from "../contexts/AppContext";
 import { useChart } from "../contexts/ChartContext";
 import { useVisualTheme } from "../contexts/VisualThemeContext";
 import { animations } from "../utils/animations";
-import { logger } from "../utils/logger";
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+  removeLocalStorageItem,
+} from "../utils/localStorage";
 
 interface DashboardGridProps {
   stocks: string[];
@@ -107,8 +111,8 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     const shouldReset = urlParams.get("reset") === "true";
 
     if (shouldReset) {
-      localStorage.removeItem("dashboard-layout");
-      localStorage.removeItem("dashboard-layout-version");
+      removeLocalStorageItem("dashboard-layout");
+      removeLocalStorageItem("dashboard-layout-version");
       // Remove reset parameter from URL
       urlParams.delete("reset");
       const newUrl =
@@ -118,34 +122,34 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     }
 
     // Check layout version
-    const layoutVersion = localStorage.getItem("dashboard-layout-version");
+    const layoutVersion = getLocalStorageItem<string>(
+      "dashboard-layout-version",
+      "",
+    );
     if (layoutVersion !== "snapshot-v20-pagination") {
       // Clear old layout when upgrading to pagination version
-      localStorage.removeItem("dashboard-layout");
-      localStorage.setItem(
+      removeLocalStorageItem("dashboard-layout");
+      setLocalStorageItem(
         "dashboard-layout-version",
         "snapshot-v20-pagination",
       );
     }
 
     // Load saved layout from localStorage (contains ALL stocks, not just current page)
-    const savedLayout = localStorage.getItem("dashboard-layout");
+    const savedLayoutItems = getLocalStorageItem<GridLayout.Layout[]>(
+      "dashboard-layout",
+      [],
+    );
     let existingLayout: Record<string, GridLayout.Layout> = {};
 
-    if (savedLayout) {
-      try {
-        const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
-        existingLayout = parsed.reduce(
-          (acc, item) => {
-            acc[item.i] = item;
-            return acc;
-          },
-          {} as Record<string, GridLayout.Layout>,
-        );
-      } catch (e) {
-        logger.error("Failed to load saved layout:", e);
-        localStorage.removeItem("dashboard-layout");
-      }
+    if (savedLayoutItems.length > 0) {
+      existingLayout = savedLayoutItems.reduce(
+        (acc, item) => {
+          acc[item.i] = item;
+          return acc;
+        },
+        {} as Record<string, GridLayout.Layout>,
+      );
     }
 
     // Generate layout for current page's stocks only
@@ -203,32 +207,25 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         setLayout(fixedLayout);
 
         // Merge with existing layout from other pages
-        const savedLayout = localStorage.getItem("dashboard-layout");
-        let allLayouts: Record<string, GridLayout.Layout> = {};
-        if (savedLayout) {
-          try {
-            const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
-            allLayouts = parsed.reduce(
-              (acc, item) => {
-                acc[item.i] = item;
-                return acc;
-              },
-              {} as Record<string, GridLayout.Layout>,
-            );
-          } catch (e) {
-            logger.error("Failed to parse saved layout:", e);
-          }
-        }
+        const savedFixedItems = getLocalStorageItem<GridLayout.Layout[]>(
+          "dashboard-layout",
+          [],
+        );
+        const allFixedLayouts: Record<string, GridLayout.Layout> =
+          savedFixedItems.reduce(
+            (acc, item) => {
+              acc[item.i] = item;
+              return acc;
+            },
+            {} as Record<string, GridLayout.Layout>,
+          );
 
         // Update with current page's layout
         fixedLayout.forEach((item) => {
-          allLayouts[item.i] = item;
+          allFixedLayouts[item.i] = item;
         });
 
-        localStorage.setItem(
-          "dashboard-layout",
-          JSON.stringify(Object.values(allLayouts)),
-        );
+        setLocalStorageItem("dashboard-layout", Object.values(allFixedLayouts));
         return;
       }
     }
@@ -236,32 +233,24 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     setLayout(correctedLayout);
 
     // Merge current page layout with existing layouts from other pages
-    const savedLayout = localStorage.getItem("dashboard-layout");
-    let allLayouts: Record<string, GridLayout.Layout> = {};
-    if (savedLayout) {
-      try {
-        const parsed = JSON.parse(savedLayout) as GridLayout.Layout[];
-        allLayouts = parsed.reduce(
-          (acc, item) => {
-            acc[item.i] = item;
-            return acc;
-          },
-          {} as Record<string, GridLayout.Layout>,
-        );
-      } catch (e) {
-        console.error("Failed to parse saved layout:", e);
-      }
-    }
+    const savedItems = getLocalStorageItem<GridLayout.Layout[]>(
+      "dashboard-layout",
+      [],
+    );
+    const allLayouts: Record<string, GridLayout.Layout> = savedItems.reduce(
+      (acc, item) => {
+        acc[item.i] = item;
+        return acc;
+      },
+      {} as Record<string, GridLayout.Layout>,
+    );
 
     // Update with current page's layout
     correctedLayout.forEach((item) => {
       allLayouts[item.i] = item;
     });
 
-    localStorage.setItem(
-      "dashboard-layout",
-      JSON.stringify(Object.values(allLayouts)),
-    );
+    setLocalStorageItem("dashboard-layout", Object.values(allLayouts));
   }, []);
 
   // Toggle chart type handler - must be before early return to follow Hooks rules
