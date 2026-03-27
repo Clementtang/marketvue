@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
-import { logger } from "../utils/logger";
+import { usePersistedState } from "../hooks/usePersistedState";
 
 // Visual theme types (Classic vs Warm Minimal)
 // Note: This is different from ColorTheme in ColorThemeSelector (Eastern/Western price colors)
@@ -15,39 +15,15 @@ const VisualThemeContext = createContext<VisualThemeContextType | undefined>(
   undefined,
 );
 
-const STORAGE_KEY = "marketvue_visual_theme";
-const DEFAULT_THEME: VisualTheme = "classic";
-
 interface VisualThemeProviderProps {
   children: ReactNode;
 }
 
 export function VisualThemeProvider({ children }: VisualThemeProviderProps) {
-  const [visualTheme, setVisualThemeState] = useState<VisualTheme>(() => {
-    // Initialize from localStorage
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === "classic" || stored === "warm") {
-        return stored;
-      }
-    } catch (error) {
-      logger.error("Failed to load visual theme from localStorage:", error);
-    }
-    return DEFAULT_THEME;
-  });
-
-  // Persist to localStorage whenever theme changes
-  useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, visualTheme);
-    } catch (error) {
-      logger.error("Failed to save visual theme to localStorage:", error);
-    }
-  }, [visualTheme]);
-
-  const setVisualTheme = (theme: VisualTheme) => {
-    setVisualThemeState(theme);
-  };
+  const [visualTheme, setVisualTheme] = usePersistedState<VisualTheme>(
+    "marketvue_visual_theme",
+    "classic",
+  );
 
   return (
     <VisualThemeContext.Provider value={{ visualTheme, setVisualTheme }}>
