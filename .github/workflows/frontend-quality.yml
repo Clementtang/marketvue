@@ -2,62 +2,64 @@ name: Frontend Quality
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig.json'
-      - 'vite.config.ts'
-      - '.github/workflows/frontend-quality.yml'
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "vite.config.ts"
+      - ".github/workflows/frontend-quality.yml"
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
     paths:
-      - 'src/**'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig.json'
-      - 'vite.config.ts'
-      - '.github/workflows/frontend-quality.yml'
+      - "src/**"
+      - "package.json"
+      - "package-lock.json"
+      - "tsconfig.json"
+      - "vite.config.ts"
+      - ".github/workflows/frontend-quality.yml"
 
 jobs:
   quality-check:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Run ESLint
-      run: npm run lint
-      continue-on-error: true
+      - name: Run ESLint
+        run: npm run lint
 
-    - name: TypeScript type check
-      run: npx tsc --noEmit
+      - name: Run tests
+        run: npm test -- --run
 
-    - name: Build production bundle
-      run: npm run build
+      - name: TypeScript type check
+        run: npx tsc -b
 
-    - name: Check bundle size
-      run: |
-        BUNDLE_SIZE=$(du -sh dist | cut -f1)
-        echo "## Build Results 📦" >> $GITHUB_STEP_SUMMARY
-        echo "" >> $GITHUB_STEP_SUMMARY
-        echo "- Bundle Size: $BUNDLE_SIZE" >> $GITHUB_STEP_SUMMARY
-        echo "- Build Status: ✅ Success" >> $GITHUB_STEP_SUMMARY
+      - name: Build production bundle
+        run: npm run build
 
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: frontend-build
-        path: dist/
-        retention-days: 7
+      - name: Check bundle size
+        run: |
+          BUNDLE_SIZE=$(du -sh dist | cut -f1)
+          echo "## Build Results 📦" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Bundle Size: $BUNDLE_SIZE" >> $GITHUB_STEP_SUMMARY
+          echo "- Build Status: ✅ Success" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: dist/
+          retention-days: 7
