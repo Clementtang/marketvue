@@ -1,29 +1,39 @@
-import { useState, useCallback } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
-import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/react';
-import StockManager from './components/StockManager';
-import TimeRangeSelector from './components/TimeRangeSelector';
-import DashboardGrid from './components/DashboardGrid';
-import ControlPanel from './components/ControlPanel';
-import ThemeSettings from './components/ThemeSettings';
-import ThemeGuide from './components/ThemeGuide';
-import NotificationBanner from './components/NotificationBanner';
-import Footer from './components/Footer';
-import { useTranslation } from './i18n/translations';
-import { TrendingUp } from 'lucide-react';
-import ErrorBoundary from './components/ErrorBoundary';
-import { AppProvider, useApp } from './contexts/AppContext';
-import { ChartProvider, useChart } from './contexts/ChartContext';
-import { ToastProvider } from './contexts/ToastContext';
-import { VisualThemeProvider, useVisualTheme } from './contexts/VisualThemeContext';
-import { StockListProvider, useStockList } from './contexts/StockListContext';
-import { ToastContainer } from './components/common/Toast';
-import { queryClient } from './config/queryClient';
+import { useState, useCallback } from "react";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/react";
+import StockManager from "./components/StockManager";
+import TimeRangeSelector from "./components/TimeRangeSelector";
+import DashboardGrid from "./components/DashboardGrid";
+import ControlPanel from "./components/ControlPanel";
+import ThemeSettings from "./components/ThemeSettings";
+import ThemeGuide from "./components/ThemeGuide";
+import NotificationBanner from "./components/NotificationBanner";
+import Footer from "./components/Footer";
+import { useTranslation } from "./i18n/translations";
+import { TrendingUp } from "lucide-react";
+import ErrorBoundary from "./components/ErrorBoundary";
+import { AppProvider, useApp } from "./contexts/AppContext";
+import { ChartProvider, useChart } from "./contexts/ChartContext";
+import { ToastProvider } from "./contexts/ToastContext";
+import {
+  VisualThemeProvider,
+  useVisualTheme,
+} from "./contexts/VisualThemeContext";
+import { StockListProvider, useStockList } from "./contexts/StockListContext";
+import { ToastContainer } from "./components/common/Toast";
+import { queryClient } from "./config/queryClient";
 
 function AppContent() {
   // Use Context hooks
-  const { language, colorTheme, setColorTheme, themeMode, setThemeMode, setLanguage } = useApp();
+  const {
+    language,
+    colorTheme,
+    setColorTheme,
+    themeMode,
+    setThemeMode,
+    setLanguage,
+  } = useApp();
   const { dateRange } = useChart();
   const { visualTheme } = useVisualTheme();
   const { stocks, actions, activeList } = useStockList();
@@ -35,13 +45,19 @@ function AppContent() {
   const t = useTranslation(language);
 
   // Stock management callbacks (now using StockListContext)
-  const handleAddStock = useCallback((symbol: string) => {
-    actions.addStock(symbol);
-  }, [actions]);
+  const handleAddStock = useCallback(
+    (symbol: string) => {
+      actions.addStock(symbol);
+    },
+    [actions],
+  );
 
-  const handleRemoveStock = useCallback((symbol: string) => {
-    actions.removeStock(symbol);
-  }, [actions]);
+  const handleRemoveStock = useCallback(
+    (symbol: string) => {
+      actions.removeStock(symbol);
+    },
+    [actions],
+  );
 
   // Show Theme Guide if requested
   if (showThemeGuide) {
@@ -54,42 +70,63 @@ function AppContent() {
 
   return (
     <ErrorBoundary language={language}>
-      <div className={`min-h-screen transition-colors flex flex-col relative ${
-        visualTheme === 'warm'
-          ? 'warm-gradient-bg noise-texture text-warm-800 dark:text-warm-200'
-          : 'bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100'
-      }`}>
+      <div
+        className={`min-h-screen transition-colors flex flex-col relative ${
+          visualTheme === "warm"
+            ? "warm-gradient-bg noise-texture text-warm-800 dark:text-warm-200"
+            : "bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100"
+        }`}
+      >
         <NotificationBanner t={t} />
 
-        <header className={`shadow-sm ${
-          visualTheme === 'warm'
-            ? 'bg-warm-100 dark:bg-warm-800 border-b border-warm-200 dark:border-warm-700'
-            : 'bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900'
-        }`}>
-          <div className="container mx-auto px-4 py-8">
+        <header
+          className={`shadow-sm ${
+            visualTheme === "warm"
+              ? "bg-warm-100 dark:bg-warm-800 border-b border-warm-200 dark:border-warm-700"
+              : "bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900"
+          }`}
+        >
+          <div className="container mx-auto px-4 py-4 sm:py-8">
             <div className="flex items-center justify-between">
-              <div className={`flex items-center gap-4 ${
-                visualTheme === 'warm'
-                  ? 'text-warm-800 dark:text-warm-100'
-                  : 'text-white'
-              }`}>
-                <TrendingUp size={36} className={visualTheme === 'warm' ? 'text-warm-accent-400' : ''} />
+              <div
+                className={`flex items-center gap-4 ${
+                  visualTheme === "warm"
+                    ? "text-warm-800 dark:text-warm-100"
+                    : "text-white"
+                }`}
+              >
+                <TrendingUp
+                  size={36}
+                  className={
+                    visualTheme === "warm" ? "text-warm-accent-400" : ""
+                  }
+                />
                 <div>
-                  <h1 className={`text-4xl font-bold ${visualTheme === 'warm' ? 'font-serif' : ''}`}>
+                  <h1
+                    className={`text-2xl sm:text-4xl font-bold ${visualTheme === "warm" ? "font-serif" : ""}`}
+                  >
                     {t.appTitle}
                   </h1>
-                  <p className={`text-sm mt-1 ${
-                    visualTheme === 'warm'
-                      ? 'text-warm-600 dark:text-warm-400 font-serif'
-                      : 'text-blue-100'
-                  }`}>
+                  <p
+                    className={`text-sm mt-1 ${
+                      visualTheme === "warm"
+                        ? "text-warm-600 dark:text-warm-400 font-serif"
+                        : "text-blue-100"
+                    }`}
+                  >
                     {t.appSubtitle}
                   </p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className={visualTheme === 'warm' ? 'text-warm-800 dark:text-warm-100' : ''}>
+                <div
+                  className={
+                    visualTheme === "warm"
+                      ? "text-warm-800 dark:text-warm-100"
+                      : ""
+                  }
+                >
                   <ThemeSettings
                     colorTheme={colorTheme}
                     onColorThemeChange={setColorTheme}
@@ -112,7 +149,7 @@ function AppContent() {
           <ControlPanel
             stocks={stocks}
             listName={activeList.name}
-            datePreset={dateRange.preset || '1m'}
+            datePreset={dateRange.preset || "1m"}
           >
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">

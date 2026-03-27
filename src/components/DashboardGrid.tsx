@@ -11,6 +11,7 @@ import { useTranslation } from "../i18n/translations";
 import { useApp } from "../contexts/AppContext";
 import { useChart } from "../contexts/ChartContext";
 import { useVisualTheme } from "../contexts/VisualThemeContext";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { animations } from "../utils/animations";
 import {
   getLocalStorageItem,
@@ -30,6 +31,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   const { chartType, setChartType, itemsPerPage } = useChart();
   const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
+  const isMobile = useIsMobile();
 
   // Local state for pagination (no need to be global)
   const [currentPage, setCurrentPage] = useState(1);
@@ -366,14 +368,15 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         <GridLayout
           className="layout"
           layout={layout}
-          cols={3}
-          rowHeight={220}
-          width={Math.max(containerWidth - 48, 300)}
+          cols={isMobile ? 1 : 3}
+          rowHeight={isMobile ? 300 : 220}
+          width={Math.max(containerWidth - (isMobile ? 16 : 48), 300)}
           onLayoutChange={handleLayoutChange}
           draggableHandle=".drag-handle"
           compactType="vertical"
           preventCollision={false}
-          isResizable={true}
+          isDraggable={!isMobile}
+          isResizable={!isMobile}
           resizeHandles={["se"]}
         >
           {trails.map((style, index) => {

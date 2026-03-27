@@ -1,10 +1,11 @@
-import { memo, useEffect, useCallback, useState } from "react";
+import { memo, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { useTransition, animated } from "@react-spring/web";
 import { useApp } from "../../contexts/AppContext";
 import { useVisualTheme } from "../../contexts/VisualThemeContext";
 import { useTranslation } from "../../i18n/translations";
 import { useNewsData } from "../../hooks/useNewsData";
+import { useIsMobile } from "../../hooks/useIsMobile";
 import { shouldReduceMotion } from "../../utils/animations";
 import NewsPanelHeader from "./NewsPanelHeader";
 import NewsCard from "./NewsCard";
@@ -15,20 +16,6 @@ interface NewsPanelProps {
   isOpen: boolean;
   onClose: () => void;
   symbol: string;
-}
-
-function useIsMobile() {
-  const [isMobile, setIsMobile] = useState(
-    typeof window !== "undefined" ? window.innerWidth < 768 : false,
-  );
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  return isMobile;
 }
 
 const NewsPanel = memo(function NewsPanel({
