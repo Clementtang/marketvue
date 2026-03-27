@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.17.0] - 2026-03-27
+
+### Added
+
+- **Mobile responsive layout** — GridLayout switches to single column on mobile (< 768px), disables drag/resize
+- **Shared `useIsMobile` hook** — extracted from NewsPanel for reuse across components
+- **ThemeSettings accessibility** — `role="dialog"`, `aria-modal`, ESC key to close, `aria-label` on trigger button
+- **NewsCard semantic link** — replaced `<div onClick>` with `<a>` tag for keyboard navigation and screen readers
+- **Focus trap support** — added `focus-trap-react` dependency for future modal focus trap implementation
+
+### Changed
+
+- **Header responsive** — padding `py-8` → `py-4 sm:py-8`, title `text-4xl` → `text-2xl sm:text-4xl`
+- **SummaryBar mobile** — shows first symbol + count on mobile instead of being hidden
+- **StockListSelector touch-friendly** — rename/delete buttons always visible on mobile (opacity-60), hover on desktop
+- **StockListSelector** — inline `<style>` keyframes moved to component styles
+
+### Fixed
+
+- **32 ESLint errors resolved** — type safety (`any` → concrete types), unused vars, proper eslint-disable for legitimate patterns
+- **CI pipeline strengthened** — ESLint strict (removed continue-on-error), frontend tests added, `tsc -b` matches Vercel, Python 3.11/3.12/3.13
+- **VisualThemeContext** — refactored to use shared `usePersistedState` hook (was duplicate localStorage logic)
+- **StockListContext** — removed redundant `isInitialized` constant
+- **Render cold start retry** — `useStockData` now uses `calculateRetryDelay` for 503 responses (5s/10s/15s vs 2s/4s/8s)
+- **DashboardGrid localStorage** — 10 direct localStorage calls replaced with safe util functions (Safari private mode)
+- **`.env.production` removed from git** — added `.env.example` for local development reference
+
 ## [1.16.2] - 2026-03-25
 
 ### Security

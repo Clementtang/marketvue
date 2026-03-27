@@ -145,7 +145,7 @@ export const DEFAULT_STOCKS = [
  */
 export const APP_METADATA = {
   NAME: "MarketVue",
-  VERSION: "1.16.2",
+  VERSION: "1.17.0",
   DESCRIPTION: "Real-time multi-market stock dashboard",
 } as const;
 

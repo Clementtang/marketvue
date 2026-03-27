@@ -28,7 +28,7 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 **相依關係**：ESLint strict 需先修正所有 lint 問題才能移除 continue-on-error。
 **驗收**：CI 全綠，無 continue-on-error，前端測試在 CI 中執行。
 
-**狀態**：待開始
+**狀態**：✅ 完成（`e53bdf3`, `b7446ba` 2026-03-27）
 
 > **優先序調整原因**：Review Warning #3 指出後續 P4-2~P4-4 的修改都不會被 CI 保護。CI 應先就位作為安全網。
 
@@ -46,7 +46,7 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 **相依關係**：無。
 **驗收**：`.env.production` 不在 git 中、VisualThemeContext 用 usePersistedState、冷啟動 retry 在 30s+ 範圍、DashboardGrid 無直接 localStorage 操作、無冗餘 code。
 
-**狀態**：待開始
+**狀態**：✅ 完成（`b4493fe`..`ec2bc22` 2026-03-27）。Branch protection 待手動操作。
 
 > **新增項目來源**：冷啟動 retry（Review Critical #1）、DashboardGrid localStorage（Review Critical #2）、`.env.example`（Review Warning #4）
 
@@ -63,7 +63,7 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 **相依關係**：useIsMobile 應先完成。GridLayout 建議先抽 `useGridLayout` hook 再改響應式。
 **驗收**：375px viewport 下所有功能可操作，無水平溢出。
 
-**狀態**：待開始
+**狀態**：✅ 完成（`7144de1` 2026-03-27）
 
 > **預估調整原因**：Review Warning #1 指出 DashboardGrid 420 行混合元件上做響應式風險高。改為先抽 hook 再改，預估 1h → 2-3h。
 
@@ -82,7 +82,7 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 **相依關係**：無，可獨立完成。
 **驗收**：Tab 鍵不離開 modal、ESC 可關閉、screen reader 可識別 dialog。
 
-**狀態**：待開始
+**狀態**：✅ 部分完成（`2aa22f1` 2026-03-27）。ThemeSettings ARIA/ESC、NewsCard 語義化、inline style 清理已完成。Focus trap 尚未套用至 CreateListModal/StockListSelector（`focus-trap-react` 已安裝，待後續整合）。
 
 > **方案決策來源**：Review Warning #2。新增 StockListSelector inline style 清理（Review Suggestion #1）。
 
@@ -190,3 +190,4 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 | ---------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 2026-03-25 | v1.0 | 初版，從 project-audit-2026-03-23.md 彙整 Phase 4-5 待辦                                                                                                                                                                   |
 | 2026-03-26 | v1.1 | 依據 review-p4-p5-plan.md 審閱結果修訂：優先序調整（CI 先行）、新增 5 項遺漏任務至 P4-2、GridLayout 預估調整、Focus trap 決定用 Radix UI、P5-1 新增 GitHub Actions audit、P5-2 baseline 已測量並達標、殘餘觀察擴充至 10 項 |
+| 2026-03-27 | v1.2 | Phase 4 實作完成（v1.17.0）：P4-1 CI 修復、P4-2 技術債清理、P4-3 響應式、P4-4 a11y 部分完成（focus trap 待整合）。9 commits `e53bdf3`..`2aa22f1`                                                                           |
