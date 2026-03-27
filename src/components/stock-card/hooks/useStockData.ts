@@ -1,11 +1,14 @@
-import { useMemo, useCallback } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchStockData, getStockQueryKey } from '../../../api/stockApi';
-import { fetchStockDataBatched } from '../../../api/batchStockApi';
-import { getErrorMessage } from '../../../utils/errorHandlers';
-import { API_CONFIG } from '../../../config/constants';
-import type { StockData } from '../../../types/stock';
-import type { Translations, Language } from '../../../i18n/translations';
+import { useMemo, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { fetchStockData, getStockQueryKey } from "../../../api/stockApi";
+import { fetchStockDataBatched } from "../../../api/batchStockApi";
+import {
+  getErrorMessage,
+  calculateRetryDelay,
+} from "../../../utils/errorHandlers";
+import { API_CONFIG } from "../../../config/constants";
+import type { StockData } from "../../../types/stock";
+import type { Translations, Language } from "../../../i18n/translations";
 
 // Enable batch API for better performance with multiple stocks
 const USE_BATCH_API = true;
@@ -62,11 +65,12 @@ export function useStockData({
       }
       return fetchStockData({ symbol, startDate, endDate });
     },
-    // Retry configuration with longer delays for rate limit issues
+    // Retry configuration — uses calculateRetryDelay for 503 cold start (5s/10s/15s)
     retry: API_CONFIG.RETRY_COUNT,
-    retryDelay: (attemptIndex) => {
-      // Longer backoff for rate limits: 2s, 4s, 8s, 16s...
-      return Math.min(2000 * 2 ** attemptIndex, 60000);
+    retryDelay: (attemptIndex, error) => {
+      const statusCode = (error as { response?: { status?: number } })?.response
+        ?.status;
+      return calculateRetryDelay(attemptIndex, statusCode);
     },
     // Cache data for longer to reduce requests
     staleTime: 5 * 60 * 1000, // 5 minutes
