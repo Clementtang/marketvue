@@ -70,22 +70,23 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 
 ### P4-4. 無障礙（A11y）
 
-| 項目                                | 做法                                                                      | 結果         |
-| ----------------------------------- | ------------------------------------------------------------------------- | ------------ |
-| ThemeSettings ARIA + ESC            | 加 `role="dialog"`, `aria-modal="true"`, ESC `onKeyDown` handler          | ✅ `2aa22f1` |
-| ThemeSettings aria-label            | button `title` → `aria-label`（雙語）                                     | ✅ `2aa22f1` |
-| NewsCard `<div onClick>` → `<a>`    | 改為語義化 `<a href>` + `target="_blank"`，移除 `onClick` + `window.open` | ✅ `2aa22f1` |
-| StockListSelector inline style 清理 | 內嵌 `<style>` keyframes 移除（動畫改由 component styles 處理）           | ✅ `2aa22f1` |
-| `focus-trap-react` 安裝             | `npm install focus-trap-react`（~3KB）                                    | ✅ `2aa22f1` |
-| Focus trap — CreateListModal        | 使用 `focus-trap-react` 包裹 modal                                        | ⏳ 待整合    |
-| Focus trap — StockListSelector      | 使用 `focus-trap-react` 包裹 dropdown                                     | ⏳ 待整合    |
+| 項目                                | 做法                                                                      | 結果                                        |
+| ----------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------- |
+| ThemeSettings ARIA + ESC            | 加 `role="dialog"`, `aria-modal="true"`, ESC `onKeyDown` handler          | ✅ `2aa22f1`                                |
+| ThemeSettings aria-label            | button `title` → `aria-label`（雙語）                                     | ✅ `2aa22f1`                                |
+| ThemeSettings focus trap            | `FocusTrap` 包裹 dropdown panel，`clickOutsideDeactivates: true`          | ✅ 補修 2026-03-31                          |
+| NewsCard `<div onClick>` → `<a>`    | 改為語義化 `<a href>` + `target="_blank"`，移除 `onClick` + `window.open` | ✅ `2aa22f1`                                |
+| StockListSelector inline style 清理 | 內嵌 `<style>` keyframes 移入 `src/index.css`                             | ✅ 補修 2026-03-31（原 `2aa22f1` 標記有誤） |
+| Focus trap — CreateListModal        | `FocusTrap` 包裹 modal + `role="dialog"` + `aria-modal="true"`            | ✅ 補修 2026-03-31                          |
+| Focus trap — StockListSelector      | `FocusTrap` 包裹 dropdown，`clickOutsideDeactivates: true`                | ✅ 補修 2026-03-31                          |
 
-**技術決策變更**：原計畫用 Radix UI，實作時改為 `focus-trap-react`。Radix Dialog 會接管整個 modal DOM 結構（Portal + Overlay + Content），與現有佈局衝突大。`focus-trap-react` 只做 focus trap 不接管 DOM，侵入性更低。
-**驗收**：ThemeSettings ESC 可關閉、NewsCard 鍵盤可 Enter 導航。Focus trap 待後續整合後驗收 Tab 循環。
+**技術決策變更**：原計畫用 Radix UI，實作時改為 `focus-trap-react`（named import `{ FocusTrap }`）。Radix Dialog 接管整個 modal DOM 結構，與現有佈局衝突大。`focus-trap-react` 只做 focus trap 不接管 DOM，侵入性更低。
+**驗收**：ThemeSettings ESC 可關閉、NewsCard 鍵盤可 Enter 導航、Tab 鍵在所有 modal/dropdown 內循環不逸出。
 
-**狀態**：✅ 部分完成（2026-03-27）。4/6 項已完成，2 項 focus trap 整合待後續。
+**狀態**：✅ 完成（2026-03-31 補修完畢）
 
 > **方案決策來源**：Review Warning #2。新增 StockListSelector inline style 清理（Review Suggestion #1）。
+> **補修來源**：Phase 4 Code Review FAIL #2（inline style）、FAIL #3（focus trap 零整合）。
 
 ### Phase 4 優先序
 
@@ -187,8 +188,9 @@ Phase 5 聚焦**長期規劃**：供應鏈安全、依賴管理、監控。
 
 ## 變更紀錄
 
-| 日期       | 版本 | 變更                                                                                                                                                                                                                       |
-| ---------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-03-25 | v1.0 | 初版，從 project-audit-2026-03-23.md 彙整 Phase 4-5 待辦                                                                                                                                                                   |
-| 2026-03-26 | v1.1 | 依據 review-p4-p5-plan.md 審閱結果修訂：優先序調整（CI 先行）、新增 5 項遺漏任務至 P4-2、GridLayout 預估調整、Focus trap 決定用 Radix UI、P5-1 新增 GitHub Actions audit、P5-2 baseline 已測量並達標、殘餘觀察擴充至 10 項 |
-| 2026-03-27 | v1.2 | Phase 4 實作完成（v1.17.0）：P4-1 CI 修復、P4-2 技術債清理、P4-3 響應式、P4-4 a11y 部分完成（focus trap 待整合）。9 commits `e53bdf3`..`2aa22f1`                                                                           |
+| 日期       | 版本 | 變更                                                                                                                                                                                                                               |
+| ---------- | ---- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-03-25 | v1.0 | 初版，從 project-audit-2026-03-23.md 彙整 Phase 4-5 待辦                                                                                                                                                                           |
+| 2026-03-26 | v1.1 | 依據 review-p4-p5-plan.md 審閱結果修訂：優先序調整（CI 先行）、新增 5 項遺漏任務至 P4-2、GridLayout 預估調整、Focus trap 決定用 Radix UI、P5-1 新增 GitHub Actions audit、P5-2 baseline 已測量並達標、殘餘觀察擴充至 10 項         |
+| 2026-03-27 | v1.2 | Phase 4 實作完成（v1.17.0）：P4-1 CI 修復、P4-2 技術債清理、P4-3 響應式、P4-4 a11y 部分完成（focus trap 待整合）。9 commits `e53bdf3`..`2aa22f1`                                                                                   |
+| 2026-03-31 | v1.3 | Phase 4 補修：FAIL #2 inline style 移入 index.css、FAIL #3 focus-trap-react 整合至 3 個元件、CreateListModal 加 role/aria-modal。FAIL #1 eslint-disable 為 reviewer 誤判（rule 是 v7 真實規則），comments 已恢復。Phase 4 全部完成 |
