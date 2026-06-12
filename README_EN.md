@@ -132,7 +132,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 - **Lucide Icons** - Beautiful icon library
 - **modern-screenshot** - High-quality screenshots (supports modern CSS)
 - **Context API** - Global state management (AppContext, ChartContext, ToastContext, VisualThemeContext)
-- **Custom Hooks** - Reusable logic (useRetry, useStockData, useToast)
+- **Custom Hooks** - Reusable logic (useStockData, usePersistedState, useStockSearch, useIsMobile)
 - **Animation System** - Unified animation configuration (animations.ts)
 - **Batch API System** - Intelligent request queue and batch processing (batchStockApi)
 - **Google Fonts** - Playfair Display (serif), Inter (sans-serif), Noto Sans TC (Chinese)
@@ -339,10 +339,9 @@ marketvue/
 │   │   ├── VisualThemeContext.tsx # Visual theme
 │   │   └── StockListContext.tsx # Stock list management
 │   ├── hooks/                    # Custom Hooks
-│   │   ├── useRetry.ts          # Retry logic
+│   │   ├── usePersistedState.ts # localStorage-backed state
 │   │   ├── useStockListReducer.ts # List state reducer
-│   │   ├── useStockSearch.ts    # Stock search hook
-│   │   └── index.ts
+│   │   └── useStockSearch.ts    # Stock search hook
 │   ├── data/
 │   │   └── stocks/              # Stock search database
 │   │       ├── tw-listed.json   # Taiwan listed (392 stocks)
@@ -355,7 +354,8 @@ marketvue/
 │   │   ├── stockList.ts         # List type definitions
 │   │   └── stockSearch.ts       # Search type definitions
 │   ├── utils/
-│   │   ├── screenshot.ts        # Screenshot utility functions
+│   │   ├── screenshot.ts        # Screenshot utilities (copy/download)
+│   │   ├── gridReorder.ts       # Map grid drags to watchlist order
 │   │   ├── animations.ts        # Animation configuration
 │   │   └── migration.ts         # Data migration utility
 │   ├── config/

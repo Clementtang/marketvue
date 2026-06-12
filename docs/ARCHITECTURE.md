@@ -66,7 +66,7 @@ MarketVue is a full-stack application consisting of a React frontend and Flask b
 - **Lucide Icons**: Beautiful SVG icon set
 - **modern-screenshot**: High-quality screenshots with modern CSS support
 - **Context API**: Global state management (AppContext, ChartContext, StockListContext, ToastContext, VisualThemeContext)
-- **Custom Hooks**: Reusable logic (useRetry, useStockData, useNewsData, usePersistedState, useStockListReducer, useStockSearch)
+- **Custom Hooks**: Reusable logic (useStockData, useNewsData, usePersistedState, useStockListReducer, useStockSearch, useIsMobile)
 - **Animation System**: Unified animation configuration (animations.ts)
 - **Batch API System**: Intelligent request queue and batch processing (batchStockApi)
 - **Google Fonts**: Playfair Display (serif), Inter (sans-serif), Noto Sans TC (Chinese)
@@ -104,8 +104,8 @@ src/
 │   │   └── ChartTooltip.tsx     # Chart tooltip component
 │   ├── StockManager.tsx         # Add/remove stocks with pagination
 │   ├── TimeRangeSelector.tsx    # Date range picker
-│   ├── DashboardGrid.tsx        # 3x3 grid layout with stagger animation
-│   ├── ScreenshotButton.tsx     # 16:9 screenshot with clipboard copy
+│   ├── DashboardGrid.tsx        # Drag-reorderable grid (order = watchlist)
+│   ├── ScreenshotButton.tsx     # Screenshot: clipboard copy or PNG download
 │   ├── ThemeSettings.tsx        # Settings modal
 │   ├── ThemeGuide.tsx           # Visual theme design guide
 │   └── ErrorBoundary.tsx        # Error boundary
@@ -116,14 +116,14 @@ src/
 │   ├── ToastContext.tsx         # Toast notifications
 │   └── VisualThemeContext.tsx   # Visual theme (Classic/Warm Minimal)
 ├── hooks/                       # Custom hooks
-│   ├── useRetry.ts              # Retry logic for API calls
 │   ├── useNewsData.ts           # News data fetching
 │   ├── usePersistedState.ts     # localStorage-backed state
 │   ├── useStockListReducer.ts   # Stock list state management
 │   ├── useStockSearch.ts        # Stock symbol search
-│   └── index.ts                 # Hook exports
+│   └── useIsMobile.ts           # Responsive breakpoint hook
 ├── utils/
-│   ├── screenshot.ts            # Screenshot utility functions
+│   ├── screenshot.ts            # Screenshot utilities (copy/download)
+│   ├── gridReorder.ts           # Map grid drags to watchlist order
 │   └── animations.ts            # Animation configuration
 ├── config/
 │   └── chartTheme.ts            # Unified theme configuration
@@ -312,13 +312,18 @@ Component Mount → react-spring hooks
 - **Persistence**: All lists and active list saved in localStorage
 - **Screenshot Compatible**: Each list can be screenshot independently
 
-### Screenshot Feature (v1.5.0)
+### Screenshot Feature (v1.5.0, extended v1.18.0–v1.20.0)
 
 - **Library**: modern-screenshot (supports modern CSS)
-- **Aspect Ratio**: 16:9 optimized for presentations
-- **Output**: High-quality PNG to clipboard
+- **Output size**: Scaled by width to a target (default 1920px), preserving the
+  element's true aspect ratio
+- **Delivery**: Copies a PNG to the clipboard when the browser supports image
+  clipboard writes, otherwise downloads a PNG file; an explicit Download button
+  is always available (works in Firefox/Safari)
 - **Theme Support**: Works with both light/dark modes and visual themes
-- **Page Support**: Screenshot current page only (9 stocks max)
+- **Page Support**: Capture the current page, or use "All" to capture every
+  stock across all pages in one image (cache is pre-warmed first to avoid
+  loading skeletons)
 
 ### Clipboard Import/Export (v1.5.1)
 
