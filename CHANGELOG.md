@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.18.0] - 2026-06-12
+
+### Added
+
+- **Screenshot download fallback** — new `captureAndDownload` / `captureScreenshot` utilities save the dashboard as a PNG file when clipboard image writes are unavailable, so the feature now works in Firefox and Safari (previously the button was hidden entirely)
+- **Explicit "Download" button** — alongside the clipboard copy action, the screenshot toolbar always offers a direct PNG download
+- **Distinct capture feedback** — UI now confirms whether the screenshot was copied to the clipboard or saved as a file, with bilingual messages and a failure state
+- **i18n keys for screenshots** — `screenshot`, `capturing`, `downloadScreenshot`, `screenshotCopied`, `screenshotDownloaded`, `screenshotFailed`, and titles (en-US / zh-TW)
+
+### Changed
+
+- **Predictable screenshot dimensions** — capture now scales by width to the target (default 1920px) preserving the element's true aspect ratio, instead of the misleading `min(scaleX, scaleY)` 16:9 letterbox
+- **`isClipboardImageSupported`** — replaces `isClipboardAvailable` (kept as a deprecated alias) and also verifies `clipboard.write` exists
+
 ## [1.17.0] - 2026-03-27
 
 ### Added
