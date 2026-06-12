@@ -7,6 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.0] - 2026-06-12
+
+### Added
+
+- **Capture all stocks ("All" button)** — when the watchlist spans more than one page, a new screenshot option captures every stock in a single image instead of just the current page. It pre-warms the React Query cache for all symbols (so no card shows a loading skeleton), renders them on one page, captures, then restores the paginated view
+- **`fullCapture` API on ScreenshotButton** — optional `{ prepare, cleanup }` hooks let a parent expand off-page content before capture and restore it afterwards
+- **i18n keys** — `screenshotAll`, `screenshotAllTitle` (en-US / zh-TW)
+
+## [1.19.1] - 2026-06-12
+
+### Removed
+
+- **Dead `useRetry` hook** — `src/hooks/useRetry.ts` (353 lines) and its test were unused; React Query handles retry/backoff for stock data
+- **Unused `hooks/index.ts` barrel** — every consumer imports hooks directly; the re-export barrel had no importers
+- **Unreachable single-fetch path** — `fetchStockData` and its duplicate `calculateMA` in `stockApi.ts` were only reached via the always-true `USE_BATCH_API` flag; `useStockData` now always uses the batched endpoint. `stockApi.ts` keeps only `getStockQueryKey`
+- **Stale config blocks in `constants.ts`** — removed unused `TIME_RANGES` (key drift: `1mo`/`3mo` vs the selector's `1m`/`3m`), `STORAGE_KEYS`, `GRID_CONFIG` (12-col, unused), `DEFAULT_STOCKS`, `VALIDATION` (`MAX_STOCK_CARDS: 20` conflicted with `MAX_STOCKS_PER_LIST: 18`), and `APP_METADATA` (duplicated the version; `package.json` is now the single source)
+
+## [1.19.0] - 2026-06-12
+
+### Changed
+
+- **Single source of truth for card arrangement** — the dashboard grid now derives its layout directly from the watchlist order. Dragging a card reorders the watchlist (`reorderStocks`) instead of writing to a separate `dashboard-layout` localStorage map, eliminating the drift between list order and grid position
+- **DashboardGrid simplified** — removed the parallel layout persistence, the `snapshot-v20-pagination` versioning, the `?reset=true` handling, the forced-height correction, and the "all cards stacked at x=0" repair hack (~110 lines lighter); cards are now a uniform, non-resizable grid whose order is the only variable
+
+### Added
+
+- **`utils/gridReorder.ts`** — pure `layoutToOrder` / `applyPageReorder` helpers that translate a drag into a new watchlist order, with unit tests (6 cases)
+
+## [1.18.0] - 2026-06-12
+
+### Added
+
+- **Screenshot download fallback** — new `captureAndDownload` / `captureScreenshot` utilities save the dashboard as a PNG file when clipboard image writes are unavailable, so the feature now works in Firefox and Safari (previously the button was hidden entirely)
+- **Explicit "Download" button** — alongside the clipboard copy action, the screenshot toolbar always offers a direct PNG download
+- **Distinct capture feedback** — UI now confirms whether the screenshot was copied to the clipboard or saved as a file, with bilingual messages and a failure state
+- **i18n keys for screenshots** — `screenshot`, `capturing`, `downloadScreenshot`, `screenshotCopied`, `screenshotDownloaded`, `screenshotFailed`, and titles (en-US / zh-TW)
+
+### Changed
+
+- **Predictable screenshot dimensions** — capture now scales by width to the target (default 1920px) preserving the element's true aspect ratio, instead of the misleading `min(scaleX, scaleY)` 16:9 letterbox
+- **`isClipboardImageSupported`** — replaces `isClipboardAvailable` (kept as a deprecated alias) and also verifies `clipboard.write` exists
+
 ## [1.17.0] - 2026-03-27
 
 ### Added

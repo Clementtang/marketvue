@@ -36,9 +36,10 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 
 - 📸 **Screenshot**
   - One-click copy dashboard screenshot to clipboard
-  - 16:9 aspect ratio optimized (for presentations)
+  - Built-in PNG download fallback — works in Firefox / Safari and other browsers without image-clipboard support
+  - Predictable output size (1920px wide by default, preserving the true aspect ratio)
   - Support light/dark themes
-  - Each page can be screenshot independently
+  - Capture each page independently, or use "All" to grab every stock across all pages in one image
 
 - 🎨 **Customization Options**
   - Visual Theme System (Classic / Warm Minimal)
@@ -131,7 +132,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 - **Lucide Icons** - Beautiful icon library
 - **modern-screenshot** - High-quality screenshots (supports modern CSS)
 - **Context API** - Global state management (AppContext, ChartContext, ToastContext, VisualThemeContext)
-- **Custom Hooks** - Reusable logic (useRetry, useStockData, useToast)
+- **Custom Hooks** - Reusable logic (useStockData, usePersistedState, useStockSearch, useIsMobile)
 - **Animation System** - Unified animation configuration (animations.ts)
 - **Batch API System** - Intelligent request queue and batch processing (batchStockApi)
 - **Google Fonts** - Playfair Display (serif), Inter (sans-serif), Noto Sans TC (Chinese)
@@ -230,8 +231,9 @@ Backend API will run at `http://localhost:5001`
    - Toggle Candlestick / Line chart
 
 5. **Screenshot**
-   - Click the green "Screenshot" button in the top-right
-   - Dashboard screenshot is automatically copied to clipboard
+   - Click the green "Screenshot" button in the top-right: supported browsers copy to the clipboard, otherwise a PNG file is downloaded automatically
+   - The adjacent "Download" button always saves a PNG file
+   - When the watchlist spans more than one page, the "All" button captures every stock in a single image
    - Paste directly into presentations, documents, or chat apps
    - Auto-matches current theme (light/dark)
 
@@ -337,10 +339,9 @@ marketvue/
 │   │   ├── VisualThemeContext.tsx # Visual theme
 │   │   └── StockListContext.tsx # Stock list management
 │   ├── hooks/                    # Custom Hooks
-│   │   ├── useRetry.ts          # Retry logic
+│   │   ├── usePersistedState.ts # localStorage-backed state
 │   │   ├── useStockListReducer.ts # List state reducer
-│   │   ├── useStockSearch.ts    # Stock search hook
-│   │   └── index.ts
+│   │   └── useStockSearch.ts    # Stock search hook
 │   ├── data/
 │   │   └── stocks/              # Stock search database
 │   │       ├── tw-listed.json   # Taiwan listed (392 stocks)
@@ -353,7 +354,8 @@ marketvue/
 │   │   ├── stockList.ts         # List type definitions
 │   │   └── stockSearch.ts       # Search type definitions
 │   ├── utils/
-│   │   ├── screenshot.ts        # Screenshot utility functions
+│   │   ├── screenshot.ts        # Screenshot utilities (copy/download)
+│   │   ├── gridReorder.ts       # Map grid drags to watchlist order
 │   │   ├── animations.ts        # Animation configuration
 │   │   └── migration.ts         # Data migration utility
 │   ├── config/
