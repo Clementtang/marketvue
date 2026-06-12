@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Camera, Download } from 'lucide-react';
+import { Camera, Download, Layers } from 'lucide-react';
 import {
   captureScreenshot,
   captureAndDownload,
@@ -11,6 +11,16 @@ import { useTranslation, type Language } from '../i18n/translations';
 interface ScreenshotButtonProps {
   targetElementId: string;
   language: Language;
+  /**
+   * Optional hooks for capturing content that spans multiple pages. When
+   * provided, an extra "All" button renders. `prepare` must make every item
+   * visible in `targetElementId` (and resolve once it is ready to capture);
+   * `cleanup` restores the normal view afterwards.
+   */
+  fullCapture?: {
+    prepare: () => Promise<void>;
+    cleanup: () => void;
+  };
 }
 
 type Feedback = 'copied' | 'downloaded' | 'failed' | null;
@@ -23,7 +33,11 @@ type Feedback = 'copied' | 'downloaded' | 'failed' | null;
  * A secondary button always offers an explicit PNG download, so the feature
  * works in every browser (including Firefox and Safari).
  */
-const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) => {
+const ScreenshotButton = ({
+  targetElementId,
+  language,
+  fullCapture,
+}: ScreenshotButtonProps) => {
   const { visualTheme } = useVisualTheme();
   const t = useTranslation(language);
   const isWarm = visualTheme === 'warm';
@@ -57,6 +71,22 @@ const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) 
     setIsCapturing(false);
     showFeedback(ok ? 'downloaded' : 'failed');
   }, [isCapturing, targetElementId, showFeedback]);
+
+  const handleCaptureAll = useCallback(async () => {
+    if (isCapturing || !fullCapture) return;
+    setIsCapturing(true);
+    setFeedback(null);
+    try {
+      await fullCapture.prepare();
+      const result = await captureScreenshot(targetElementId);
+      showFeedback(result);
+    } catch {
+      showFeedback('failed');
+    } finally {
+      fullCapture.cleanup();
+      setIsCapturing(false);
+    }
+  }, [isCapturing, fullCapture, targetElementId, showFeedback]);
 
   const primaryClasses = isWarm
     ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
@@ -107,6 +137,20 @@ const ScreenshotButton = ({ targetElementId, language }: ScreenshotButtonProps) 
           aria-label={t.downloadScreenshotTitle}
         >
           <Download size={18} />
+        </button>
+      )}
+
+      {/* Capture every stock across all pages in a single image */}
+      {fullCapture && (
+        <button
+          onClick={handleCaptureAll}
+          disabled={isCapturing}
+          className={`flex items-center gap-1.5 px-3 py-2 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed ${secondaryClasses}`}
+          title={t.screenshotAllTitle}
+          aria-label={t.screenshotAllTitle}
+        >
+          <Layers size={18} />
+          <span className="text-sm font-medium">{t.screenshotAll}</span>
         </button>
       )}
 

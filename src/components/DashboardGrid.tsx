@@ -15,6 +15,9 @@ import { useStockList } from "../contexts/StockListContext";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { animations } from "../utils/animations";
 import { layoutToOrder, applyPageReorder } from "../utils/gridReorder";
+import { queryClient } from "../config/queryClient";
+import { getStockQueryKey } from "../api/stockApi";
+import { fetchStockDataBatched } from "../api/batchStockApi";
 
 interface DashboardGridProps {
   stocks: string[];
@@ -38,6 +41,10 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [containerWidth, setContainerWidth] = useState(1200);
 
+  // When capturing the whole watchlist, every stock is rendered on one page so
+  // the screenshot includes all of them (not just the current page).
+  const [isCapturingAll, setIsCapturingAll] = useState(false);
+
   const cols = isMobile ? 1 : COLS;
 
   // The current page's slice of the single source of truth (watchlist order).
@@ -47,12 +54,17 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     [stocks, pageStart, itemsPerPage],
   );
 
+  // What actually gets rendered: the current page normally, or every stock
+  // while a full-watchlist screenshot is being taken.
+  const displayStocks = isCapturingAll ? stocks : paginatedStocks;
+  const hasMultiplePages = stocks.length > itemsPerPage;
+
   // Layout is DERIVED from the watchlist order — there is no separate persisted
   // layout. Position in the array is the single source of truth; dragging a card
   // commits a new order back to the watchlist (see handleDragStop).
   const layout = useMemo<GridLayout.Layout[]>(
     () =>
-      paginatedStocks.map((symbol, index) => ({
+      displayStocks.map((symbol, index) => ({
         i: symbol,
         x: index % cols,
         y: Math.floor(index / cols) * CARD_H,
@@ -64,15 +76,17 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         maxH: CARD_H,
         static: false,
       })),
-    [paginatedStocks, cols],
+    [displayStocks, cols],
   );
 
-  // Stagger animation for stock cards
-  const trails = useTrail(paginatedStocks.length, {
+  // Stagger animation for stock cards. Disabled during a full capture so the
+  // screenshot is taken with cards fully visible, not mid-fade.
+  const trails = useTrail(displayStocks.length, {
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0px)" },
     config: animations.gentle,
     reset: true,
+    immediate: isCapturingAll,
   });
 
   // Keep pagination sensible as the watchlist changes: jump to the last page
@@ -132,6 +146,29 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   const handleToggleChartType = useCallback(() => {
     setChartType(chartType === "line" ? "candlestick" : "line");
   }, [chartType, setChartType]);
+
+  // Prepare a full-watchlist screenshot: warm the React Query cache for every
+  // stock (so no card renders a loading skeleton), then render them all on one
+  // page and wait for charts to settle. Resolves once the grid is ready to be
+  // captured by ScreenshotButton.
+  const prepareFullCapture = useCallback(async () => {
+    await Promise.allSettled(
+      stocks.map((symbol) =>
+        queryClient.ensureQueryData({
+          queryKey: getStockQueryKey({ symbol, startDate, endDate }),
+          queryFn: () => fetchStockDataBatched({ symbol, startDate, endDate }),
+          staleTime: 5 * 60 * 1000,
+        }),
+      ),
+    );
+    setIsCapturingAll(true);
+    // Let React render every card and Recharts finish its entry animation.
+    await new Promise((resolve) => setTimeout(resolve, 600));
+  }, [stocks, startDate, endDate]);
+
+  const endFullCapture = useCallback(() => {
+    setIsCapturingAll(false);
+  }, []);
 
   if (stocks.length === 0) {
     return (
@@ -231,6 +268,11 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           <ScreenshotButton
             targetElementId="dashboard-grid-layout"
             language={language}
+            fullCapture={
+              hasMultiplePages
+                ? { prepare: prepareFullCapture, cleanup: endFullCapture }
+                : undefined
+            }
           />
         </div>
       </div>
@@ -246,11 +288,11 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
           draggableHandle=".drag-handle"
           compactType="vertical"
           preventCollision={false}
-          isDraggable={!isMobile}
+          isDraggable={!isMobile && !isCapturingAll}
           isResizable={false}
         >
           {trails.map((style, index) => {
-            const symbol = paginatedStocks[index];
+            const symbol = displayStocks[index];
             return (
               <animated.div
                 key={symbol}

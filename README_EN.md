@@ -39,7 +39,7 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
   - Built-in PNG download fallback — works in Firefox / Safari and other browsers without image-clipboard support
   - Predictable output size (1920px wide by default, preserving the true aspect ratio)
   - Support light/dark themes
-  - Each page can be screenshot independently
+  - Capture each page independently, or use "All" to grab every stock across all pages in one image
 
 - 🎨 **Customization Options**
   - Visual Theme System (Classic / Warm Minimal)
@@ -233,6 +233,7 @@ Backend API will run at `http://localhost:5001`
 5. **Screenshot**
    - Click the green "Screenshot" button in the top-right: supported browsers copy to the clipboard, otherwise a PNG file is downloaded automatically
    - The adjacent "Download" button always saves a PNG file
+   - When the watchlist spans more than one page, the "All" button captures every stock in a single image
    - Paste directly into presentations, documents, or chat apps
    - Auto-matches current theme (light/dark)
 

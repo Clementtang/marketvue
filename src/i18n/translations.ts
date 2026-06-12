@@ -51,11 +51,13 @@ export interface Translations {
   screenshot: string;
   capturing: string;
   downloadScreenshot: string;
+  screenshotAll: string;
   screenshotCopied: string;
   screenshotDownloaded: string;
   screenshotFailed: string;
   copyScreenshotTitle: string;
   downloadScreenshotTitle: string;
+  screenshotAllTitle: string;
 
   // Stock examples
   stockExampleTaiwan: string;
@@ -226,11 +228,13 @@ export const translations: Record<Language, Translations> = {
     screenshot: "Screenshot",
     capturing: "Capturing...",
     downloadScreenshot: "Download",
+    screenshotAll: "All",
     screenshotCopied: "✓ Copied to clipboard",
     screenshotDownloaded: "✓ Saved as PNG file",
     screenshotFailed: "Screenshot failed",
     copyScreenshotTitle: "Copy screenshot to clipboard",
     downloadScreenshotTitle: "Download screenshot as PNG",
+    screenshotAllTitle: "Capture all stocks across every page",
 
     // Stock examples
     stockExampleTaiwan: "Taiwan: 2330.TW (TSMC)",
@@ -401,11 +405,13 @@ export const translations: Record<Language, Translations> = {
     screenshot: "截圖",
     capturing: "截圖中...",
     downloadScreenshot: "下載",
+    screenshotAll: "全部",
     screenshotCopied: "✓ 已複製到剪貼簿",
     screenshotDownloaded: "✓ 已儲存為 PNG 檔",
     screenshotFailed: "截圖失敗",
     copyScreenshotTitle: "複製截圖到剪貼簿",
     downloadScreenshotTitle: "下載截圖 PNG 檔",
+    screenshotAllTitle: "擷取所有分頁的全部股票",
 
     // Stock examples
     stockExampleTaiwan: "台股：2330.TW（台積電）",

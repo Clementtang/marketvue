@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.20.0] - 2026-06-12
+
+### Added
+
+- **Capture all stocks ("All" button)** — when the watchlist spans more than one page, a new screenshot option captures every stock in a single image instead of just the current page. It pre-warms the React Query cache for all symbols (so no card shows a loading skeleton), renders them on one page, captures, then restores the paginated view
+- **`fullCapture` API on ScreenshotButton** — optional `{ prepare, cleanup }` hooks let a parent expand off-page content before capture and restore it afterwards
+- **i18n keys** — `screenshotAll`, `screenshotAllTitle` (en-US / zh-TW)
+
 ## [1.19.1] - 2026-06-12
 
 ### Removed
