@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.1] - 2026-06-12
+
+### Removed
+
+- **Dead `useRetry` hook** — `src/hooks/useRetry.ts` (353 lines) and its test were unused; React Query handles retry/backoff for stock data
+- **Unused `hooks/index.ts` barrel** — every consumer imports hooks directly; the re-export barrel had no importers
+- **Unreachable single-fetch path** — `fetchStockData` and its duplicate `calculateMA` in `stockApi.ts` were only reached via the always-true `USE_BATCH_API` flag; `useStockData` now always uses the batched endpoint. `stockApi.ts` keeps only `getStockQueryKey`
+- **Stale config blocks in `constants.ts`** — removed unused `TIME_RANGES` (key drift: `1mo`/`3mo` vs the selector's `1m`/`3m`), `STORAGE_KEYS`, `GRID_CONFIG` (12-col, unused), `DEFAULT_STOCKS`, `VALIDATION` (`MAX_STOCK_CARDS: 20` conflicted with `MAX_STOCKS_PER_LIST: 18`), and `APP_METADATA` (duplicated the version; `package.json` is now the single source)
+
 ## [1.19.0] - 2026-06-12
 
 ### Changed

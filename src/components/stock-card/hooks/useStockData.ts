@@ -1,6 +1,6 @@
 import { useMemo, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchStockData, getStockQueryKey } from "../../../api/stockApi";
+import { getStockQueryKey } from "../../../api/stockApi";
 import { fetchStockDataBatched } from "../../../api/batchStockApi";
 import {
   getErrorMessage,
@@ -9,9 +9,6 @@ import {
 import { API_CONFIG } from "../../../config/constants";
 import type { StockData } from "../../../types/stock";
 import type { Translations, Language } from "../../../i18n/translations";
-
-// Enable batch API for better performance with multiple stocks
-const USE_BATCH_API = true;
 
 interface UseStockDataOptions {
   symbol: string;
@@ -58,13 +55,9 @@ export function useStockData({
     failureCount,
   } = useQuery({
     queryKey,
-    queryFn: () => {
-      // Use batch API for better performance
-      if (USE_BATCH_API) {
-        return fetchStockDataBatched({ symbol, startDate, endDate });
-      }
-      return fetchStockData({ symbol, startDate, endDate });
-    },
+    // Requests are collected and sent through the batched endpoint for
+    // better performance with multiple stocks (see batchStockApi.ts).
+    queryFn: () => fetchStockDataBatched({ symbol, startDate, endDate }),
     // Retry configuration — uses calculateRetryDelay for 503 cold start (5s/10s/15s)
     retry: API_CONFIG.RETRY_COUNT,
     retryDelay: (attemptIndex, error) => {
