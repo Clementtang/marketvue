@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.19.0] - 2026-06-12
+
+### Changed
+
+- **Single source of truth for card arrangement** — the dashboard grid now derives its layout directly from the watchlist order. Dragging a card reorders the watchlist (`reorderStocks`) instead of writing to a separate `dashboard-layout` localStorage map, eliminating the drift between list order and grid position
+- **DashboardGrid simplified** — removed the parallel layout persistence, the `snapshot-v20-pagination` versioning, the `?reset=true` handling, the forced-height correction, and the "all cards stacked at x=0" repair hack (~110 lines lighter); cards are now a uniform, non-resizable grid whose order is the only variable
+
+### Added
+
+- **`utils/gridReorder.ts`** — pure `layoutToOrder` / `applyPageReorder` helpers that translate a drag into a new watchlist order, with unit tests (6 cases)
+
 ## [1.18.0] - 2026-06-12
 
 ### Added

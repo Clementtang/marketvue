@@ -11,13 +11,10 @@ import { useTranslation } from "../i18n/translations";
 import { useApp } from "../contexts/AppContext";
 import { useChart } from "../contexts/ChartContext";
 import { useVisualTheme } from "../contexts/VisualThemeContext";
+import { useStockList } from "../contexts/StockListContext";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { animations } from "../utils/animations";
-import {
-  getLocalStorageItem,
-  setLocalStorageItem,
-  removeLocalStorageItem,
-} from "../utils/localStorage";
+import { layoutToOrder, applyPageReorder } from "../utils/gridReorder";
 
 interface DashboardGridProps {
   stocks: string[];
@@ -25,69 +22,78 @@ interface DashboardGridProps {
   endDate: string;
 }
 
+// Card height in grid row units (1 row = rowHeight px).
+const CARD_H = 1;
+// Columns in the desktop grid.
+const COLS = 3;
+
 const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
-  // Use Context
   const { language } = useApp();
   const { chartType, setChartType, itemsPerPage } = useChart();
   const { visualTheme } = useVisualTheme();
+  const { actions } = useStockList();
   const t = useTranslation(language);
   const isMobile = useIsMobile();
 
-  // Local state for pagination (no need to be global)
   const [currentPage, setCurrentPage] = useState(1);
-
-  const [layout, setLayout] = useState<GridLayout.Layout[]>([]);
   const [containerWidth, setContainerWidth] = useState(1200);
 
-  // Calculate paginated stocks
-  const paginatedStocks = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return stocks.slice(startIndex, endIndex);
-  }, [stocks, currentPage, itemsPerPage]);
+  const cols = isMobile ? 1 : COLS;
+
+  // The current page's slice of the single source of truth (watchlist order).
+  const pageStart = (currentPage - 1) * itemsPerPage;
+  const paginatedStocks = useMemo(
+    () => stocks.slice(pageStart, pageStart + itemsPerPage),
+    [stocks, pageStart, itemsPerPage],
+  );
+
+  // Layout is DERIVED from the watchlist order — there is no separate persisted
+  // layout. Position in the array is the single source of truth; dragging a card
+  // commits a new order back to the watchlist (see handleDragStop).
+  const layout = useMemo<GridLayout.Layout[]>(
+    () =>
+      paginatedStocks.map((symbol, index) => ({
+        i: symbol,
+        x: index % cols,
+        y: Math.floor(index / cols) * CARD_H,
+        w: 1,
+        h: CARD_H,
+        minW: 1,
+        maxW: 1,
+        minH: CARD_H,
+        maxH: CARD_H,
+        static: false,
+      })),
+    [paginatedStocks, cols],
+  );
 
   // Stagger animation for stock cards
   const trails = useTrail(paginatedStocks.length, {
     from: { opacity: 0, transform: "translateY(20px)" },
     to: { opacity: 1, transform: "translateY(0px)" },
     config: animations.gentle,
-    reset: true, // Reset animation when page changes
+    reset: true,
   });
 
-  // Smart page navigation when stocks change
-  const previousStocksRef = useRef<string[]>([]);
+  // Keep pagination sensible as the watchlist changes: jump to the last page
+  // when a stock is added (so the new card is visible), and clamp the page if
+  // it falls out of range after a removal.
+  const previousLengthRef = useRef(stocks.length);
   useEffect(() => {
-    const previousStocks = previousStocksRef.current;
+    const previousLength = previousLengthRef.current;
+    const totalPages = Math.max(1, Math.ceil(stocks.length / itemsPerPage));
 
-    // Check if stocks actually changed (not just re-rendered)
-    const stocksString = stocks.join(",");
-    const previousStocksString = previousStocks.join(",");
-
-    if (stocksString !== previousStocksString && previousStocks.length > 0) {
-      const totalPages = Math.ceil(stocks.length / itemsPerPage);
-
-      // Stock was added (array grew) - jump to last page to show the new stock
-      if (stocks.length > previousStocks.length) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setCurrentPage(totalPages);
-      }
-      // Stock was removed (array shrunk) - stay on current page if valid
-      else if (stocks.length < previousStocks.length) {
-        // If current page is now out of range, go to last valid page
-        if (currentPage > totalPages) {
-          setCurrentPage(totalPages);
-        }
-        // Otherwise stay on current page
-      }
-
-      previousStocksRef.current = stocks;
-    } else if (previousStocks.length === 0) {
-      // First load, initialize the ref
-      previousStocksRef.current = stocks;
+    if (stocks.length > previousLength) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setCurrentPage(totalPages);
+    } else if (currentPage > totalPages) {
+      setCurrentPage(totalPages);
     }
-  }, [stocks, currentPage, itemsPerPage, setCurrentPage]);
 
-  // Memoized width update handler
+    previousLengthRef.current = stocks.length;
+  }, [stocks.length, itemsPerPage, currentPage]);
+
+  // Measure the container so GridLayout gets an accurate width.
   const updateWidth = useCallback(() => {
     const container = document.getElementById("grid-container");
     if (container && container.offsetWidth > 0) {
@@ -95,9 +101,7 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     }
   }, []);
 
-  // Update container width on resize
   useEffect(() => {
-    // Small delay to ensure DOM is fully rendered
     const timer = setTimeout(updateWidth, 100);
     window.addEventListener("resize", updateWidth);
     return () => {
@@ -106,159 +110,27 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     };
   }, [updateWidth]);
 
-  // Generate layout for 3x3 grid
-  useEffect(() => {
-    // Check URL parameter for reset
-    const urlParams = new URLSearchParams(window.location.search);
-    const shouldReset = urlParams.get("reset") === "true";
-
-    if (shouldReset) {
-      removeLocalStorageItem("dashboard-layout");
-      removeLocalStorageItem("dashboard-layout-version");
-      // Remove reset parameter from URL
-      urlParams.delete("reset");
-      const newUrl =
-        window.location.pathname +
-        (urlParams.toString() ? "?" + urlParams.toString() : "");
-      window.history.replaceState({}, "", newUrl);
-    }
-
-    // Check layout version
-    const layoutVersion = getLocalStorageItem<string>(
-      "dashboard-layout-version",
-      "",
-    );
-    if (layoutVersion !== "snapshot-v20-pagination") {
-      // Clear old layout when upgrading to pagination version
-      removeLocalStorageItem("dashboard-layout");
-      setLocalStorageItem(
-        "dashboard-layout-version",
-        "snapshot-v20-pagination",
+  // Commit a drag as a reorder of the watchlist (the single source of truth).
+  // The dragged layout is read row-major (top-to-bottom, left-to-right) to
+  // derive the new order for the current page, then spliced into the full list.
+  const handleDragStop = useCallback(
+    (newLayout: GridLayout.Layout[]) => {
+      const orderedPage = layoutToOrder(newLayout);
+      const newStocks = applyPageReorder(
+        stocks,
+        pageStart,
+        itemsPerPage,
+        orderedPage,
       );
-    }
-
-    // Load saved layout from localStorage (contains ALL stocks, not just current page)
-    const savedLayoutItems = getLocalStorageItem<GridLayout.Layout[]>(
-      "dashboard-layout",
-      [],
-    );
-    let existingLayout: Record<string, GridLayout.Layout> = {};
-
-    if (savedLayoutItems.length > 0) {
-      existingLayout = savedLayoutItems.reduce(
-        (acc, item) => {
-          acc[item.i] = item;
-          return acc;
-        },
-        {} as Record<string, GridLayout.Layout>,
-      );
-    }
-
-    // Generate layout for current page's stocks only
-    const newLayout = paginatedStocks.map((symbol, index) => {
-      // Use saved layout if exists for this stock
-      if (existingLayout[symbol]) {
-        return {
-          ...existingLayout[symbol],
-          i: symbol,
-          h: 1.0, // Force update height to current setting (220px)
-          minH: 1.0,
-          static: false,
-        };
+      if (newStocks !== stocks) {
+        actions.reorderStocks(newStocks);
       }
-      // Generate default 3x3 grid layout for new stocks
-      // SNAPSHOT MODE: Using h: 1.0 for compact card height (220px)
-      const row = Math.floor(index / 3);
-      return {
-        i: symbol,
-        x: index % 3, // Column (0-2)
-        y: row * 1.0, // Row position for auto-compaction
-        w: 1, // Width (1 unit = 1/3 of container)
-        h: 1.0, // Height (1.0 units = 220px * 1.0 = 220px)
-        minW: 1,
-        minH: 1.0,
-        static: false, // Allow auto-repositioning for compaction
-      };
-    });
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setLayout(newLayout);
-  }, [paginatedStocks]);
+    },
+    [stocks, pageStart, itemsPerPage, actions],
+  );
 
-  // Memoized layout change handler
-  const handleLayoutChange = useCallback((newLayout: GridLayout.Layout[]) => {
-    // Force update all items to have correct h value
-    const correctedLayout = newLayout.map((item) => ({
-      ...item,
-      h: 1.0, // Always enforce correct height (220px)
-      minH: 1.0,
-      static: false,
-    }));
-
-    // Check if all items are stacked vertically (all x=0)
-    if (correctedLayout.length >= 3) {
-      const allAtXZero =
-        correctedLayout.filter((item) => item.x === 0).length ===
-        correctedLayout.length;
-
-      if (allAtXZero) {
-        const fixedLayout = correctedLayout.map((item, index) => ({
-          ...item,
-          x: index % 3,
-          y: Math.floor(index / 3) * 1.0,
-        }));
-        setLayout(fixedLayout);
-
-        // Merge with existing layout from other pages
-        const savedFixedItems = getLocalStorageItem<GridLayout.Layout[]>(
-          "dashboard-layout",
-          [],
-        );
-        const allFixedLayouts: Record<string, GridLayout.Layout> =
-          savedFixedItems.reduce(
-            (acc, item) => {
-              acc[item.i] = item;
-              return acc;
-            },
-            {} as Record<string, GridLayout.Layout>,
-          );
-
-        // Update with current page's layout
-        fixedLayout.forEach((item) => {
-          allFixedLayouts[item.i] = item;
-        });
-
-        setLocalStorageItem("dashboard-layout", Object.values(allFixedLayouts));
-        return;
-      }
-    }
-
-    setLayout(correctedLayout);
-
-    // Merge current page layout with existing layouts from other pages
-    const savedItems = getLocalStorageItem<GridLayout.Layout[]>(
-      "dashboard-layout",
-      [],
-    );
-    const allLayouts: Record<string, GridLayout.Layout> = savedItems.reduce(
-      (acc, item) => {
-        acc[item.i] = item;
-        return acc;
-      },
-      {} as Record<string, GridLayout.Layout>,
-    );
-
-    // Update with current page's layout
-    correctedLayout.forEach((item) => {
-      allLayouts[item.i] = item;
-    });
-
-    setLocalStorageItem("dashboard-layout", Object.values(allLayouts));
-  }, []);
-
-  // Toggle chart type handler - must be before early return to follow Hooks rules
   const handleToggleChartType = useCallback(() => {
-    const newType = chartType === "line" ? "candlestick" : "line";
-    setChartType(newType);
+    setChartType(chartType === "line" ? "candlestick" : "line");
   }, [chartType, setChartType]);
 
   if (stocks.length === 0) {
@@ -318,7 +190,6 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         </h2>
 
         <div className="flex items-center gap-3">
-          {/* Page Navigator (only show if multiple pages) */}
           <PageNavigator
             totalItems={stocks.length}
             language={language}
@@ -368,16 +239,15 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         <GridLayout
           className="layout"
           layout={layout}
-          cols={isMobile ? 1 : 3}
+          cols={cols}
           rowHeight={isMobile ? 300 : 220}
           width={Math.max(containerWidth - (isMobile ? 16 : 48), 300)}
-          onLayoutChange={handleLayoutChange}
+          onDragStop={handleDragStop}
           draggableHandle=".drag-handle"
           compactType="vertical"
           preventCollision={false}
           isDraggable={!isMobile}
-          isResizable={!isMobile}
-          resizeHandles={["se"]}
+          isResizable={false}
         >
           {trails.map((style, index) => {
             const symbol = paginatedStocks[index];
