@@ -22,6 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Reliable "capture all" timing** — the full-watchlist screenshot no longer relies on a fixed 600 ms wait (which was shorter than the line chart's ~1 s entry animation, risking a mid-animation capture). Charts now disable their entry animation during export (new `ChartContext.isExporting` flag) and the capture waits for an actual paint (double `requestAnimationFrame` + a short measure margin) instead of a blind timer
 
+### Tested
+
+- **DashboardGrid drag → reorder integration test** — verifies a grid drag commits the new order to the watchlist (single source of truth) and re-renders, complementing the existing `gridReorder` unit tests
+- **Test setup** — added a `matchMedia` stub so components reading `prefers-color-scheme` render in jsdom
+
 ## [1.20.0] - 2026-06-12
 
 ### Added
