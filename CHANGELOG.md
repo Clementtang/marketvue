@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Keyboard & mobile reordering** — each stock tag in the Stock Manager now has "move earlier" / "move later" buttons that reorder the watchlist. This is the first way to arrange cards on mobile (where grid drag is disabled) and a keyboard-accessible alternative to drag-and-drop on desktop; both share the same `reorderStocks` single source of truth
 - **i18n keys** — `moveEarlier`, `moveLater` (en-US / zh-TW)
 
+### Changed
+
+- **Bundle code-splitting** — Vite now splits `node_modules` into cacheable vendor chunks (`react-vendor`, `recharts`, `react-grid-layout`, `vendor`) and `ThemeGuide` is lazy-loaded. The main app chunk dropped from ~1,124 KB to ~261 KB and the >500 KB chunk-size warning is gone; large libraries load in parallel and are cached across deploys
+
 ## [1.20.0] - 2026-06-12
 
 ### Added
