@@ -110,7 +110,8 @@ MarketVue is a modern stock tracking dashboard that supports real-time stock dat
 - 🔀 **Drag & Drop Reordering**
   - Freely drag stock cards to rearrange order
   - Precise grip icon drag handle (top-left corner)
-  - Layout order auto-saved
+  - Move earlier/later buttons on each stock tag (mobile- and keyboard-friendly)
+  - Arrangement is the watchlist order, auto-saved
 
 - 📱 **Responsive Design**
   - Support for desktop, tablet, and mobile
