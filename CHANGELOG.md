@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-06-13
+
+### Added
+
+- **Keyboard & mobile reordering** — each stock tag in the Stock Manager now has "move earlier" / "move later" buttons that reorder the watchlist. This is the first way to arrange cards on mobile (where grid drag is disabled) and a keyboard-accessible alternative to drag-and-drop on desktop; both share the same `reorderStocks` single source of truth
+- **i18n keys** — `moveEarlier`, `moveLater` (en-US / zh-TW)
+
 ## [1.20.0] - 2026-06-12
 
 ### Added

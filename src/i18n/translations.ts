@@ -29,6 +29,8 @@ export interface Translations {
   add: string;
   stocksAdded: string;
   trackedStocks: string;
+  moveEarlier: string;
+  moveLater: string;
   noStocksYet: string;
   maxStocksReached: string;
   stockAlreadyAdded: string;
@@ -206,6 +208,8 @@ export const translations: Record<Language, Translations> = {
     add: "Add",
     stocksAdded: "stocks added",
     trackedStocks: "Tracked Stocks:",
+    moveEarlier: "Move earlier",
+    moveLater: "Move later",
     noStocksYet: "No stocks added yet. Add your first stock to get started!",
     maxStocksReached: "Maximum 18 stocks allowed",
     stockAlreadyAdded: "Stock already added",
@@ -383,6 +387,8 @@ export const translations: Record<Language, Translations> = {
     add: "新增",
     stocksAdded: "支股票已新增",
     trackedStocks: "追蹤中的股票：",
+    moveEarlier: "前移",
+    moveLater: "後移",
     noStocksYet: "尚未新增股票。新增第一支股票開始追蹤！",
     maxStocksReached: "最多只能新增 18 支股票",
     stockAlreadyAdded: "股票已新增",
