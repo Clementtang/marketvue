@@ -27,6 +27,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **DashboardGrid drag → reorder integration test** — verifies a grid drag commits the new order to the watchlist (single source of truth) and re-renders, complementing the existing `gridReorder` unit tests
 - **Test setup** — added a `matchMedia` stub so components reading `prefers-color-scheme` render in jsdom
 
+### Removed
+
+- **Obsolete `dashboard-layout` localStorage** — a one-time `cleanupObsoleteKeys()` on startup removes the orphaned `dashboard-layout` / `dashboard-layout-version` entries left by pre-1.19.0 versions (arrangement is now derived from the watchlist order)
+
 ## [1.20.0] - 2026-06-12
 
 ### Added

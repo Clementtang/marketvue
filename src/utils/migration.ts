@@ -68,6 +68,32 @@ export function migrateFromLegacyStorage(defaultListName: string): StockListStat
 }
 
 /**
+ * localStorage keys written by earlier versions that are no longer read.
+ * As of v1.19.0 card arrangement is derived from the watchlist order, so the
+ * separate persisted grid layout is obsolete and only takes up space.
+ */
+const OBSOLETE_STORAGE_KEYS = [
+  'dashboard-layout',
+  'dashboard-layout-version',
+] as const;
+
+/**
+ * Remove obsolete localStorage keys left over from older versions.
+ * Safe to call on every startup; it is a no-op once the keys are gone.
+ */
+export function cleanupObsoleteKeys(): void {
+  try {
+    for (const key of OBSOLETE_STORAGE_KEYS) {
+      if (localStorage.getItem(key) !== null) {
+        localStorage.removeItem(key);
+      }
+    }
+  } catch (error) {
+    console.error('Failed to clean up obsolete localStorage keys:', error);
+  }
+}
+
+/**
  * Check if migration is needed
  */
 export function needsMigration(): boolean {
