@@ -1,4 +1,9 @@
-import { createContext, useContext, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  type ReactNode,
+} from "react";
 import { format, subMonths } from "date-fns";
 import type { DateRange } from "../components/TimeRangeSelector";
 import { usePersistedState } from "../hooks/usePersistedState";
@@ -9,6 +14,13 @@ interface ChartContextType {
   dateRange: DateRange;
   setDateRange: (range: DateRange) => void;
   itemsPerPage: number;
+  /**
+   * True while a screenshot is being taken. Charts disable their entry
+   * animation so the capture reflects final state immediately rather than a
+   * mid-animation frame. Transient (not persisted).
+   */
+  isExporting: boolean;
+  setIsExporting: (value: boolean) => void;
 }
 
 const ChartContext = createContext<ChartContextType | undefined>(undefined);
@@ -40,12 +52,16 @@ export function ChartProvider({ children }: ChartProviderProps) {
 
   const itemsPerPage = 9; // 3x3 grid
 
+  const [isExporting, setIsExporting] = useState(false);
+
   const value: ChartContextType = {
     chartType,
     setChartType,
     dateRange,
     setDateRange,
     itemsPerPage,
+    isExporting,
+    setIsExporting,
   };
 
   return (

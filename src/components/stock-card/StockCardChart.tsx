@@ -15,6 +15,7 @@ import { CHART_CONFIG } from "../../config/constants";
 import CandlestickChart from "../CandlestickChart";
 import ChartTooltip from "../common/ChartTooltip";
 import { smartAggregateStockData } from "../../utils/dateAggregation";
+import { useChart } from "../../contexts/ChartContext";
 
 interface StockCardChartProps {
   data: StockDataPoint[];
@@ -39,6 +40,11 @@ const StockCardChart = memo(function StockCardChart({
   t,
   isVisible,
 }: StockCardChartProps) {
+  // While exporting (screenshot), render charts in their final state with no
+  // entry animation so the capture is deterministic.
+  const { isExporting } = useChart();
+  const animate = !isExporting;
+
   // Smart aggregation based on data length
   const { data: aggregatedData, interval } = useMemo(() => {
     return smartAggregateStockData(data);
@@ -121,7 +127,7 @@ const StockCardChart = memo(function StockCardChart({
               strokeWidth={2}
               dot={false}
               name={t.close}
-              isAnimationActive={true}
+              isAnimationActive={animate}
               animationBegin={0}
               animationDuration={1000}
               animationEasing="ease-in-out"
@@ -135,7 +141,7 @@ const StockCardChart = memo(function StockCardChart({
               dot={false}
               name={t.ma20}
               strokeDasharray="5 5"
-              isAnimationActive={true}
+              isAnimationActive={animate}
               animationBegin={200}
               animationDuration={1000}
               animationEasing="ease-in-out"
@@ -149,7 +155,7 @@ const StockCardChart = memo(function StockCardChart({
               dot={false}
               name={t.ma60}
               strokeDasharray="3 3"
-              isAnimationActive={true}
+              isAnimationActive={animate}
               animationBegin={400}
               animationDuration={1000}
               animationEasing="ease-in-out"

@@ -32,7 +32,7 @@ const COLS = 3;
 
 const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   const { language } = useApp();
-  const { chartType, setChartType, itemsPerPage } = useChart();
+  const { chartType, setChartType, itemsPerPage, setIsExporting } = useChart();
   const { visualTheme } = useVisualTheme();
   const { actions } = useStockList();
   const t = useTranslation(language);
@@ -147,10 +147,14 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
     setChartType(chartType === "line" ? "candlestick" : "line");
   }, [chartType, setChartType]);
 
-  // Prepare a full-watchlist screenshot: warm the React Query cache for every
-  // stock (so no card renders a loading skeleton), then render them all on one
-  // page and wait for charts to settle. Resolves once the grid is ready to be
-  // captured by ScreenshotButton.
+  // Prepare a full-watchlist screenshot. The capture is made deterministic
+  // rather than timing-dependent:
+  //   1. Await data for every stock so no card shows a loading skeleton.
+  //   2. Set isExporting, which disables chart entry animations (the line
+  //      chart otherwise animates for ~1s — longer than any fixed wait).
+  //   3. Render every stock on one page and wait for the browser to actually
+  //      paint (double rAF) plus a short margin for ResponsiveContainer to
+  //      measure newly-mounted charts.
   const prepareFullCapture = useCallback(async () => {
     await Promise.allSettled(
       stocks.map((symbol) =>
@@ -161,14 +165,21 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         }),
       ),
     );
+    setIsExporting(true);
     setIsCapturingAll(true);
-    // Let React render every card and Recharts finish its entry animation.
-    await new Promise((resolve) => setTimeout(resolve, 600));
-  }, [stocks, startDate, endDate]);
+    // Wait for React to commit and the browser to paint the newly rendered
+    // cards, then a short margin for chart containers to measure their size.
+    await new Promise<void>((resolve) => {
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => setTimeout(resolve, 150)),
+      );
+    });
+  }, [stocks, startDate, endDate, setIsExporting]);
 
   const endFullCapture = useCallback(() => {
     setIsCapturingAll(false);
-  }, []);
+    setIsExporting(false);
+  }, [setIsExporting]);
 
   if (stocks.length === 0) {
     return (

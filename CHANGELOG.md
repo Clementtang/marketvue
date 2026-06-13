@@ -18,6 +18,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Bundle code-splitting** — Vite now splits `node_modules` into cacheable vendor chunks (`react-vendor`, `recharts`, `react-grid-layout`, `vendor`) and `ThemeGuide` is lazy-loaded. The main app chunk dropped from ~1,124 KB to ~261 KB and the >500 KB chunk-size warning is gone; large libraries load in parallel and are cached across deploys
 
+### Fixed
+
+- **Reliable "capture all" timing** — the full-watchlist screenshot no longer relies on a fixed 600 ms wait (which was shorter than the line chart's ~1 s entry animation, risking a mid-animation capture). Charts now disable their entry animation during export (new `ChartContext.isExporting` flag) and the capture waits for an actual paint (double `requestAnimationFrame` + a short measure margin) instead of a blind timer
+
 ## [1.20.0] - 2026-06-12
 
 ### Added
