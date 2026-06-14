@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Copy, ClipboardPaste } from 'lucide-react';
+import { X, Copy, ClipboardPaste, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useTranslation } from '../i18n/translations';
 import { useApp } from '../contexts/AppContext';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
@@ -86,6 +86,24 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
     if (success) {
       showToast('success', t.listDeleted || 'List deleted');
     }
+  };
+
+  // Move a stock one position earlier (-1) or later (+1) in the watchlist.
+  // This is the keyboard-accessible reordering path and the only way to
+  // reorder on mobile, where grid drag is disabled. It shares the single
+  // source of truth (reorderStocks) with desktop drag-and-drop.
+  const moveStock = (symbol: string, direction: -1 | 1) => {
+    const index = stocks.indexOf(symbol);
+    const target = index + direction;
+    if (index === -1 || target < 0 || target >= stocks.length) {
+      return;
+    }
+    const reordered = [...stocks];
+    [reordered[index], reordered[target]] = [
+      reordered[target],
+      reordered[index],
+    ];
+    actions.reorderStocks(reordered);
   };
 
   const handleAddStock = (symbol: string) => {
@@ -273,29 +291,51 @@ const StockManager = ({ stocks, onAddStock, onRemoveStock }: StockManagerProps) 
           {/* Stock Tags */}
           {stocks.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {stocks.map((symbol) => (
-                <div
-                  key={symbol}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors ${
-                    visualTheme === 'warm'
-                      ? 'bg-warm-accent-50 dark:bg-warm-accent-900/30 text-warm-accent-700 dark:text-warm-accent-300 border-warm-accent-200 dark:border-warm-accent-700'
-                      : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700'
-                  }`}
-                >
-                  <span className="font-medium">{symbol}</span>
-                  <button
-                    onClick={() => onRemoveStock(symbol)}
-                    className={`rounded-full p-0.5 transition-colors ${
+              {stocks.map((symbol, index) => {
+                const iconButtonClass = `rounded-full p-0.5 transition-colors disabled:opacity-30 disabled:cursor-not-allowed ${
+                  visualTheme === 'warm'
+                    ? 'hover:bg-warm-accent-100 dark:hover:bg-warm-accent-800/50'
+                    : 'hover:bg-blue-100 dark:hover:bg-blue-800/50'
+                }`;
+                return (
+                  <div
+                    key={symbol}
+                    className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full border transition-colors ${
                       visualTheme === 'warm'
-                        ? 'hover:bg-warm-accent-100 dark:hover:bg-warm-accent-800/50'
-                        : 'hover:bg-blue-100 dark:hover:bg-blue-800/50'
+                        ? 'bg-warm-accent-50 dark:bg-warm-accent-900/30 text-warm-accent-700 dark:text-warm-accent-300 border-warm-accent-200 dark:border-warm-accent-700'
+                        : 'bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700'
                     }`}
-                    title={`Remove ${symbol}`}
                   >
-                    <X size={16} />
-                  </button>
-                </div>
-              ))}
+                    <button
+                      onClick={() => moveStock(symbol, -1)}
+                      disabled={index === 0}
+                      className={iconButtonClass}
+                      title={`${t.moveEarlier}: ${symbol}`}
+                      aria-label={`${t.moveEarlier}: ${symbol}`}
+                    >
+                      <ChevronLeft size={16} />
+                    </button>
+                    <span className="font-medium">{symbol}</span>
+                    <button
+                      onClick={() => moveStock(symbol, 1)}
+                      disabled={index === stocks.length - 1}
+                      className={iconButtonClass}
+                      title={`${t.moveLater}: ${symbol}`}
+                      aria-label={`${t.moveLater}: ${symbol}`}
+                    >
+                      <ChevronRight size={16} />
+                    </button>
+                    <button
+                      onClick={() => onRemoveStock(symbol)}
+                      className={`ml-0.5 ${iconButtonClass}`}
+                      title={`Remove ${symbol}`}
+                      aria-label={`Remove ${symbol}`}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <div className={`text-center py-6 rounded-xl ${

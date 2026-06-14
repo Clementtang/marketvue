@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, lazy, Suspense } from "react";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/react";
@@ -7,7 +7,6 @@ import TimeRangeSelector from "./components/TimeRangeSelector";
 import DashboardGrid from "./components/DashboardGrid";
 import ControlPanel from "./components/ControlPanel";
 import ThemeSettings from "./components/ThemeSettings";
-import ThemeGuide from "./components/ThemeGuide";
 import NotificationBanner from "./components/NotificationBanner";
 import Footer from "./components/Footer";
 import { useTranslation } from "./i18n/translations";
@@ -23,6 +22,10 @@ import {
 import { StockListProvider, useStockList } from "./contexts/StockListContext";
 import { ToastContainer } from "./components/common/Toast";
 import { queryClient } from "./config/queryClient";
+
+// ThemeGuide is a full-screen view shown only on demand; lazy-load it so its
+// bundle (and its section sub-components) stays out of the initial payload.
+const ThemeGuide = lazy(() => import("./components/ThemeGuide"));
 
 function AppContent() {
   // Use Context hooks
@@ -63,7 +66,9 @@ function AppContent() {
   if (showThemeGuide) {
     return (
       <ErrorBoundary language={language}>
-        <ThemeGuide onClose={() => setShowThemeGuide(false)} />
+        <Suspense fallback={null}>
+          <ThemeGuide onClose={() => setShowThemeGuide(false)} />
+        </Suspense>
       </ErrorBoundary>
     );
   }

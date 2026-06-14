@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.21.0] - 2026-06-13
+
+### Added
+
+- **Keyboard & mobile reordering** — each stock tag in the Stock Manager now has "move earlier" / "move later" buttons that reorder the watchlist. This is the first way to arrange cards on mobile (where grid drag is disabled) and a keyboard-accessible alternative to drag-and-drop on desktop; both share the same `reorderStocks` single source of truth
+- **i18n keys** — `moveEarlier`, `moveLater` (en-US / zh-TW)
+
+### Changed
+
+- **Bundle code-splitting** — Vite now splits `node_modules` into cacheable vendor chunks (`react-vendor`, `recharts`, `react-grid-layout`, `vendor`) and `ThemeGuide` is lazy-loaded. The main app chunk dropped from ~1,124 KB to ~261 KB and the >500 KB chunk-size warning is gone; large libraries load in parallel and are cached across deploys
+
+### Fixed
+
+- **Reliable "capture all" timing** — the full-watchlist screenshot no longer relies on a fixed 600 ms wait (which was shorter than the line chart's ~1 s entry animation, risking a mid-animation capture). Charts now disable their entry animation during export (new `ChartContext.isExporting` flag) and the capture waits for an actual paint (double `requestAnimationFrame` + a short measure margin) instead of a blind timer
+
+### Tested
+
+- **DashboardGrid drag → reorder integration test** — verifies a grid drag commits the new order to the watchlist (single source of truth) and re-renders, complementing the existing `gridReorder` unit tests
+- **Test setup** — added a `matchMedia` stub so components reading `prefers-color-scheme` render in jsdom
+
+### Removed
+
+- **Obsolete `dashboard-layout` localStorage** — a one-time `cleanupObsoleteKeys()` on startup removes the orphaned `dashboard-layout` / `dashboard-layout-version` entries left by pre-1.19.0 versions (arrangement is now derived from the watchlist order)
+
 ## [1.20.0] - 2026-06-12
 
 ### Added
