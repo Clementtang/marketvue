@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.22.0] - 2026-06-14
+
+### Added
+
+- **Self-describing screenshots** — captured images now include a caption baked into the top of the grid: the active watchlist name and the date range (`MarketVue · <start> ～ <end>`). Shared screenshots are now self-explanatory. The caption only appears in the exported image, not in the live UI
+- **Consistent export rendering** — the `isExporting` flag is now applied to every screenshot path (single page, download, and capture-all), so charts render in their final state (no entry animation) and the caption is present for all captures. Each capture waits for an actual paint before rasterizing
+
 ## [1.21.0] - 2026-06-13
 
 ### Added

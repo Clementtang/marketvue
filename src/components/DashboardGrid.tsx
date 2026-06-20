@@ -32,9 +32,9 @@ const COLS = 3;
 
 const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   const { language } = useApp();
-  const { chartType, setChartType, itemsPerPage, setIsExporting } = useChart();
+  const { chartType, setChartType, itemsPerPage, isExporting } = useChart();
   const { visualTheme } = useVisualTheme();
-  const { actions } = useStockList();
+  const { actions, activeList } = useStockList();
   const t = useTranslation(language);
   const isMobile = useIsMobile();
 
@@ -148,11 +148,10 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
   }, [chartType, setChartType]);
 
   // Prepare a full-watchlist screenshot. The capture is made deterministic
-  // rather than timing-dependent:
+  // rather than timing-dependent (ScreenshotButton owns the isExporting flag,
+  // which disables chart entry animations and shows the caption):
   //   1. Await data for every stock so no card shows a loading skeleton.
-  //   2. Set isExporting, which disables chart entry animations (the line
-  //      chart otherwise animates for ~1s — longer than any fixed wait).
-  //   3. Render every stock on one page and wait for the browser to actually
+  //   2. Render every stock on one page and wait for the browser to actually
   //      paint (double rAF) plus a short margin for ResponsiveContainer to
   //      measure newly-mounted charts.
   const prepareFullCapture = useCallback(async () => {
@@ -165,7 +164,6 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         }),
       ),
     );
-    setIsExporting(true);
     setIsCapturingAll(true);
     // Wait for React to commit and the browser to paint the newly rendered
     // cards, then a short margin for chart containers to measure their size.
@@ -174,12 +172,11 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
         requestAnimationFrame(() => setTimeout(resolve, 150)),
       );
     });
-  }, [stocks, startDate, endDate, setIsExporting]);
+  }, [stocks, startDate, endDate]);
 
   const endFullCapture = useCallback(() => {
     setIsCapturingAll(false);
-    setIsExporting(false);
-  }, [setIsExporting]);
+  }, []);
 
   if (stocks.length === 0) {
     return (
@@ -289,6 +286,36 @@ const DashboardGrid = ({ stocks, startDate, endDate }: DashboardGridProps) => {
       </div>
 
       <div id="dashboard-grid-layout">
+        {/* Caption baked into the screenshot so a shared image is
+            self-describing. Only rendered while exporting. */}
+        {isExporting && (
+          <div
+            className={`mb-4 px-1 flex items-baseline justify-between gap-4 border-b pb-2 ${
+              visualTheme === "warm"
+                ? "border-warm-200 dark:border-warm-700"
+                : "border-gray-200 dark:border-gray-700"
+            }`}
+          >
+            <h3
+              className={`text-lg font-semibold truncate ${
+                visualTheme === "warm"
+                  ? "text-warm-800 dark:text-warm-100 font-serif"
+                  : "text-gray-800 dark:text-white"
+              }`}
+            >
+              {activeList.name}
+            </h3>
+            <span
+              className={`text-sm whitespace-nowrap ${
+                visualTheme === "warm"
+                  ? "text-warm-600 dark:text-warm-400"
+                  : "text-gray-500 dark:text-gray-400"
+              }`}
+            >
+              MarketVue · {startDate} ～ {endDate}
+            </span>
+          </div>
+        )}
         <GridLayout
           className="layout"
           layout={layout}
