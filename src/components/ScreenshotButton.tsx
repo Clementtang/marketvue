@@ -6,7 +6,15 @@ import {
   isClipboardImageSupported,
 } from '../utils/screenshot';
 import { useVisualTheme } from '../contexts/VisualThemeContext';
+import { useChart } from '../contexts/ChartContext';
 import { useTranslation, type Language } from '../i18n/translations';
+
+/** Resolve after the browser has painted (two animation frames). */
+function nextPaint(): Promise<void> {
+  return new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+  );
+}
 
 interface ScreenshotButtonProps {
   targetElementId: string;
@@ -39,6 +47,7 @@ const ScreenshotButton = ({
   fullCapture,
 }: ScreenshotButtonProps) => {
   const { visualTheme } = useVisualTheme();
+  const { setIsExporting } = useChart();
   const t = useTranslation(language);
   const isWarm = visualTheme === 'warm';
   const canCopy = isClipboardImageSupported();
@@ -55,38 +64,48 @@ const ScreenshotButton = ({
     if (isCapturing) return;
     setIsCapturing(true);
     setFeedback(null);
-    // Let the UI settle (drop hover/focus states) before rasterizing.
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const result = await captureScreenshot(targetElementId);
-    setIsCapturing(false);
-    showFeedback(result);
-  }, [isCapturing, targetElementId, showFeedback]);
+    setIsExporting(true);
+    try {
+      // Wait for the export caption + static charts to paint before rasterizing.
+      await nextPaint();
+      showFeedback(await captureScreenshot(targetElementId));
+    } finally {
+      setIsExporting(false);
+      setIsCapturing(false);
+    }
+  }, [isCapturing, targetElementId, showFeedback, setIsExporting]);
 
   const handleDownload = useCallback(async () => {
     if (isCapturing) return;
     setIsCapturing(true);
     setFeedback(null);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    const ok = await captureAndDownload(targetElementId);
-    setIsCapturing(false);
-    showFeedback(ok ? 'downloaded' : 'failed');
-  }, [isCapturing, targetElementId, showFeedback]);
+    setIsExporting(true);
+    try {
+      await nextPaint();
+      const ok = await captureAndDownload(targetElementId);
+      showFeedback(ok ? 'downloaded' : 'failed');
+    } finally {
+      setIsExporting(false);
+      setIsCapturing(false);
+    }
+  }, [isCapturing, targetElementId, showFeedback, setIsExporting]);
 
   const handleCaptureAll = useCallback(async () => {
     if (isCapturing || !fullCapture) return;
     setIsCapturing(true);
     setFeedback(null);
+    setIsExporting(true);
     try {
       await fullCapture.prepare();
-      const result = await captureScreenshot(targetElementId);
-      showFeedback(result);
+      showFeedback(await captureScreenshot(targetElementId));
     } catch {
       showFeedback('failed');
     } finally {
       fullCapture.cleanup();
+      setIsExporting(false);
       setIsCapturing(false);
     }
-  }, [isCapturing, fullCapture, targetElementId, showFeedback]);
+  }, [isCapturing, fullCapture, targetElementId, showFeedback, setIsExporting]);
 
   const primaryClasses = isWarm
     ? 'bg-warm-accent-500 hover:bg-warm-accent-600 dark:bg-warm-accent-600 dark:hover:bg-warm-accent-700 rounded-2xl'
