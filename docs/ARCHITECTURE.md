@@ -312,7 +312,7 @@ Component Mount → react-spring hooks
 - **Persistence**: All lists and active list saved in localStorage
 - **Screenshot Compatible**: Each list can be screenshot independently
 
-### Screenshot Feature (v1.5.0, extended v1.18.0–v1.20.0)
+### Screenshot Feature (v1.5.0, extended v1.18.0–v1.22.0)
 
 - **Library**: modern-screenshot (supports modern CSS)
 - **Output size**: Scaled by width to a target (default 1920px), preserving the
@@ -324,6 +324,10 @@ Component Mount → react-spring hooks
 - **Page Support**: Capture the current page, or use "All" to capture every
   stock across all pages in one image (cache is pre-warmed first to avoid
   loading skeletons)
+- **Self-describing caption** (v1.22.0): the exported image embeds the active
+  watchlist name and date range; the `ChartContext.isExporting` flag (set for
+  every capture path) disables chart entry animation and renders the caption,
+  and capture waits for an actual paint before rasterizing
 
 ### Clipboard Import/Export (v1.5.1)
 
